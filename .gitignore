@@ -1,9 +1,12 @@
 # Ignore tudo no repositório pai
 *
+/frontend/node_modules
+/backend/node_modules
 
-# Exceto os arquivos essenciais e a pasta frontend
+# Exceto os arquivos essenciais, pastas dos projetos e docker
 !/.gitignore
 !/frontend/
 !/frontend/**
 !/backend/
 !/backend/**
+!/docker-compose.yml
