@@ -82,4 +82,23 @@ export declare class CredenciadosController {
         tipo: string;
         criadoEm: Date;
     }>;
+    buscarPorCpf(cpf: string): Promise<{
+        nomeCompleto: string;
+        cpf: string;
+        rg: string;
+        celular: string;
+        email: string;
+        municipio: string;
+        uf: string;
+        aceitouLgpd: boolean;
+        ccir: string | null;
+        nomePropriedade: string | null;
+        cnpj: string | null;
+        nomeVeiculo: string | null;
+        siteEmpresa: string | null;
+        nomeEmpresa: string | null;
+        id: string;
+        tipo: string;
+        criadoEm: Date;
+    }>;
 }

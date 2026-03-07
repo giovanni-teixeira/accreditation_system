@@ -46,7 +46,6 @@ export async function cadastrarUsuario(formData: any): Promise<CadastroResponse>
             throw new Error('Perfil inválido no sistema.');
         }
 
-        /*
         // Requisição para o backend NestJS rodando na porta 3001
         const res = await fetch(`http://localhost:3001/credenciados/${role}`, {
             method: 'POST',
@@ -65,16 +64,12 @@ export async function cadastrarUsuario(formData: any): Promise<CadastroResponse>
 
             throw new Error(errorMessage);
         }
-        */
 
-        // TESTE LOCAL SEM BANCO DE DADOS
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // console.log("Novo credenciado salvo [Backend Action Realizado]:", novoUsuario);
+        const usuarioCriado = await res.json();
 
         return {
             sucesso: true,
-            mensagem: `Cadastro realizado com sucesso! Bem-vindo(a), ${novoUsuario.nomeCompleto}.`
+            mensagem: `Cadastro realizado com sucesso! Bem-vindo(a), ${usuarioCriado.nomeCompleto}.`
         };
 
     } catch (error: any) {

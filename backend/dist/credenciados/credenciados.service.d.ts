@@ -7,6 +7,25 @@ export declare class CredenciadosService {
     private readonly prisma;
     constructor(prisma: PrismaService);
     validarCpfUnico(cpf: string): Promise<void>;
+    buscarPorCpf(cpf: string): Promise<{
+        nomeCompleto: string;
+        cpf: string;
+        rg: string;
+        celular: string;
+        email: string;
+        municipio: string;
+        uf: string;
+        aceitouLgpd: boolean;
+        ccir: string | null;
+        nomePropriedade: string | null;
+        cnpj: string | null;
+        nomeVeiculo: string | null;
+        siteEmpresa: string | null;
+        nomeEmpresa: string | null;
+        id: string;
+        tipo: string;
+        criadoEm: Date;
+    }>;
     cadastrarVisitante(dto: CriarVisitanteDto): Promise<{
         nomeCompleto: string;
         cpf: string;

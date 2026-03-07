@@ -16,6 +16,14 @@ export class CredenciadosService {
         }
     }
 
+    async buscarPorCpf(cpf: string) {
+        const credenciado = await this.prisma.credenciado.findUnique({ where: { cpf } });
+        if (!credenciado) {
+            throw new BadRequestException('Credenciado não encontrado para o CPF informado');
+        }
+        return credenciado;
+    }
+
     async cadastrarVisitante(dto: CriarVisitanteDto) {
         await this.validarCpfUnico(dto.cpf);
         return this.prisma.credenciado.create({

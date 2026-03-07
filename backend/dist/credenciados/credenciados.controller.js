@@ -37,6 +37,9 @@ let CredenciadosController = class CredenciadosController {
     async cadastrarExpositor(criarExpositorDto) {
         return this.credenciadosService.cadastrarExpositor(criarExpositorDto);
     }
+    async buscarPorCpf(cpf) {
+        return this.credenciadosService.buscarPorCpf(cpf);
+    }
 };
 exports.CredenciadosController = CredenciadosController;
 __decorate([
@@ -75,6 +78,16 @@ __decorate([
     __metadata("design:paramtypes", [criar_expositor_dto_1.CriarExpositorDto]),
     __metadata("design:returntype", Promise)
 ], CredenciadosController.prototype, "cadastrarExpositor", null);
+__decorate([
+    (0, common_1.Get)('cpf/:cpf'),
+    (0, swagger_1.ApiOperation)({ summary: 'Buscar credenciado por CPF', description: 'Retorna os dados cadastrados para um CPF específico.' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Dados encontrados.' }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'Credenciado não encontrado.' }),
+    __param(0, (0, common_1.Param)('cpf')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], CredenciadosController.prototype, "buscarPorCpf", null);
 exports.CredenciadosController = CredenciadosController = __decorate([
     (0, swagger_1.ApiTags)('Credenciamento'),
     (0, common_1.Controller)('credenciados'),

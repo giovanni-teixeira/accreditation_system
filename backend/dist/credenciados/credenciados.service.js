@@ -23,6 +23,13 @@ let CredenciadosService = class CredenciadosService {
             throw new common_1.BadRequestException('Já existe um credenciado com este CPF');
         }
     }
+    async buscarPorCpf(cpf) {
+        const credenciado = await this.prisma.credenciado.findUnique({ where: { cpf } });
+        if (!credenciado) {
+            throw new common_1.BadRequestException('Credenciado não encontrado para o CPF informado');
+        }
+        return credenciado;
+    }
     async cadastrarVisitante(dto) {
         await this.validarCpfUnico(dto.cpf);
         return this.prisma.credenciado.create({

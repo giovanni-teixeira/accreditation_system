@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param } from '@nestjs/common';
 import { CredenciadosService } from './credenciados.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CriarVisitanteDto } from './dto/criar-visitante.dto';
@@ -37,5 +37,13 @@ export class CredenciadosController {
     @ApiResponse({ status: 201, description: 'Expositor cadastrado.' })
     async cadastrarExpositor(@Body() criarExpositorDto: CriarExpositorDto) {
         return this.credenciadosService.cadastrarExpositor(criarExpositorDto);
+    }
+
+    @Get('cpf/:cpf')
+    @ApiOperation({ summary: 'Buscar credenciado por CPF', description: 'Retorna os dados cadastrados para um CPF específico.' })
+    @ApiResponse({ status: 200, description: 'Dados encontrados.' })
+    @ApiResponse({ status: 400, description: 'Credenciado não encontrado.' })
+    async buscarPorCpf(@Param('cpf') cpf: string) {
+        return this.credenciadosService.buscarPorCpf(cpf);
     }
 }
