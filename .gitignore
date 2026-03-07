@@ -1,0 +1,7 @@
+# Ignore tudo no repositório pai
+*
+
+# Exceto os arquivos essenciais e a pasta frontend
+!/.gitignore
+!/frontend/
+!/frontend/**

@@ -1,0 +1,292 @@
+.formContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.sectionTitle {
+    color: var(--coffee-brown);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Radio Button Grid for Roles */
+.roleSelection {
+    margin-bottom: 0.5rem;
+}
+
+.radioGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 1rem;
+}
+
+.radioCard {
+    background-color: var(--white);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1.25rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.radioCard:hover {
+    border-color: var(--light-green);
+    background-color: var(--light-green);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.radioCard.selected {
+    border-color: var(--primary-green);
+    background-color: var(--light-green);
+    box-shadow: 0 0 0 1px var(--primary-green);
+}
+
+.hiddenRadio {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.cardIcon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    transition: transform var(--transition-fast);
+}
+
+.radioCard:hover .cardIcon,
+.radioCard.selected .cardIcon {
+    transform: scale(1.1);
+}
+
+.cardLabel {
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--text-main);
+}
+
+.radioCard.selected .cardLabel {
+    color: var(--dark-green);
+    font-weight: 600;
+}
+
+/* Dynamic Form Animation */
+.dynamicFormAnimation {
+    animation: slideDown 0.4s ease-out forwards;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Input Fields Grid */
+.inputGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.inputGroupFull {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.inputGroup label,
+.inputGroupFull label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.inputGroup input,
+.inputGroup select,
+.inputGroupFull input,
+.inputGroupFull select {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    background-color: var(--bg-color);
+}
+
+.inputGroup input:focus,
+.inputGroup select:focus,
+.inputGroupFull input:focus,
+.inputGroupFull select:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
+}
+
+/* LGPD Checkbox Customization */
+.lgpdSection {
+    margin-top: 2rem;
+    background-color: var(--bg-color);
+    padding: 1.25rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--coffee-brown);
+}
+
+.checkboxLabel {
+    display: flex;
+    position: relative;
+    padding-left: 2rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    user-select: none;
+    line-height: 1.4;
+    align-items: flex-start;
+}
+
+.checkboxLabel input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: var(--white);
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    transition: all var(--transition-fast);
+}
+
+.checkboxLabel:hover input~.checkmark {
+    border-color: var(--primary-green);
+}
+
+.checkboxLabel input:checked~.checkmark {
+    background-color: var(--primary-green);
+    border-color: var(--primary-green);
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.checkboxLabel input:checked~.checkmark:after {
+    display: block;
+}
+
+.checkboxLabel .checkmark:after {
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Submit Button */
+.submitBtn {
+    background-color: var(--primary-green);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-top: 1rem;
+    width: 100%;
+    box-shadow: var(--shadow-md);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.submitBtn:hover {
+    background-color: var(--dark-green);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.submitBtn:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .inputGrid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .radioGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Feedback Messages */
+.feedbackMessage {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    text-align: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.feedbackMessage.success {
+    background-color: var(--light-green);
+    color: var(--dark-green);
+    border: 1px solid var(--primary-green);
+}
+
+.feedbackMessage.error {
+    background-color: #fdeded;
+    color: var(--error);
+    border: 1px solid #f5c6c6;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

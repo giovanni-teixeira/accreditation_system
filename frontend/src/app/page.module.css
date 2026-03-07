@@ -1,0 +1,139 @@
+.main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.95)),
+    url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+  /* Subtle wood texture background */
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  width: 100%;
+}
+
+.header {
+  padding: 3rem 0;
+  text-align: center;
+  animation: fadeInDown 0.8s ease-out;
+}
+
+.logoContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Stylish text logo while image isn't available */
+.logoText {
+  font-size: 5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: baseline;
+  line-height: 1;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.alta {
+  color: var(--primary-green);
+}
+
+.cafe {
+  color: var(--dark-green);
+}
+
+.date {
+  color: var(--coffee-brown);
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: 1px;
+  margin-top: 1rem;
+  border-bottom: 2px solid var(--primary-green);
+  padding-bottom: 0.5rem;
+}
+
+.tagline {
+  color: var(--light-brown);
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-top: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.formSection {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0 5rem;
+}
+
+.formCard {
+  background-color: var(--white);
+  border-radius: 12px;
+  padding: 3rem;
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 800px;
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+  border-top: 4px solid var(--primary-green);
+}
+
+.formTitle {
+  color: var(--dark-brown);
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.formSubtitle {
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .logoText {
+    font-size: 3.5rem;
+  }
+
+  .date {
+    font-size: 1rem;
+  }
+
+  .tagline {
+    font-size: 1.2rem;
+  }
+
+  .formCard {
+    padding: 2rem 1.5rem;
+  }
+}
