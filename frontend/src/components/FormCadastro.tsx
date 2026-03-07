@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, ChangeEvent, FormEvent } from 'react';
 import styles from './FormCadastro.module.css';
-import { cadastrarUsuario } from '@/controllers/CredenciadoController';
+import { cadastrarUsuario, CadastroResponse } from '@/controllers/CredenciadoController';
 
 const ROLES = [
     { id: 'expositor', label: 'Expositor', icon: '🏢' },
@@ -11,30 +11,50 @@ const ROLES = [
     { id: 'imprensa', label: 'Imprensa', icon: '📸' }
 ];
 
+interface FormDataState {
+    nomeCompleto: string;
+    cpf: string;
+    rg: string;
+    celular: string;
+    email: string;
+    municipio: string;
+    uf: string;
+    aceitouLgpd: boolean;
+    cnpj: string;
+    siteEmpresa: string;
+    nomeEmpresa: string;
+    ccir: string;
+    nomePropriedade: string;
+    nomeVeiculo: string;
+}
+
 export default function FormCadastro() {
-    const [role, setRole] = useState('');
+    const [role, setRole] = useState<string>('');
     const [isPending, startTransition] = useTransition();
-    const [feedback, setFeedback] = useState(null);
-    const [formData, setFormData] = useState({
+    const [feedback, setFeedback] = useState<{ tipo: 'sucesso' | 'erro'; mensagem: string } | null>(null);
+
+    const [formData, setFormData] = useState<FormDataState>({
         nomeCompleto: '', cpf: '', rg: '', celular: '', email: '',
         municipio: '', uf: '', aceitouLgpd: false,
         cnpj: '', siteEmpresa: '', nomeEmpresa: '',
         ccir: '', nomePropriedade: '', nomeVeiculo: ''
     });
 
-    const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value, type } = e.target;
+        const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
+
         setFormData(prev => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setFeedback(null);
         startTransition(async () => {
-            const result = await cadastrarUsuario({ role, ...formData });
+            const result: CadastroResponse = await cadastrarUsuario({ role, ...formData });
             setFeedback({ tipo: result.sucesso ? 'sucesso' : 'erro', mensagem: result.mensagem });
             if (result.sucesso) {
                 setRole('');
@@ -199,7 +219,15 @@ export default function FormCadastro() {
 
                     {feedback && (
                         <div className={`${styles.feedbackMessage} ${feedback.tipo === 'sucesso' ? styles.success : styles.error}`}>
-                            {feedback.mensagem}
+                            {feedback.tipo === 'erro' && feedback.mensagem.includes(', ') ? (
+                                <ul className={styles.errorList}>
+                                    {feedback.mensagem.split(', ').map((msg, i) => (
+                                        <li key={i}>{msg}</li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                feedback.mensagem
+                            )}
                         </div>
                     )}
                 </div>

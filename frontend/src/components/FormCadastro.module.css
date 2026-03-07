@@ -277,6 +277,17 @@
     background-color: #fdeded;
     color: var(--error);
     border: 1px solid #f5c6c6;
+    text-align: left;
+}
+
+.errorList {
+    margin: 0;
+    padding-left: 1.2rem;
+    font-size: 0.9rem;
+}
+
+.errorList li {
+    margin-bottom: 0.2rem;
 }
 
 @keyframes fadeIn {

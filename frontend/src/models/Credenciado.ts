@@ -1,16 +1,36 @@
-// src/models/Credenciado.js
+export interface ICredenciadoArgs {
+    nomeCompleto: string;
+    cpf: string;
+    rg: string;
+    celular: string;
+    email: string;
+    municipio: string;
+    uf: string;
+    aceitouLgpd: boolean;
+}
 
 export class Credenciado {
-    constructor({ nomeCompleto, cpf, rg, celular, email, municipio, uf, aceitouLgpd }) {
+    id: string;
+    nomeCompleto: string;
+    cpf: string;
+    rg: string;
+    celular: string;
+    email: string;
+    municipio: string;
+    uf: string;
+    aceitouLgpd: boolean;
+    tipo: string;
+
+    constructor(data: ICredenciadoArgs) {
         this.id = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
-        this.nomeCompleto = nomeCompleto;
-        this.cpf = cpf;
-        this.rg = rg;
-        this.celular = celular;
-        this.email = email;
-        this.municipio = municipio;
-        this.uf = uf;
-        this.aceitouLgpd = aceitouLgpd;
+        this.nomeCompleto = data.nomeCompleto;
+        this.cpf = data.cpf;
+        this.rg = data.rg;
+        this.celular = data.celular;
+        this.email = data.email;
+        this.municipio = data.municipio;
+        this.uf = data.uf;
+        this.aceitouLgpd = data.aceitouLgpd;
         this.tipo = 'Credenciado';
     }
 
@@ -21,8 +41,18 @@ export class Credenciado {
     }
 }
 
+export interface IExpositorArgs extends ICredenciadoArgs {
+    cnpj: string;
+    nomeEmpresa: string;
+    siteEmpresa?: string;
+}
+
 export class Expositor extends Credenciado {
-    constructor(data) {
+    cnpj: string;
+    nomeEmpresa: string;
+    siteEmpresa?: string;
+
+    constructor(data: IExpositorArgs) {
         super(data);
         this.cnpj = data.cnpj;
         this.nomeEmpresa = data.nomeEmpresa;
@@ -38,8 +68,16 @@ export class Expositor extends Credenciado {
     }
 }
 
+export interface ICafeicultorArgs extends ICredenciadoArgs {
+    ccir: string;
+    nomePropriedade: string;
+}
+
 export class Cafeicultor extends Credenciado {
-    constructor(data) {
+    ccir: string;
+    nomePropriedade: string;
+
+    constructor(data: ICafeicultorArgs) {
         super(data);
         this.ccir = data.ccir;
         this.nomePropriedade = data.nomePropriedade;
@@ -55,14 +93,24 @@ export class Cafeicultor extends Credenciado {
 }
 
 export class Visitante extends Credenciado {
-    constructor(data) {
+    constructor(data: ICredenciadoArgs) {
         super(data);
         this.tipo = 'Visitante';
     }
 }
 
+export interface IImprensaArgs extends ICredenciadoArgs {
+    cnpj: string;
+    nomeVeiculo: string;
+    siteEmpresa?: string;
+}
+
 export class Imprensa extends Credenciado {
-    constructor(data) {
+    cnpj: string;
+    nomeVeiculo: string;
+    siteEmpresa?: string;
+
+    constructor(data: IImprensaArgs) {
         super(data);
         this.cnpj = data.cnpj;
         this.nomeVeiculo = data.nomeVeiculo;
