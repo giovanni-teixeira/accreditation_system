@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition, ChangeEvent, FormEvent } from 'react';
+import { useState, useTransition, ChangeEvent, FormEvent, useRef, useEffect } from 'react';
 import styles from './FormCadastro.module.css';
 import { cadastrarUsuario, CadastroResponse } from '@/controllers/CredenciadoController';
 import SuccessModal from './SuccessModal';
@@ -31,6 +31,7 @@ interface FormDataState {
 
 export default function FormCadastro() {
     const [role, setRole] = useState<string>('');
+    const formStartRef = useRef<HTMLDivElement>(null);
     const [isPending, startTransition] = useTransition();
     const [feedback, setFeedback] = useState<{ tipo: 'sucesso' | 'erro'; mensagem: string } | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,6 +44,41 @@ export default function FormCadastro() {
         ccir: '', nomePropriedade: '', nomeVeiculo: ''
     });
 
+    // Refs para as seções para scroll inteligente
+    const perfisRef = useRef<HTMLDivElement>(null);
+    const dadosPessoaisRef = useRef<HTMLDivElement>(null);
+    const dadosEspecificosRef = useRef<HTMLDivElement>(null);
+    const lgpdRef = useRef<HTMLDivElement>(null);
+    const submitRef = useRef<HTMLButtonElement>(null);
+
+    // Primeiro campo de cada seção para auto-foco
+    const nomeInputRef = useRef<HTMLInputElement>(null);
+    const cnpjInputRef = useRef<HTMLInputElement>(null);
+    const ccirInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (role && dadosPessoaisRef.current) {
+            dadosPessoaisRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            setTimeout(() => nomeInputRef.current?.focus(), 500);
+        }
+    }, [role]);
+
+    // Função para auxiliar scroll quando campos chave são preenchidos
+    const checkProgress = (name: string, value: string) => {
+        // Se preencheu email (último campo dos pessoais), rola para os específicos se existirem, senão LGPD
+        if (name === 'email' && value.includes('@') && value.includes('.')) {
+            if (role === 'visitante') {
+                lgpdRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                dadosEspecificosRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                setTimeout(() => {
+                    cnpjInputRef.current?.focus();
+                    ccirInputRef.current?.focus();
+                }, 500);
+            }
+        }
+    };
+
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
         const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
@@ -51,6 +87,10 @@ export default function FormCadastro() {
             ...prev,
             [name]: type === 'checkbox' ? checked : value
         }));
+
+        if (type !== 'checkbox') {
+            checkProgress(name, value);
+        }
     };
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -101,13 +141,13 @@ export default function FormCadastro() {
             </div>
 
             {role && (
-                <div className={styles.dynamicFormAnimation}>
+                <div ref={dadosPessoaisRef} className={styles.dynamicFormAnimation}>
                     <h3 className={styles.sectionTitle}>2. Seus Dados Pessoais</h3>
 
                     <div className={styles.inputGrid}>
                         <div className={styles.inputGroupFull}>
                             <label>Nome Completo</label>
-                            <input type="text" name="nomeCompleto" value={formData.nomeCompleto} onChange={handleInputChange} required />
+                            <input ref={nomeInputRef} type="text" name="nomeCompleto" value={formData.nomeCompleto} onChange={handleInputChange} required />
                         </div>
 
                         <div className={styles.inputGroup}>
@@ -149,7 +189,7 @@ export default function FormCadastro() {
 
                     {/* DADOS ESPECÍFICOS */}
                     {(role === 'expositor' || role === 'cafeicultor' || role === 'imprensa') && (
-                        <>
+                        <div ref={dadosEspecificosRef}>
                             <h3 className={styles.sectionTitle}>3. Informações Complementares ({role})</h3>
                             <div className={styles.inputGrid}>
 
@@ -157,7 +197,7 @@ export default function FormCadastro() {
                                     <>
                                         <div className={styles.inputGroup}>
                                             <label>CNPJ</label>
-                                            <input type="text" name="cnpj" value={formData.cnpj} onChange={handleInputChange} required />
+                                            <input ref={cnpjInputRef} type="text" name="cnpj" value={formData.cnpj} onChange={handleInputChange} required />
                                         </div>
                                         <div className={styles.inputGroup}>
                                             <label>Nome da Empresa</label>
@@ -174,7 +214,7 @@ export default function FormCadastro() {
                                     <>
                                         <div className={styles.inputGroup}>
                                             <label>CCIR</label>
-                                            <input type="text" name="ccir" value={formData.ccir} onChange={handleInputChange} required />
+                                            <input ref={ccirInputRef} type="text" name="ccir" value={formData.ccir} onChange={handleInputChange} required />
                                         </div>
                                         <div className={styles.inputGroupFull}>
                                             <label>Nome da Propriedade</label>
@@ -187,7 +227,7 @@ export default function FormCadastro() {
                                     <>
                                         <div className={styles.inputGroup}>
                                             <label>CNPJ</label>
-                                            <input type="text" name="cnpj" value={formData.cnpj} onChange={handleInputChange} required />
+                                            <input ref={cnpjInputRef} type="text" name="cnpj" value={formData.cnpj} onChange={handleInputChange} required />
                                         </div>
                                         <div className={styles.inputGroup}>
                                             <label>Nome do Veículo</label>
@@ -200,11 +240,11 @@ export default function FormCadastro() {
                                     </>
                                 )}
                             </div>
-                        </>
+                        </div>
                     )}
 
                     {/* TERMOS LGPD */}
-                    <div className={styles.lgpdSection}>
+                    <div ref={lgpdRef} className={styles.lgpdSection}>
                         <label className={styles.checkboxLabel}>
                             <input
                                 type="checkbox"

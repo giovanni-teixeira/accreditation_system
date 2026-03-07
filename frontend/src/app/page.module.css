@@ -29,7 +29,7 @@
 }
 
 .logoImage {
-  max-width: 400px;
+  max-width: 250px;
   width: 100%;
   height: auto;
   margin-bottom: 1rem;
@@ -118,19 +118,40 @@
 }
 
 @media (max-width: 768px) {
-  .logoText {
-    font-size: 3.5rem;
+  .header {
+    padding: 1rem 0;
+  }
+
+  .logoImage {
+    max-width: 180px;
+    margin-bottom: 0.5rem;
   }
 
   .date {
-    font-size: 1rem;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
   }
 
   .tagline {
-    font-size: 1.2rem;
+    font-size: 1rem;
+    margin-top: 0.25rem;
+  }
+
+  .formSection {
+    padding: 1rem 0 3rem;
   }
 
   .formCard {
-    padding: 2rem 1.5rem;
+    padding: 1rem;
+  }
+
+  .formTitle {
+    font-size: 1.4rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .formSubtitle {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
   }
 }

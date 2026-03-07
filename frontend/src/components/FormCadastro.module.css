@@ -298,6 +298,41 @@ input::placeholder {
     margin-bottom: 0.2rem;
 }
 
+@media (max-width: 600px) {
+    .formContainer {
+        padding: 0;
+        gap: 1rem;
+    }
+
+    .sectionTitle {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.25rem;
+    }
+
+    .radioGrid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+
+    .radioCard {
+        padding: 1rem;
+    }
+
+    .cardIcon {
+        font-size: 1.5rem;
+    }
+
+    .cardLabel {
+        font-size: 0.9rem;
+    }
+
+    .sectionTitle {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
