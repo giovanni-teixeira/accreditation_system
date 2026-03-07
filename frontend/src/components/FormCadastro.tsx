@@ -3,6 +3,7 @@
 import { useState, useTransition, ChangeEvent, FormEvent } from 'react';
 import styles from './FormCadastro.module.css';
 import { cadastrarUsuario, CadastroResponse } from '@/controllers/CredenciadoController';
+import SuccessModal from './SuccessModal';
 
 const ROLES = [
     { id: 'expositor', label: 'Expositor', icon: '🏢' },
@@ -32,6 +33,8 @@ export default function FormCadastro() {
     const [role, setRole] = useState<string>('');
     const [isPending, startTransition] = useTransition();
     const [feedback, setFeedback] = useState<{ tipo: 'sucesso' | 'erro'; mensagem: string } | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [lastSubmission, setLastSubmission] = useState<any>(null);
 
     const [formData, setFormData] = useState<FormDataState>({
         nomeCompleto: '', cpf: '', rg: '', celular: '', email: '',
@@ -57,7 +60,9 @@ export default function FormCadastro() {
             const result: CadastroResponse = await cadastrarUsuario({ role, ...formData });
             setFeedback({ tipo: result.sucesso ? 'sucesso' : 'erro', mensagem: result.mensagem });
             if (result.sucesso) {
-                setRole('');
+                setLastSubmission({ ...formData, role });
+                setIsModalOpen(true);
+                // setRole(''); // Keep role for now to avoid the form vanishing before modal is seen if needed, but the modal is overlay
                 setFormData({
                     nomeCompleto: '', cpf: '', rg: '', celular: '', email: '',
                     municipio: '', uf: '', aceitouLgpd: false,
@@ -231,6 +236,14 @@ export default function FormCadastro() {
                         </div>
                     )}
                 </div>
+            )}
+
+            {isModalOpen && lastSubmission && (
+                <SuccessModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    userData={lastSubmission}
+                />
             )}
         </form>
     );

@@ -8,10 +8,7 @@ export default function Home() {
         <header className={styles.header}>
           <div className={styles.logoContainer}>
             {/* For dynamic/actual logo later, replacing with styled text for now */}
-            <h1 className={styles.logoText}>
-              <span className={styles.alta}>Alta</span>
-              <span className={styles.cafe}>Café</span>
-            </h1>
+            <img src="/pdf-imagens/altacafe.png" alt="Alta Café Logo" className={styles.logoImage} />
             <p className={styles.date}>24 A 26 DE MARÇO DE 2026 | CLUBE DE CAMPO DA FRANCA</p>
             <p className={styles.tagline}>CULTIVANDO CONEXÕES</p>
           </div>

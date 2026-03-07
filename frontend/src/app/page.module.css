@@ -28,14 +28,11 @@
   gap: 0.5rem;
 }
 
-/* Stylish text logo while image isn't available */
-.logoText {
-  font-size: 5rem;
-  font-weight: 700;
-  display: flex;
-  align-items: baseline;
-  line-height: 1;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+.logoImage {
+  max-width: 400px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 1rem;
 }
 
 .alta {

@@ -1,0 +1,213 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modalContent {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 20px;
+    max-width: 550px;
+    width: 90%;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.modalHeader {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.modalHeader h2 {
+    color: var(--coffee-brown);
+    margin-bottom: 0.75rem;
+    font-size: 1.8rem;
+}
+
+.modalHeader p {
+    color: var(--text-muted);
+}
+
+.alertBox {
+    background: #fff9c4;
+    color: var(--coffee-brown);
+    border-left: 5px solid #fbc02d;
+    padding: 1.2rem;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+}
+
+.alertBox strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #455a64;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.downloadBtn {
+    background: var(--primary-green);
+    color: white;
+    border: none;
+    padding: 1.2rem;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1.2rem;
+}
+
+.downloadBtn:hover {
+    background: var(--dark-green);
+    transform: translateY(-2px);
+}
+
+.closeBtn {
+    background: #f0f0f0;
+    color: #555;
+    border: none;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* PDF TEMPLATE STYLES - 1:1 REPLICA FROM index.html */
+
+.folhaA4 {
+    width: 210mm;
+    height: 297mm;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    background: white;
+    font-family: Arial, sans-serif;
+    color: black;
+}
+
+.quadrante {
+    width: 105mm;
+    height: 148.5mm;
+    padding: 12mm;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    border: 0.1mm dashed #ccc;
+}
+
+.logoEvento {
+    max-width: 85%;
+    margin: auto;
+    margin-bottom: 6mm;
+    display: block;
+}
+
+.nomeUsuario {
+    font-size: 22pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.cidadeEmpresa {
+    font-size: 13pt;
+    text-align: center;
+    margin-top: 3mm;
+}
+
+.qrContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: 8mm;
+}
+
+.qrCode {
+    width: 90px;
+    height: 90px;
+    border: 1px solid #000;
+    padding: 3px;
+}
+
+.faixaTipo {
+    background: var(--cor-tipo);
+    color: white;
+    text-align: center;
+    font-size: 24pt;
+    font-weight: bold;
+    margin-top: auto;
+    width: calc(100% + 24mm);
+    margin-left: -12mm;
+    padding: 15px 0;
+    text-transform: uppercase;
+}
+
+.tituloSecao {
+    font-size: 14pt;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: underline;
+    margin-bottom: 10mm;
+}
+
+.gridLogos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.gridLogos img {
+    max-width: 90px;
+    max-height: 50px;
+    object-fit: contain;
+}
+
+.labelEvento {
+    font-size: 11pt;
+    color: #666;
+    font-weight: bold;
+}
+
+.valorEvento {
+    font-size: 15pt;
+    font-weight: bold;
+    margin-bottom: 7mm;
+}
+
+.q4 {
+    font-size: 10pt;
+    text-align: justify;
+    line-height: 1.4;
+}
+
+.tituloRegras {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 6mm;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
