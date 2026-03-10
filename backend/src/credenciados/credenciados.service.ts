@@ -46,11 +46,12 @@ export class CredenciadosService {
     return evento;
   }
 
-  private gerarCredencialAssinada(eventoId: string, privateKeyBase64: string) {
+  private gerarCredencialAssinada(eventoId: string, privateKeyBase64: string, nome: string) {
     const ticketId = uuidv4();
     const payload = {
       e: eventoId,
       t: ticketId,
+      n: nome,
       iat: Date.now()
     };
 
@@ -58,6 +59,7 @@ export class CredenciadosService {
     const privateKey = util.decodeBase64(privateKeyBase64);
 
     const signature = nacl.sign.detached(message, privateKey);
+    // Formato: payloadBase64.signatureBase64
     const token = util.encodeBase64(message) + "." + util.encodeBase64(signature);
 
     return { ticketId, qrToken: token };
@@ -91,7 +93,7 @@ export class CredenciadosService {
     await this.validarCpfUnico(dto.cpf);
 
     const { cep, rua, bairro, cidade, estado, ...dadosParticipante } = dto;
-    const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey!);
+    const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey!, dto.nomeCompleto);
 
     return this.prisma.credenciado.create({
       data: {
@@ -116,7 +118,7 @@ export class CredenciadosService {
     await this.validarCpfUnico(dto.cpf);
 
     const { cep, rua, bairro, cidade, estado, ...dadosParticipante } = dto;
-    const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey!);
+    const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey!, dto.nomeCompleto);
 
     return this.prisma.credenciado.create({
       data: {
@@ -141,7 +143,7 @@ export class CredenciadosService {
     await this.validarCpfUnico(dto.cpf);
 
     const { cep, rua, bairro, cidade, estado, ...dadosParticipante } = dto;
-    const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey!);
+    const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey!, dto.nomeCompleto);
 
     return this.prisma.credenciado.create({
       data: {
@@ -166,7 +168,7 @@ export class CredenciadosService {
     await this.validarCpfUnico(dto.cpf);
 
     const { cep, rua, bairro, cidade, estado, ...dadosParticipante } = dto;
-    const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey!);
+    const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey!, dto.nomeCompleto);
 
     return this.prisma.credenciado.create({
       data: {
