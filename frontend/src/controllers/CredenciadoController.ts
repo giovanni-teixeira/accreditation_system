@@ -6,6 +6,7 @@ import { Credenciado, Expositor, Cafeicultor, Visitante, Imprensa } from '@/mode
 export interface CadastroResponse {
     sucesso: boolean;
     mensagem: string;
+    dadosRecebidos?: any;
 }
 
 /**
@@ -69,7 +70,8 @@ export async function cadastrarUsuario(formData: any): Promise<CadastroResponse>
 
         return {
             sucesso: true,
-            mensagem: `Cadastro realizado com sucesso! Bem-vindo(a), ${usuarioCriado.nomeCompleto}.`
+            mensagem: `Cadastro realizado com sucesso! Bem-vindo(a), ${usuarioCriado.nomeCompleto}.`,
+            dadosRecebidos: usuarioCriado
         };
 
     } catch (error: any) {

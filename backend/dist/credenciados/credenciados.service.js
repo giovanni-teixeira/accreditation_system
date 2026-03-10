@@ -56,40 +56,17 @@ let CredenciadosService = class CredenciadosService {
     }
     async getEventoPadrao() {
         let evento = await this.prisma.evento.findFirst();
-        if (evento && (evento.nomeEvento !== 'FEIRA ALTACAFÉ 6° EDIÇÃO' || !evento.isGratuito)) {
-            evento = await this.prisma.evento.update({
-                where: { id: evento.id },
-                data: { nomeEvento: 'FEIRA ALTACAFÉ 6° EDIÇÃO', isGratuito: true }
-            });
-        }
-        if (!evento) {
-            const keyPair = nacl.sign.keyPair();
-            evento = await this.prisma.evento.create({
-                data: {
-                    nomeEvento: 'FEIRA ALTACAFÉ 6° EDIÇÃO',
-                    isGratuito: true,
-                    privateKey: util.encodeBase64(keyPair.secretKey),
-                    publicKey: util.encodeBase64(keyPair.publicKey)
-                }
-            });
-        }
-        else if (!evento.privateKey || !evento.publicKey) {
-            const keyPair = nacl.sign.keyPair();
-            evento = await this.prisma.evento.update({
-                where: { id: evento.id },
-                data: {
-                    privateKey: util.encodeBase64(keyPair.secretKey),
-                    publicKey: util.encodeBase64(keyPair.publicKey)
-                }
-            });
+        if (!evento || !evento.privateKey || !evento.publicKey) {
+            throw new common_1.BadRequestException('O Evento base ou as Chaves Criptográficas não estão configuradas. Reinicie o servidor para efetuar o Seeding Automático.');
         }
         return evento;
     }
-    gerarCredencialAssinada(eventoId, privateKeyBase64) {
+    gerarCredencialAssinada(eventoId, privateKeyBase64, nome) {
         const ticketId = (0, uuid_1.v4)();
         const payload = {
             e: eventoId,
             t: ticketId,
+            n: nome,
             iat: Date.now()
         };
         const message = util.decodeUTF8(JSON.stringify(payload));
@@ -122,7 +99,7 @@ let CredenciadosService = class CredenciadosService {
         const evento = await this.getEventoPadrao();
         await this.validarCpfUnico(dto.cpf);
         const { cep, rua, bairro, cidade, estado, ...dadosParticipante } = dto;
-        const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey);
+        const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey, dto.nomeCompleto);
         return this.prisma.credenciado.create({
             data: {
                 ...dadosParticipante,
@@ -144,7 +121,7 @@ let CredenciadosService = class CredenciadosService {
         const evento = await this.getEventoPadrao();
         await this.validarCpfUnico(dto.cpf);
         const { cep, rua, bairro, cidade, estado, ...dadosParticipante } = dto;
-        const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey);
+        const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey, dto.nomeCompleto);
         return this.prisma.credenciado.create({
             data: {
                 ...dadosParticipante,
@@ -166,7 +143,7 @@ let CredenciadosService = class CredenciadosService {
         const evento = await this.getEventoPadrao();
         await this.validarCpfUnico(dto.cpf);
         const { cep, rua, bairro, cidade, estado, ...dadosParticipante } = dto;
-        const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey);
+        const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey, dto.nomeCompleto);
         return this.prisma.credenciado.create({
             data: {
                 ...dadosParticipante,
@@ -188,7 +165,7 @@ let CredenciadosService = class CredenciadosService {
         const evento = await this.getEventoPadrao();
         await this.validarCpfUnico(dto.cpf);
         const { cep, rua, bairro, cidade, estado, ...dadosParticipante } = dto;
-        const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey);
+        const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey, dto.nomeCompleto);
         return this.prisma.credenciado.create({
             data: {
                 ...dadosParticipante,

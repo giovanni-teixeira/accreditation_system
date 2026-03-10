@@ -19,7 +19,9 @@ async function bootstrap() {
         .build();
     const documentFactory = () => swagger_1.SwaggerModule.createDocument(app, config);
     swagger_1.SwaggerModule.setup('api/docs', app, documentFactory);
-    await app.listen(process.env.PORT ?? 3001);
+    const port = process.env.PORT ?? 3001;
+    await app.listen(port);
+    console.log(`🚀 Servidor Backend NestJS rodando com sucesso na porta ${port}!`);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

@@ -11,6 +11,7 @@ interface SuccessModalProps {
         nomeEmpresa?: string;
         role: string;
         email: string;
+        qrToken: string;
     };
 }
 
@@ -40,13 +41,14 @@ export default function SuccessModal({ isOpen, onClose, userData }: SuccessModal
         const r = role.toLowerCase();
         if (r.includes("visitante")) return "#007bff";
         if (r.includes("expositor")) return "#28a745";
-        if (r.includes("imprensa")) return "#6f42c1";
+        if (r.includes("cafeicultor")) return "#5D4037"; // Marrom
+        if (r.includes("imprensa")) return "#6f42c1"; // Roxo
         if (r.includes("staff")) return "#fd7e14";
         return "#007bff"; // default
     };
 
     const corTipo = getFaixaColor(userData.role);
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${encodeURIComponent(userData.nomeCompleto)}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(userData.qrToken)}`;
 
     return (
         <div className={styles.modalOverlay}>
@@ -78,10 +80,16 @@ export default function SuccessModal({ isOpen, onClose, userData }: SuccessModal
 
                         {/* QUADRANTE 1 */}
                         <div className={styles.quadrante}>
-                            <img src="/pdf-imagens/evento.png" className={styles.logoEvento} alt="Logo Evento" />
+                            <img src="/imagens/6 alta café.png" className={styles.logoEvento} alt="Logo Evento" />
                             <div className={styles.nomeUsuario}>{userData.nomeCompleto}</div>
                             <div className={styles.cidadeEmpresa}>
                                 {userData.cidade} - {userData.estado}
+                                {userData.nomeEmpresa && (
+                                    <>
+                                        <br />
+                                        <strong>{userData.nomeEmpresa}</strong>
+                                    </>
+                                )}
                             </div>
                             <div className={styles.qrContainer}>
                                 <img src={qrUrl} className={styles.qrCode} alt="QR Code" />
@@ -93,10 +101,11 @@ export default function SuccessModal({ isOpen, onClose, userData }: SuccessModal
 
                         {/* QUADRANTE 2 */}
                         <div className={styles.quadrante}>
-                            <img src="/pdf-imagens/evento.png" className={styles.logoEvento} alt="Logo Evento" />
+                            <img src="/imagens/6 alta café.png" className={styles.logoEvento} alt="Logo Evento" />
                             <div className={styles.nomeUsuario}>{userData.nomeCompleto}</div>
                             <div className={styles.cidadeEmpresa}>
-                                {userData.cidade} - {userData.estado}
+                                {userData.cidade} - {userData.estado} <br />
+                                <strong>{userData.nomeEmpresa || '----'}</strong>
                             </div>
                             <div className={styles.qrContainer}>
                                 <img src={qrUrl} className={styles.qrCode} alt="QR Code" />
@@ -110,38 +119,52 @@ export default function SuccessModal({ isOpen, onClose, userData }: SuccessModal
                         <div className={styles.quadrante}>
                             <div className={styles.labelEvento}>EVENTO</div>
                             <div className={styles.valorEvento}>6ª ALTA CAFÉ</div>
+
                             <div className={styles.labelEvento}>LOCAL</div>
                             <div className={styles.valorEvento}>CLUBE DE CAMPO DE FRANCA</div>
+
                             <div className={styles.labelEvento}>DATA INICIAL</div>
                             <div className={styles.valorEvento}>24/03/2026</div>
+
                             <div className={styles.labelEvento}>DATA FINAL</div>
                             <div className={styles.valorEvento}>26/03/2026</div>
-                            <div className={styles.tituloSecao}>ORGANIZADORES</div>
+
+                            <div className={styles.tituloSecao}>APOIO DE MÍDIA</div>
                             <div className={styles.gridLogos}>
-                                <img src="/pdf-imagens/altacafe.png" />
-                                <img src="/pdf-imagens/srfranca.png" />
-                                <img src="/pdf-imagens/aeagro.png" />
+                                <img src="/imagens/EPTV.png" alt="EPTV" />
+                                <img src="/imagens/epagro.png" alt="Epagro" />
+                                <img src="/imagens/Attalea.png" alt="Attalea" />
                             </div>
                         </div>
 
                         {/* QUADRANTE 4 */}
                         <div className={`${styles.quadrante} ${styles.q4}`}>
                             <div className={styles.tituloRegras}>ESTA É SUA CREDENCIAL</div>
+
                             <p>
                                 • Leve sua credencial impressa ao evento<br />
                                 • Dobre em 4<br />
                                 • Apresente no portão a sua credencial
                             </p>
+
                             <p>
                                 <strong>CREDENCIAL PESSOAL E INTRANSFERÍVEL</strong><br />
                                 • Uso obrigatório durante todo o evento. <br />
                                 • O portador concorda com o uso de sua imagem (fotos e vídeos) para divulgação do evento.
                             </p>
-                            <br />
-                            <div className={styles.tituloSecao}>APOIO DE MÍDIA</div>
+
+                            <div className={styles.tituloSecao}>PATROCINADORES</div>
                             <div className={styles.gridLogos}>
-                                <img src="/pdf-imagens/EPTV.png" />
-                                <img src="/pdf-imagens/epagro.png" />
+                                <img src="/imagens/altacafe.png" alt="Alta Cafe" />
+                                <img src="/imagens/aeagro.png" alt="AEAgro" />
+                                <img src="/imagens/Sindicato Rural.png" alt="Sindicato Rural" />
+                                <img src="/imagens/Sami.png" alt="Sami" />
+                                <img src="/imagens/AgroPL.png" alt="Agro PL" />
+                                <img src="/imagens/Guapuã.png" alt="Guapua" />
+                                <img src="/imagens/OIMASA.png" alt="OIMASA" />
+                                <img src="/imagens/Olimáquinas.png" alt="Olimaquinas" />
+                                <img src="/imagens/Robusta.png" alt="Robusta" />
+                                <img src="/imagens/AAlves.png" alt="AAlves" />
                             </div>
                         </div>
 

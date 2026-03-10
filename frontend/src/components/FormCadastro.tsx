@@ -193,12 +193,15 @@ export default function FormCadastro() {
             const result: CadastroResponse = await cadastrarUsuario(cleanData);
             setFeedback({ tipo: result.sucesso ? 'sucesso' : 'erro', mensagem: result.mensagem });
             if (result.sucesso) {
-                setLastSubmission({ ...formData, role });
+                setLastSubmission({
+                    ...formData,
+                    role,
+                    qrToken: result.dadosRecebidos?.credencial?.qrToken || ''
+                });
                 setIsModalOpen(true);
                 setTimeout(() => {
                     document.getElementById('cadastroForm')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }, 100);
-                // setRole(''); // Keep role for now to avoid the form vanishing before modal is seen if needed, but the modal is overlay
                 setFormData({
                     nomeCompleto: '', cpf: '', rg: '', celular: '', email: '',
                     cep: '', rua: '', bairro: '', cidade: '', estado: '',

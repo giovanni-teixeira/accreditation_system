@@ -16,33 +16,10 @@ export class CredenciadosService {
   private async getEventoPadrao() {
     let evento = await this.prisma.evento.findFirst();
 
-    if (evento && (evento.nomeEvento !== 'FEIRA ALTACAFÉ 6° EDIÇÃO' || !evento.isGratuito)) {
-      evento = await this.prisma.evento.update({
-        where: { id: evento.id },
-        data: { nomeEvento: 'FEIRA ALTACAFÉ 6° EDIÇÃO', isGratuito: true }
-      });
+    if (!evento || !evento.privateKey || !evento.publicKey) {
+      throw new BadRequestException('O Evento base ou as Chaves Criptográficas não estão configuradas. Reinicie o servidor para efetuar o Seeding Automático.');
     }
 
-    if (!evento) {
-      const keyPair = nacl.sign.keyPair();
-      evento = await this.prisma.evento.create({
-        data: {
-          nomeEvento: 'FEIRA ALTACAFÉ 6° EDIÇÃO',
-          isGratuito: true,
-          privateKey: util.encodeBase64(keyPair.secretKey),
-          publicKey: util.encodeBase64(keyPair.publicKey)
-        }
-      });
-    } else if (!evento.privateKey || !evento.publicKey) {
-      const keyPair = nacl.sign.keyPair();
-      evento = await this.prisma.evento.update({
-        where: { id: evento.id },
-        data: {
-          privateKey: util.encodeBase64(keyPair.secretKey),
-          publicKey: util.encodeBase64(keyPair.publicKey)
-        }
-      });
-    }
     return evento;
   }
 
