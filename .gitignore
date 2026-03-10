@@ -9,4 +9,8 @@
 !/frontend/**
 !/backend/
 !/backend/**
+!/alta_cafe_adimin/
+!/alta_cafe_adimin/**
+!/scanner_admin/
+!/scanner_admin/**
 !/docker-compose.yml
