@@ -18,9 +18,13 @@ interface FormDataState {
     rg: string;
     celular: string;
     email: string;
-    municipio: string;
-    uf: string;
-    aceitouLgpd: boolean;
+    cep: string;
+    rua: string;
+    bairro: string;
+    cidade: string;
+    estado: string;
+    tipoCombustivel: string;
+    aceiteLgpd: boolean;
     cnpj: string;
     siteEmpresa: string;
     nomeEmpresa: string;
@@ -36,10 +40,12 @@ export default function FormCadastro() {
     const [feedback, setFeedback] = useState<{ tipo: 'sucesso' | 'erro'; mensagem: string } | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [lastSubmission, setLastSubmission] = useState<any>(null);
+    const [cepLocked, setCepLocked] = useState({ rua: false, bairro: false, cidade: false, estado: false });
 
     const [formData, setFormData] = useState<FormDataState>({
         nomeCompleto: '', cpf: '', rg: '', celular: '', email: '',
-        municipio: '', uf: '', aceitouLgpd: false,
+        cep: '', rua: '', bairro: '', cidade: '', estado: '',
+        tipoCombustivel: 'NAO_INFORMADO', aceiteLgpd: false,
         cnpj: '', siteEmpresa: '', nomeEmpresa: '',
         ccir: '', nomePropriedade: '', nomeVeiculo: ''
     });
@@ -79,17 +85,59 @@ export default function FormCadastro() {
         }
     };
 
+    const fetchViaCep = async (cepText: string) => {
+        const zipCode = cepText.replace(/\D/g, '');
+        if (zipCode.length === 8) {
+            try {
+                const response = await fetch(`https://viacep.com.br/ws/${zipCode}/json/`);
+                const data = await response.json();
+                if (!data.erro) {
+                    setFormData(prev => ({
+                        ...prev,
+                        rua: data.logradouro || prev.rua,
+                        bairro: data.bairro || prev.bairro,
+                        cidade: data.localidade || prev.cidade,
+                        estado: data.uf || prev.estado
+                    }));
+                    setCepLocked({
+                        rua: !!data.logradouro,
+                        bairro: !!data.bairro,
+                        cidade: !!data.localidade,
+                        estado: !!data.uf
+                    });
+                } else {
+                    setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
+                }
+            } catch (err) {
+                console.error('Erro ao buscar CEP:', err);
+                setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
+            }
+        }
+    };
+
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
         const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
 
+        let finalValue = value;
+        // Aplica máscara de CEP (00000-000)
+        if (name === 'cep') {
+            finalValue = finalValue.replace(/\D/g, '').replace(/^(\d{5})(\d)/, '$1-$2').slice(0, 9);
+        }
+
         setFormData(prev => ({
             ...prev,
-            [name]: type === 'checkbox' ? checked : value
+            [name]: type === 'checkbox' ? checked : finalValue
         }));
 
+        if (name === 'cep' && finalValue.length === 9) {
+            fetchViaCep(finalValue);
+        } else if (name === 'cep' && finalValue.length < 9) {
+            setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
+        }
+
         if (type !== 'checkbox') {
-            checkProgress(name, value);
+            checkProgress(name, finalValue);
         }
     };
 
@@ -105,7 +153,8 @@ export default function FormCadastro() {
                 // setRole(''); // Keep role for now to avoid the form vanishing before modal is seen if needed, but the modal is overlay
                 setFormData({
                     nomeCompleto: '', cpf: '', rg: '', celular: '', email: '',
-                    municipio: '', uf: '', aceitouLgpd: false,
+                    cep: '', rua: '', bairro: '', cidade: '', estado: '',
+                    tipoCombustivel: 'NAO_INFORMADO', aceiteLgpd: false,
                     cnpj: '', siteEmpresa: '', nomeEmpresa: '',
                     ccir: '', nomePropriedade: '', nomeVeiculo: ''
                 });
@@ -171,18 +220,38 @@ export default function FormCadastro() {
                         </div>
 
                         <div className={styles.inputGroup}>
-                            <label>Município</label>
-                            <input type="text" name="municipio" value={formData.municipio} onChange={handleInputChange} required />
+                            <label>CEP</label>
+                            <input type="text" name="cep" value={formData.cep} onChange={handleInputChange} maxLength={9} placeholder="00000-000" required />
+                        </div>
+
+                        <div className={styles.inputGroupFull}>
+                            <label>Rua / Logradouro</label>
+                            <input type="text" name="rua" value={formData.rua} onChange={handleInputChange} disabled={cepLocked.rua} required />
                         </div>
 
                         <div className={styles.inputGroup}>
-                            <label>UF</label>
-                            <select name="uf" value={formData.uf} onChange={handleInputChange} required>
-                                <option value="">Selecione</option>
-                                <option value="SP">São Paulo</option>
-                                <option value="MG">Minas Gerais</option>
-                                {/* Omitindo os outros estados por brevidade, mas deveriam estar aqui */}
-                                <option value="OUTRO">Outro</option>
+                            <label>Bairro</label>
+                            <input type="text" name="bairro" value={formData.bairro} onChange={handleInputChange} disabled={cepLocked.bairro} required />
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label>Cidade</label>
+                            <input type="text" name="cidade" value={formData.cidade} onChange={handleInputChange} disabled={cepLocked.cidade} required />
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label>Estado (UF)</label>
+                            <input type="text" name="estado" value={formData.estado} onChange={handleInputChange} maxLength={2} disabled={cepLocked.estado} required />
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label>Combustível do Veículo</label>
+                            <select name="tipoCombustivel" value={formData.tipoCombustivel} onChange={handleInputChange} required>
+                                <option value="NAO_INFORMADO">Não Informado</option>
+                                <option value="GASOLINA">Gasolina</option>
+                                <option value="ETANOL">Etanol</option>
+                                <option value="DIESEL">Diesel</option>
+                                <option value="ELETRICO">Elétrico</option>
                             </select>
                         </div>
                     </div>
@@ -248,8 +317,8 @@ export default function FormCadastro() {
                         <label className={styles.checkboxLabel}>
                             <input
                                 type="checkbox"
-                                name="aceitouLgpd"
-                                checked={formData.aceitouLgpd}
+                                name="aceiteLgpd"
+                                checked={formData.aceiteLgpd}
                                 onChange={handleInputChange}
                                 required
                             />

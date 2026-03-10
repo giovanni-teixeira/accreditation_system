@@ -6,8 +6,8 @@ interface SuccessModalProps {
     onClose: () => void;
     userData: {
         nomeCompleto: string;
-        municipio: string;
-        uf: string;
+        cidade: string;
+        estado: string;
         nomeEmpresa?: string;
         role: string;
         email: string;
@@ -78,14 +78,13 @@ export default function SuccessModal({ isOpen, onClose, userData }: SuccessModal
 
                         {/* QUADRANTE 1 */}
                         <div className={styles.quadrante}>
-                            <img src="/pdf-imagens/evento.png" className={styles.logoEvento} />
+                            <img src="/pdf-imagens/evento.png" className={styles.logoEvento} alt="Logo Evento" />
                             <div className={styles.nomeUsuario}>{userData.nomeCompleto}</div>
                             <div className={styles.cidadeEmpresa}>
-                                {userData.municipio} - {userData.uf} <br />
-                                <strong>{userData.nomeEmpresa || ''}</strong>
+                                {userData.cidade} - {userData.estado}
                             </div>
                             <div className={styles.qrContainer}>
-                                <img src={qrUrl} className={styles.qrCode} />
+                                <img src={qrUrl} className={styles.qrCode} alt="QR Code" />
                             </div>
                             <div className={styles.faixaTipo}>
                                 {userData.role}
@@ -94,14 +93,13 @@ export default function SuccessModal({ isOpen, onClose, userData }: SuccessModal
 
                         {/* QUADRANTE 2 */}
                         <div className={styles.quadrante}>
-                            <img src="/pdf-imagens/evento.png" className={styles.logoEvento} />
+                            <img src="/pdf-imagens/evento.png" className={styles.logoEvento} alt="Logo Evento" />
                             <div className={styles.nomeUsuario}>{userData.nomeCompleto}</div>
                             <div className={styles.cidadeEmpresa}>
-                                {userData.municipio} - {userData.uf} <br />
-                                <strong>{userData.nomeEmpresa || ''}</strong>
+                                {userData.cidade} - {userData.estado}
                             </div>
                             <div className={styles.qrContainer}>
-                                <img src={qrUrl} className={styles.qrCode} />
+                                <img src={qrUrl} className={styles.qrCode} alt="QR Code" />
                             </div>
                             <div className={styles.faixaTipo}>
                                 {userData.role}

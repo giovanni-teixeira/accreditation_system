@@ -5,7 +5,7 @@ export const metadata = {
   description: 'Sistema de credenciamento para a 6ª edição da feira Alta Café.',
 }
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
       <body>

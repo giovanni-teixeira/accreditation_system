@@ -6,7 +6,7 @@ export interface ICredenciadoArgs {
     email: string;
     municipio: string;
     uf: string;
-    aceitouLgpd: boolean;
+    aceiteLgpd: boolean;
 }
 
 export class Credenciado {
@@ -18,7 +18,7 @@ export class Credenciado {
     email: string;
     municipio: string;
     uf: string;
-    aceitouLgpd: boolean;
+    aceiteLgpd: boolean;
     tipo: string;
 
     constructor(data: ICredenciadoArgs) {
@@ -30,12 +30,12 @@ export class Credenciado {
         this.email = data.email;
         this.municipio = data.municipio;
         this.uf = data.uf;
-        this.aceitouLgpd = data.aceitouLgpd;
+        this.aceiteLgpd = data.aceiteLgpd;
         this.tipo = 'Credenciado';
     }
 
     validar() {
-        if (!this.nomeCompleto || !this.cpf || !this.aceitouLgpd) {
+        if (!this.nomeCompleto || !this.cpf || !this.aceiteLgpd) {
             throw new Error("Dados básicos incompletos (Nome, CPF e aceite da LGPD são obrigatórios).");
         }
     }
