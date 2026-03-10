@@ -71,18 +71,7 @@ export default function FormCadastro() {
 
     // Função para auxiliar scroll quando campos chave são preenchidos
     const checkProgress = (name: string, value: string) => {
-        // Se preencheu email (último campo dos pessoais), rola para os específicos se existirem, senão LGPD
-        if (name === 'email' && value.includes('@') && value.includes('.')) {
-            if (role === 'visitante') {
-                lgpdRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } else {
-                dadosEspecificosRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                setTimeout(() => {
-                    cnpjInputRef.current?.focus();
-                    ccirInputRef.current?.focus();
-                }, 500);
-            }
-        }
+        // Comportamento desativado para evitar pulo incorreto dos campos de endereço (CEP, Cidades) após digitação de e-mail.
     };
 
     const fetchViaCep = async (cepText: string) => {
@@ -120,9 +109,50 @@ export default function FormCadastro() {
         const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
 
         let finalValue = value;
-        // Aplica máscara de CEP (00000-000)
+        // Aplica máscaras
         if (name === 'cep') {
             finalValue = finalValue.replace(/\D/g, '').replace(/^(\d{5})(\d)/, '$1-$2').slice(0, 9);
+        } else if (name === 'cpf') {
+            finalValue = finalValue
+                .replace(/\D/g, '')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+                .replace(/(-\d{2})\d+?$/, '$1');
+        } else if (name === 'celular') {
+            finalValue = finalValue
+                .replace(/\D/g, '')
+                .replace(/(\d{2})(\d)/, '($1) $2')
+                .replace(/(\d{5})(\d)/, '$1-$2')
+                .replace(/(-\d{4})\d+?$/, '$1');
+        } else if (name === 'rg') {
+            let raw = finalValue.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            if (raw.length > 9) raw = raw.slice(0, 9);
+            if (raw.length > 8) {
+                finalValue = raw.replace(/^(.{2})(.{3})(.{3})(.{1}).*/, '$1.$2.$3-$4');
+            } else if (raw.length > 5) {
+                finalValue = raw.replace(/^(.{2})(.{3})(.+)/, '$1.$2.$3');
+            } else if (raw.length > 2) {
+                finalValue = raw.replace(/^(.{2})(.+)/, '$1.$2');
+            } else {
+                finalValue = raw;
+            }
+        } else if (name === 'cnpj') {
+            finalValue = finalValue
+                .replace(/\D/g, '')
+                .replace(/(\d{2})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d)/, '$1/$2')
+                .replace(/(\d{4})(\d{1,2})/, '$1-$2')
+                .replace(/(-\d{2})\d+?$/, '$1');
+        } else if (name === 'ccir') {
+            finalValue = finalValue
+                .replace(/\D/g, '')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+                .replace(/(-\d{1})\d+?$/, '$1');
         }
 
         setFormData(prev => ({
@@ -145,11 +175,29 @@ export default function FormCadastro() {
         e.preventDefault();
         setFeedback(null);
         startTransition(async () => {
-            const result: CadastroResponse = await cadastrarUsuario({ role, ...formData });
+            const cleanData: any = { ...formData, role };
+
+            // Loop para uppercase em todas as strings e limpar mascaras especificas
+            for (const key in cleanData) {
+                if (typeof cleanData[key] === 'string') {
+                    if (['cpf', 'celular', 'cnpj', 'ccir', 'cep'].includes(key)) {
+                        cleanData[key] = cleanData[key].replace(/\D/g, '');
+                    } else if (key === 'rg') {
+                        cleanData[key] = cleanData[key].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                    } else if (key !== 'role') {
+                        cleanData[key] = cleanData[key].toUpperCase();
+                    }
+                }
+            }
+
+            const result: CadastroResponse = await cadastrarUsuario(cleanData);
             setFeedback({ tipo: result.sucesso ? 'sucesso' : 'erro', mensagem: result.mensagem });
             if (result.sucesso) {
                 setLastSubmission({ ...formData, role });
                 setIsModalOpen(true);
+                setTimeout(() => {
+                    document.getElementById('cadastroForm')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
                 // setRole(''); // Keep role for now to avoid the form vanishing before modal is seen if needed, but the modal is overlay
                 setFormData({
                     nomeCompleto: '', cpf: '', rg: '', celular: '', email: '',
@@ -163,7 +211,7 @@ export default function FormCadastro() {
     };
 
     return (
-        <form className={styles.formContainer} onSubmit={handleSubmit}>
+        <form id="cadastroForm" className={styles.formContainer} onSubmit={handleSubmit}>
             {/* SELEÇÃO DE PERFIL */}
             <div className={styles.roleSelection}>
                 <h3 className={styles.sectionTitle}>1. Qual o seu perfil no evento?</h3>
