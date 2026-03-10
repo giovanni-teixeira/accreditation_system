@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CredenciadosService = void 0;
+const client_1 = require("@prisma/client");
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma.service");
 let CredenciadosService = class CredenciadosService {
@@ -17,10 +18,32 @@ let CredenciadosService = class CredenciadosService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async getEventoPadrao() {
+        let evento = await this.prisma.evento.findFirst();
+        if (evento && (evento.nomeEvento !== 'FEIRA ALTACAFÉ 6° EDIÇÃO' || !evento.isGratuito)) {
+            evento = await this.prisma.evento.update({
+                where: { id: evento.id },
+                data: { nomeEvento: 'FEIRA ALTACAFÉ 6° EDIÇÃO', isGratuito: true }
+            });
+        }
+        if (!evento) {
+            evento = await this.prisma.evento.create({
+                data: {
+                    nomeEvento: 'FEIRA ALTACAFÉ 6° EDIÇÃO',
+                    isGratuito: true
+                }
+            });
+        }
+        return evento;
+    }
     async validarCpfUnico(cpf) {
-        const existe = await this.prisma.credenciado.findUnique({ where: { cpf } });
+        const existe = await this.prisma.credenciado.findUnique({
+            where: {
+                cpf
+            }
+        });
         if (existe) {
-            throw new common_1.BadRequestException('Já existe um credenciado com este CPF');
+            throw new common_1.BadRequestException('Já existe um credenciado com este CPF neste evento');
         }
     }
     async buscarPorCpf(cpf) {
@@ -31,38 +54,54 @@ let CredenciadosService = class CredenciadosService {
         return credenciado;
     }
     async cadastrarVisitante(dto) {
+        const evento = await this.getEventoPadrao();
         await this.validarCpfUnico(dto.cpf);
+        const { cep, rua, bairro, cidade, estado, ...dadosParticipante } = dto;
         return this.prisma.credenciado.create({
             data: {
-                ...dto,
-                tipo: 'Visitante',
+                ...dadosParticipante,
+                evento: { connect: { id: evento.id } },
+                tipoCategoria: client_1.TipoCategoria.VISITANTE,
+                endereco: { create: { cep, rua, bairro, cidade, estado } }
             },
         });
     }
     async cadastrarCafeicultor(dto) {
+        const evento = await this.getEventoPadrao();
         await this.validarCpfUnico(dto.cpf);
+        const { cep, rua, bairro, cidade, estado, ...dadosParticipante } = dto;
         return this.prisma.credenciado.create({
             data: {
-                ...dto,
-                tipo: 'Cafeicultor',
+                ...dadosParticipante,
+                evento: { connect: { id: evento.id } },
+                tipoCategoria: client_1.TipoCategoria.CAFEICULTOR,
+                endereco: { create: { cep, rua, bairro, cidade, estado } }
             },
         });
     }
     async cadastrarImprensa(dto) {
+        const evento = await this.getEventoPadrao();
         await this.validarCpfUnico(dto.cpf);
+        const { cep, rua, bairro, cidade, estado, ...dadosParticipante } = dto;
         return this.prisma.credenciado.create({
             data: {
-                ...dto,
-                tipo: 'Imprensa',
+                ...dadosParticipante,
+                evento: { connect: { id: evento.id } },
+                tipoCategoria: client_1.TipoCategoria.IMPRENSA,
+                endereco: { create: { cep, rua, bairro, cidade, estado } }
             },
         });
     }
     async cadastrarExpositor(dto) {
+        const evento = await this.getEventoPadrao();
         await this.validarCpfUnico(dto.cpf);
+        const { cep, rua, bairro, cidade, estado, ...dadosParticipante } = dto;
         return this.prisma.credenciado.create({
             data: {
-                ...dto,
-                tipo: 'Expositor',
+                ...dadosParticipante,
+                evento: { connect: { id: evento.id } },
+                tipoCategoria: client_1.TipoCategoria.EXPOSITOR,
+                endereco: { create: { cep, rua, bairro, cidade, estado } }
             },
         });
     }

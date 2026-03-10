@@ -15,7 +15,6 @@ const swagger_1 = require("@nestjs/swagger");
 const credenciado_base_dto_1 = require("./credenciado-base.dto");
 class CriarCafeicultorDto extends credenciado_base_dto_1.CredenciadoBaseDto {
     ccir;
-    nomePropriedade;
 }
 exports.CriarCafeicultorDto = CriarCafeicultorDto;
 __decorate([
@@ -24,10 +23,4 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)({ message: 'O CCIR é obrigatório para cafeicultores' }),
     __metadata("design:type", String)
 ], CriarCafeicultorDto.prototype, "ccir", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)(),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)({ message: 'O nome da propriedade é obrigatório para cafeicultores' }),
-    __metadata("design:type", String)
-], CriarCafeicultorDto.prototype, "nomePropriedade", void 0);
 //# sourceMappingURL=criar-cafeicultor.dto.js.map

@@ -15,8 +15,6 @@ const swagger_1 = require("@nestjs/swagger");
 const credenciado_base_dto_1 = require("./credenciado-base.dto");
 class CriarImprensaDto extends credenciado_base_dto_1.CredenciadoBaseDto {
     cnpj;
-    nomeVeiculo;
-    siteEmpresa;
 }
 exports.CriarImprensaDto = CriarImprensaDto;
 __decorate([
@@ -25,16 +23,4 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)({ message: 'O CNPJ é obrigatório para profissionais de imprensa' }),
     __metadata("design:type", String)
 ], CriarImprensaDto.prototype, "cnpj", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)(),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)({ message: 'O nome do veículo é obrigatório para profissionais de imprensa' }),
-    __metadata("design:type", String)
-], CriarImprensaDto.prototype, "nomeVeiculo", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)(),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
-], CriarImprensaDto.prototype, "siteEmpresa", void 0);
 //# sourceMappingURL=criar-imprensa.dto.js.map

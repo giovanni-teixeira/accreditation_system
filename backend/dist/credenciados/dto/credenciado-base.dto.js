@@ -12,15 +12,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CredenciadoBaseDto = void 0;
 const class_validator_1 = require("class-validator");
 const swagger_1 = require("@nestjs/swagger");
+const client_1 = require("@prisma/client");
 class CredenciadoBaseDto {
     nomeCompleto;
     cpf;
     rg;
     celular;
     email;
-    municipio;
-    uf;
-    aceitouLgpd;
+    cep;
+    rua;
+    bairro;
+    cidade;
+    estado;
+    aceiteLgpd;
+    tipoCombustivel;
 }
 exports.CredenciadoBaseDto = CredenciadoBaseDto;
 __decorate([
@@ -56,19 +61,43 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)({ message: 'O município é obrigatório' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'O CEP é obrigatório' }),
     __metadata("design:type", String)
-], CredenciadoBaseDto.prototype, "municipio", void 0);
+], CredenciadoBaseDto.prototype, "cep", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.Length)(2, 2, { message: 'A UF deve ter exatamente 2 caracteres' }),
-    (0, class_validator_1.IsNotEmpty)({ message: 'A UF é obrigatória' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'A rua é obrigatória' }),
     __metadata("design:type", String)
-], CredenciadoBaseDto.prototype, "uf", void 0);
+], CredenciadoBaseDto.prototype, "rua", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)({ message: 'O bairro é obrigatório' }),
+    __metadata("design:type", String)
+], CredenciadoBaseDto.prototype, "bairro", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)({ message: 'A cidade é obrigatória' }),
+    __metadata("design:type", String)
+], CredenciadoBaseDto.prototype, "cidade", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.Length)(2, 2, { message: 'O estado deve ter exatamente 2 caracteres' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'O estado é obrigatório' }),
+    __metadata("design:type", String)
+], CredenciadoBaseDto.prototype, "estado", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
-], CredenciadoBaseDto.prototype, "aceitouLgpd", void 0);
+], CredenciadoBaseDto.prototype, "aceiteLgpd", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsEnum)(client_1.TipoCombustivel),
+    (0, class_validator_1.IsNotEmpty)({ message: 'O tipo de combustível é obrigatório' }),
+    __metadata("design:type", String)
+], CredenciadoBaseDto.prototype, "tipoCombustivel", void 0);
 //# sourceMappingURL=credenciado-base.dto.js.map

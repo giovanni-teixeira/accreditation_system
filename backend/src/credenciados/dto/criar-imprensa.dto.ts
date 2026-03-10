@@ -8,13 +8,4 @@ export class CriarImprensaDto extends CredenciadoBaseDto {
     @IsNotEmpty({ message: 'O CNPJ é obrigatório para profissionais de imprensa' })
     cnpj: string;
 
-    @ApiProperty()
-    @IsString()
-    @IsNotEmpty({ message: 'O nome do veículo é obrigatório para profissionais de imprensa' })
-    nomeVeiculo: string;
-
-    @ApiPropertyOptional()
-    @IsString()
-    @IsOptional()
-    siteEmpresa?: string;
 }

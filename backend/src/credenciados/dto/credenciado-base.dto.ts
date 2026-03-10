@@ -1,5 +1,6 @@
-import { IsString, IsEmail, IsBoolean, IsNotEmpty, Length } from 'class-validator';
+import { IsString, IsEmail, IsBoolean, IsNotEmpty, Length, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { TipoCombustivel } from '@prisma/client';
 
 export class CredenciadoBaseDto {
     @ApiProperty()
@@ -29,16 +30,36 @@ export class CredenciadoBaseDto {
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty({ message: 'O município é obrigatório' })
-    municipio: string;
+    @IsNotEmpty({ message: 'O CEP é obrigatório' })
+    cep: string;
 
     @ApiProperty()
     @IsString()
-    @Length(2, 2, { message: 'A UF deve ter exatamente 2 caracteres' })
-    @IsNotEmpty({ message: 'A UF é obrigatória' })
-    uf: string;
+    @IsNotEmpty({ message: 'A rua é obrigatória' })
+    rua: string;
+
+    @ApiProperty()
+    @IsString()
+    @IsNotEmpty({ message: 'O bairro é obrigatório' })
+    bairro: string;
+
+    @ApiProperty()
+    @IsString()
+    @IsNotEmpty({ message: 'A cidade é obrigatória' })
+    cidade: string;
+
+    @ApiProperty()
+    @IsString()
+    @Length(2, 2, { message: 'O estado deve ter exatamente 2 caracteres' })
+    @IsNotEmpty({ message: 'O estado é obrigatório' })
+    estado: string;
 
     @ApiProperty()
     @IsBoolean()
-    aceitouLgpd: boolean;
+    aceiteLgpd: boolean;
+
+    @ApiProperty()
+    @IsEnum(TipoCombustivel)
+    @IsNotEmpty({ message: 'O tipo de combustível é obrigatório' })
+    tipoCombustivel: TipoCombustivel;
 }

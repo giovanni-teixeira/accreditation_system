@@ -15,8 +15,6 @@ const swagger_1 = require("@nestjs/swagger");
 const credenciado_base_dto_1 = require("./credenciado-base.dto");
 class CriarExpositorDto extends credenciado_base_dto_1.CredenciadoBaseDto {
     cnpj;
-    nomeEmpresa;
-    siteEmpresa;
 }
 exports.CriarExpositorDto = CriarExpositorDto;
 __decorate([
@@ -25,16 +23,4 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)({ message: 'O CNPJ é obrigatório para expositores' }),
     __metadata("design:type", String)
 ], CriarExpositorDto.prototype, "cnpj", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)(),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)({ message: 'O nome da empresa é obrigatório para expositores' }),
-    __metadata("design:type", String)
-], CriarExpositorDto.prototype, "nomeEmpresa", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)(),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
-], CriarExpositorDto.prototype, "siteEmpresa", void 0);
 //# sourceMappingURL=criar-expositor.dto.js.map

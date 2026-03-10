@@ -1,11 +1,12 @@
-import { PrismaService } from '../prisma.service';
 import { CriarVisitanteDto } from './dto/criar-visitante.dto';
 import { CriarCafeicultorDto } from './dto/criar-cafeicultor.dto';
 import { CriarImprensaDto } from './dto/criar-imprensa.dto';
 import { CriarExpositorDto } from './dto/criar-expositor.dto';
+import { PrismaService } from '../prisma.service';
 export declare class CredenciadosService {
     private readonly prisma;
     constructor(prisma: PrismaService);
+    private getEventoPadrao;
     validarCpfUnico(cpf: string): Promise<void>;
     buscarPorCpf(cpf: string): Promise<{
         nomeCompleto: string;
@@ -13,18 +14,13 @@ export declare class CredenciadosService {
         rg: string;
         celular: string;
         email: string;
-        municipio: string;
-        uf: string;
-        aceitouLgpd: boolean;
+        aceiteLgpd: boolean;
+        tipoCombustivel: import(".prisma/client").$Enums.TipoCombustivel;
         ccir: string | null;
-        nomePropriedade: string | null;
         cnpj: string | null;
-        nomeVeiculo: string | null;
-        siteEmpresa: string | null;
-        nomeEmpresa: string | null;
         id: string;
-        tipo: string;
-        criadoEm: Date;
+        eventoId: string;
+        tipoCategoria: import(".prisma/client").$Enums.TipoCategoria;
     }>;
     cadastrarVisitante(dto: CriarVisitanteDto): Promise<{
         nomeCompleto: string;
@@ -32,18 +28,13 @@ export declare class CredenciadosService {
         rg: string;
         celular: string;
         email: string;
-        municipio: string;
-        uf: string;
-        aceitouLgpd: boolean;
+        aceiteLgpd: boolean;
+        tipoCombustivel: import(".prisma/client").$Enums.TipoCombustivel;
         ccir: string | null;
-        nomePropriedade: string | null;
         cnpj: string | null;
-        nomeVeiculo: string | null;
-        siteEmpresa: string | null;
-        nomeEmpresa: string | null;
         id: string;
-        tipo: string;
-        criadoEm: Date;
+        eventoId: string;
+        tipoCategoria: import(".prisma/client").$Enums.TipoCategoria;
     }>;
     cadastrarCafeicultor(dto: CriarCafeicultorDto): Promise<{
         nomeCompleto: string;
@@ -51,18 +42,13 @@ export declare class CredenciadosService {
         rg: string;
         celular: string;
         email: string;
-        municipio: string;
-        uf: string;
-        aceitouLgpd: boolean;
+        aceiteLgpd: boolean;
+        tipoCombustivel: import(".prisma/client").$Enums.TipoCombustivel;
         ccir: string | null;
-        nomePropriedade: string | null;
         cnpj: string | null;
-        nomeVeiculo: string | null;
-        siteEmpresa: string | null;
-        nomeEmpresa: string | null;
         id: string;
-        tipo: string;
-        criadoEm: Date;
+        eventoId: string;
+        tipoCategoria: import(".prisma/client").$Enums.TipoCategoria;
     }>;
     cadastrarImprensa(dto: CriarImprensaDto): Promise<{
         nomeCompleto: string;
@@ -70,18 +56,13 @@ export declare class CredenciadosService {
         rg: string;
         celular: string;
         email: string;
-        municipio: string;
-        uf: string;
-        aceitouLgpd: boolean;
+        aceiteLgpd: boolean;
+        tipoCombustivel: import(".prisma/client").$Enums.TipoCombustivel;
         ccir: string | null;
-        nomePropriedade: string | null;
         cnpj: string | null;
-        nomeVeiculo: string | null;
-        siteEmpresa: string | null;
-        nomeEmpresa: string | null;
         id: string;
-        tipo: string;
-        criadoEm: Date;
+        eventoId: string;
+        tipoCategoria: import(".prisma/client").$Enums.TipoCategoria;
     }>;
     cadastrarExpositor(dto: CriarExpositorDto): Promise<{
         nomeCompleto: string;
@@ -89,17 +70,12 @@ export declare class CredenciadosService {
         rg: string;
         celular: string;
         email: string;
-        municipio: string;
-        uf: string;
-        aceitouLgpd: boolean;
+        aceiteLgpd: boolean;
+        tipoCombustivel: import(".prisma/client").$Enums.TipoCombustivel;
         ccir: string | null;
-        nomePropriedade: string | null;
         cnpj: string | null;
-        nomeVeiculo: string | null;
-        siteEmpresa: string | null;
-        nomeEmpresa: string | null;
         id: string;
-        tipo: string;
-        criadoEm: Date;
+        eventoId: string;
+        tipoCategoria: import(".prisma/client").$Enums.TipoCategoria;
     }>;
 }

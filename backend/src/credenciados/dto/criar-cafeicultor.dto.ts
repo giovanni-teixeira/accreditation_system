@@ -8,8 +8,4 @@ export class CriarCafeicultorDto extends CredenciadoBaseDto {
     @IsNotEmpty({ message: 'O CCIR é obrigatório para cafeicultores' })
     ccir: string;
 
-    @ApiProperty()
-    @IsString()
-    @IsNotEmpty({ message: 'O nome da propriedade é obrigatório para cafeicultores' })
-    nomePropriedade: string;
 }

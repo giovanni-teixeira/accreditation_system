@@ -8,13 +8,4 @@ export class CriarExpositorDto extends CredenciadoBaseDto {
     @IsNotEmpty({ message: 'O CNPJ é obrigatório para expositores' })
     cnpj: string;
 
-    @ApiProperty()
-    @IsString()
-    @IsNotEmpty({ message: 'O nome da empresa é obrigatório para expositores' })
-    nomeEmpresa: string;
-
-    @ApiPropertyOptional()
-    @IsString()
-    @IsOptional()
-    siteEmpresa?: string;
 }
