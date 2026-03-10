@@ -5,6 +5,9 @@ import { CriarExpositorDto } from './dto/criar-expositor.dto';
 import { TipoCategoria } from '@prisma/client';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import * as nacl from 'tweetnacl';
+import * as util from 'tweetnacl-util';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class CredenciadosService {
@@ -21,14 +24,43 @@ export class CredenciadosService {
     }
 
     if (!evento) {
+      const keyPair = nacl.sign.keyPair();
       evento = await this.prisma.evento.create({
         data: {
           nomeEvento: 'FEIRA ALTACAFÉ 6° EDIÇÃO',
-          isGratuito: true
+          isGratuito: true,
+          privateKey: util.encodeBase64(keyPair.secretKey),
+          publicKey: util.encodeBase64(keyPair.publicKey)
+        }
+      });
+    } else if (!evento.privateKey || !evento.publicKey) {
+      const keyPair = nacl.sign.keyPair();
+      evento = await this.prisma.evento.update({
+        where: { id: evento.id },
+        data: {
+          privateKey: util.encodeBase64(keyPair.secretKey),
+          publicKey: util.encodeBase64(keyPair.publicKey)
         }
       });
     }
     return evento;
+  }
+
+  private gerarCredencialAssinada(eventoId: string, privateKeyBase64: string) {
+    const ticketId = uuidv4();
+    const payload = {
+      e: eventoId,
+      t: ticketId,
+      iat: Date.now()
+    };
+
+    const message = util.decodeUTF8(JSON.stringify(payload));
+    const privateKey = util.decodeBase64(privateKeyBase64);
+
+    const signature = nacl.sign.detached(message, privateKey);
+    const token = util.encodeBase64(message) + "." + util.encodeBase64(signature);
+
+    return { ticketId, qrToken: token };
   }
 
   async validarCpfUnico(cpf: string) {
@@ -44,7 +76,10 @@ export class CredenciadosService {
 
   async buscarPorCpf(cpf: string) {
     // Assume busca global pelo CPF do evento atual (ideal seria receber o eventoId)
-    const credenciado = await this.prisma.credenciado.findUnique({ where: { cpf } });
+    const credenciado = await this.prisma.credenciado.findUnique({
+      where: { cpf },
+      include: { credencial: true, endereco: true }
+    });
     if (!credenciado) {
       throw new BadRequestException('Credenciado não encontrado para o CPF informado');
     }
@@ -56,14 +91,23 @@ export class CredenciadosService {
     await this.validarCpfUnico(dto.cpf);
 
     const { cep, rua, bairro, cidade, estado, ...dadosParticipante } = dto;
+    const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey!);
 
     return this.prisma.credenciado.create({
       data: {
         ...dadosParticipante,
         evento: { connect: { id: evento.id } },
         tipoCategoria: TipoCategoria.VISITANTE,
-        endereco: { create: { cep, rua, bairro, cidade, estado } }
+        endereco: { create: { cep, rua, bairro, cidade, estado } },
+        credencial: {
+          create: {
+            ticketId: credencialDados.ticketId,
+            qrToken: credencialDados.qrToken,
+            status: 'ACTIVE'
+          }
+        }
       },
+      include: { credencial: true, endereco: true }
     });
   }
 
@@ -72,14 +116,23 @@ export class CredenciadosService {
     await this.validarCpfUnico(dto.cpf);
 
     const { cep, rua, bairro, cidade, estado, ...dadosParticipante } = dto;
+    const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey!);
 
     return this.prisma.credenciado.create({
       data: {
         ...dadosParticipante,
         evento: { connect: { id: evento.id } },
         tipoCategoria: TipoCategoria.CAFEICULTOR,
-        endereco: { create: { cep, rua, bairro, cidade, estado } }
+        endereco: { create: { cep, rua, bairro, cidade, estado } },
+        credencial: {
+          create: {
+            ticketId: credencialDados.ticketId,
+            qrToken: credencialDados.qrToken,
+            status: 'ACTIVE'
+          }
+        }
       },
+      include: { credencial: true, endereco: true }
     });
   }
 
@@ -88,14 +141,23 @@ export class CredenciadosService {
     await this.validarCpfUnico(dto.cpf);
 
     const { cep, rua, bairro, cidade, estado, ...dadosParticipante } = dto;
+    const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey!);
 
     return this.prisma.credenciado.create({
       data: {
         ...dadosParticipante,
         evento: { connect: { id: evento.id } },
         tipoCategoria: TipoCategoria.IMPRENSA,
-        endereco: { create: { cep, rua, bairro, cidade, estado } }
+        endereco: { create: { cep, rua, bairro, cidade, estado } },
+        credencial: {
+          create: {
+            ticketId: credencialDados.ticketId,
+            qrToken: credencialDados.qrToken,
+            status: 'ACTIVE'
+          }
+        }
       },
+      include: { credencial: true, endereco: true }
     });
   }
 
@@ -104,14 +166,23 @@ export class CredenciadosService {
     await this.validarCpfUnico(dto.cpf);
 
     const { cep, rua, bairro, cidade, estado, ...dadosParticipante } = dto;
+    const credencialDados = this.gerarCredencialAssinada(evento.id, evento.privateKey!);
 
     return this.prisma.credenciado.create({
       data: {
         ...dadosParticipante,
         evento: { connect: { id: evento.id } },
         tipoCategoria: TipoCategoria.EXPOSITOR,
-        endereco: { create: { cep, rua, bairro, cidade, estado } }
+        endereco: { create: { cep, rua, bairro, cidade, estado } },
+        credencial: {
+          create: {
+            ticketId: credencialDados.ticketId,
+            qrToken: credencialDados.qrToken,
+            status: 'ACTIVE'
+          }
+        }
       },
+      include: { credencial: true, endereco: true }
     });
   }
 }

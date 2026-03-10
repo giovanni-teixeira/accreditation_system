@@ -62,6 +62,8 @@ model Evento {
   id           String        @id @default(uuid()) @db.Uuid
   nomeEvento   String        @unique @map("nome_evento")
   isGratuito   Boolean       @default(true) @map("is_gratuito")
+  privateKey   String?       @map("private_key")
+  publicKey    String?       @map("public_key")
   credenciados Credenciado[]
 
   @@map("evento")
@@ -130,11 +132,29 @@ model Descarbonizacao {
 model Credencial {
   id                 String  @id @default(uuid()) @db.Uuid
   credenciadoId      String  @unique @map("credenciado_id") @db.Uuid
-  hashQrCode         String  @map("hash_qr_code")
-  hashCodigoBarras   String  @map("hash_codigo_barras")
-  isImpressaQuiosque Boolean @default(false) @map("is_impressa_quiosque")
+  ticketId           String  @unique @default(uuid()) @map("ticket_id") @db.Uuid
+  qrToken            String  @map("qr_token") @db.Text
+  downloads          Int     @default(0)
+  printCount         Int     @default(0) @map("print_count")
+  status             String  @default("ACTIVE")
+  createdAt          DateTime @default(now()) @map("created_at")
 
   credenciado Credenciado @relation(fields: [credenciadoId], references: [id], onDelete: Cascade)
+  scans       QrScan[]
 
+  @@index([ticketId])
   @@map("credencial")
+}
+
+model QrScan {
+  id           String   @id @default(uuid()) @db.Uuid
+  ticketId     String   @map("ticket_id") @db.Uuid
+  scannerId    String   @map("scanner_id")
+  scanType     String   @map("scan_type")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  credencial   Credencial @relation(fields: [ticketId], references: [ticketId], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@map("qrscans")
 }
