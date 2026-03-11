@@ -1,0 +1,411 @@
+'use client';
+
+import { useState, useTransition, ChangeEvent, FormEvent, useRef, useEffect } from 'react';
+import styles from './FormCadastro.module.css';
+import { cadastrarUsuario, CadastroResponse } from '@/controllers/CredenciadoController';
+import { API_ROUTES } from '@/config/api';
+import SuccessModal from './SuccessModal';
+import ErrorModal from './ErrorModal';
+
+const ROLES = [
+    { id: 'expositor', label: 'Expositor', icon: '🏢' },
+    { id: 'cafeicultor', label: 'Cafeicultor', icon: '🌱' },
+    { id: 'visitante', label: 'Visitante', icon: '🎟️' },
+    { id: 'imprensa', label: 'Imprensa', icon: '📸' }
+];
+
+interface FormDataState {
+    nomeCompleto: string;
+    cpf: string;
+    rg: string;
+    celular: string;
+    email: string;
+    cep: string;
+    rua: string;
+    bairro: string;
+    cidade: string;
+    estado: string;
+    tipoCombustivel: string;
+    aceiteLgpd: boolean;
+    cnpj: string;
+    siteEmpresa: string;
+    nomeEmpresa: string;
+    ccir: string;
+    nomePropriedade: string;
+    nomeVeiculo: string;
+}
+
+export default function FormCadastro() {
+    const [role, setRole] = useState<string>('');
+    const formStartRef = useRef<HTMLDivElement>(null);
+    const [isPending, startTransition] = useTransition();
+    const [feedback, setFeedback] = useState<{ tipo: 'sucesso' | 'erro'; mensagem: string } | null>(null);
+    const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+    const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+    const [lastSubmission, setLastSubmission] = useState<any>(null);
+    const [cepLocked, setCepLocked] = useState({ rua: false, bairro: false, cidade: false, estado: false });
+
+    const [formData, setFormData] = useState<FormDataState>({
+        nomeCompleto: '', cpf: '', rg: '', celular: '', email: '',
+        cep: '', rua: '', bairro: '', cidade: '', estado: '',
+        tipoCombustivel: 'NAO_INFORMADO', aceiteLgpd: false,
+        cnpj: '', siteEmpresa: '', nomeEmpresa: '',
+        ccir: '', nomePropriedade: '', nomeVeiculo: ''
+    });
+
+    // Refs para as seções para scroll inteligente
+    const perfisRef = useRef<HTMLDivElement>(null);
+    const dadosPessoaisRef = useRef<HTMLDivElement>(null);
+    const dadosEspecificosRef = useRef<HTMLDivElement>(null);
+    const lgpdRef = useRef<HTMLDivElement>(null);
+    const submitRef = useRef<HTMLButtonElement>(null);
+
+    // Primeiro campo de cada seção para auto-foco
+    const nomeInputRef = useRef<HTMLInputElement>(null);
+    const cnpjInputRef = useRef<HTMLInputElement>(null);
+    const ccirInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (role && dadosPessoaisRef.current) {
+            dadosPessoaisRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            setTimeout(() => nomeInputRef.current?.focus(), 500);
+        }
+    }, [role]);
+
+    // Função para auxiliar scroll quando campos chave são preenchidos
+    const checkProgress = (name: string, value: string) => {
+        // Comportamento desativado para evitar pulo incorreto dos campos de endereço (CEP, Cidades) após digitação de e-mail.
+    };
+
+    const fetchViaCep = async (cepText: string) => {
+        const zipCode = cepText.replace(/\D/g, '');
+        if (zipCode.length === 8) {
+            try {
+                const response = await fetch(API_ROUTES.EXTERNAL.VIA_CEP(zipCode));
+                const data = await response.json();
+                if (!data.erro) {
+                    setFormData(prev => ({
+                        ...prev,
+                        rua: data.logradouro || prev.rua,
+                        bairro: data.bairro || prev.bairro,
+                        cidade: data.localidade || prev.cidade,
+                        estado: data.uf || prev.estado
+                    }));
+                    setCepLocked({
+                        rua: !!data.logradouro,
+                        bairro: !!data.bairro,
+                        cidade: !!data.localidade,
+                        estado: !!data.uf
+                    });
+                } else {
+                    setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
+                }
+            } catch (err) {
+                console.error('Erro ao buscar CEP:', err);
+                setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
+            }
+        }
+    };
+
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value, type } = e.target;
+        const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
+
+        let finalValue = value;
+        // Aplica máscaras
+        if (name === 'cep') {
+            finalValue = finalValue.replace(/\D/g, '').replace(/^(\d{5})(\d)/, '$1-$2').slice(0, 9);
+        } else if (name === 'cpf') {
+            finalValue = finalValue
+                .replace(/\D/g, '')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+                .replace(/(-\d{2})\d+?$/, '$1');
+        } else if (name === 'celular') {
+            finalValue = finalValue
+                .replace(/\D/g, '')
+                .replace(/(\d{2})(\d)/, '($1) $2')
+                .replace(/(\d{5})(\d)/, '$1-$2')
+                .replace(/(-\d{4})\d+?$/, '$1');
+        } else if (name === 'rg') {
+            let raw = finalValue.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            if (raw.length > 9) raw = raw.slice(0, 9);
+            if (raw.length > 8) {
+                finalValue = raw.replace(/^(.{2})(.{3})(.{3})(.{1}).*/, '$1.$2.$3-$4');
+            } else if (raw.length > 5) {
+                finalValue = raw.replace(/^(.{2})(.{3})(.+)/, '$1.$2.$3');
+            } else if (raw.length > 2) {
+                finalValue = raw.replace(/^(.{2})(.+)/, '$1.$2');
+            } else {
+                finalValue = raw;
+            }
+        } else if (name === 'cnpj') {
+            finalValue = finalValue
+                .replace(/\D/g, '')
+                .replace(/(\d{2})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d)/, '$1/$2')
+                .replace(/(\d{4})(\d{1,2})/, '$1-$2')
+                .replace(/(-\d{2})\d+?$/, '$1');
+        } else if (name === 'ccir') {
+            finalValue = finalValue
+                .replace(/\D/g, '')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+                .replace(/(-\d{1})\d+?$/, '$1');
+        }
+
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : finalValue
+        }));
+
+        if (name === 'cep' && finalValue.length === 9) {
+            fetchViaCep(finalValue);
+        } else if (name === 'cep' && finalValue.length < 9) {
+            setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
+        }
+
+        if (type !== 'checkbox') {
+            checkProgress(name, finalValue);
+        }
+    };
+
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setFeedback(null);
+        startTransition(async () => {
+            const cleanData: any = { ...formData, role };
+
+            // Loop para uppercase em todas as strings e limpar mascaras especificas
+            for (const key in cleanData) {
+                if (typeof cleanData[key] === 'string') {
+                    if (['cpf', 'celular', 'cnpj', 'ccir', 'cep'].includes(key)) {
+                        cleanData[key] = cleanData[key].replace(/\D/g, '');
+                    } else if (key === 'rg') {
+                        cleanData[key] = cleanData[key].replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                    } else if (key !== 'role') {
+                        cleanData[key] = cleanData[key].toUpperCase();
+                    }
+                }
+            }
+
+            const result: CadastroResponse = await cadastrarUsuario(cleanData);
+            setFeedback({ tipo: result.sucesso ? 'sucesso' : 'erro', mensagem: result.mensagem });
+
+            if (result.sucesso) {
+                setLastSubmission({
+                    ...formData,
+                    role,
+                    qrToken: result.dadosRecebidos?.credencial?.qrToken || ''
+                });
+                setIsSuccessModalOpen(true);
+                setTimeout(() => {
+                    document.getElementById('cadastroForm')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+                setFormData({
+                    nomeCompleto: '', cpf: '', rg: '', celular: '', email: '',
+                    cep: '', rua: '', bairro: '', cidade: '', estado: '',
+                    tipoCombustivel: 'NAO_INFORMADO', aceiteLgpd: false,
+                    cnpj: '', siteEmpresa: '', nomeEmpresa: '',
+                    ccir: '', nomePropriedade: '', nomeVeiculo: ''
+                });
+            } else {
+                // Abre o modal de erro quando encontrar restrições no backend
+                setIsErrorModalOpen(true);
+            }
+        });
+    };
+
+    return (
+        <form id="cadastroForm" className={styles.formContainer} onSubmit={handleSubmit}>
+            {/* SELEÇÃO DE PERFIL */}
+            <div className={styles.roleSelection}>
+                <h3 className={styles.sectionTitle}>1. Qual o seu perfil no evento?</h3>
+                <div className={styles.radioGrid}>
+                    {ROLES.map((r) => (
+                        <label
+                            key={r.id}
+                            className={`${styles.radioCard} ${role === r.id ? styles.selected : ''}`}
+                        >
+                            <input
+                                type="radio"
+                                name="role"
+                                value={r.id}
+                                checked={role === r.id}
+                                onChange={(e) => setRole(e.target.value)}
+                                className={styles.hiddenRadio}
+                                required
+                            />
+                            <span className={styles.cardIcon}>{r.icon}</span>
+                            <span className={styles.cardLabel}>{r.label}</span>
+                        </label>
+                    ))}
+                </div>
+            </div>
+
+            {role && (
+                <div ref={dadosPessoaisRef} className={styles.dynamicFormAnimation}>
+                    <h3 className={styles.sectionTitle}>2. Seus Dados Pessoais</h3>
+
+                    <div className={styles.inputGrid}>
+                        <div className={styles.inputGroupFull}>
+                            <label>Nome Completo</label>
+                            <input ref={nomeInputRef} type="text" name="nomeCompleto" value={formData.nomeCompleto} onChange={handleInputChange} required />
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label>CPF</label>
+                            <input type="text" name="cpf" value={formData.cpf} onChange={handleInputChange} required />
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label>RG</label>
+                            <input type="text" name="rg" value={formData.rg} onChange={handleInputChange} required />
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label>Celular (WhatsApp)</label>
+                            <input type="tel" name="celular" value={formData.celular} onChange={handleInputChange} required />
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label>E-mail</label>
+                            <input type="email" name="email" value={formData.email} onChange={handleInputChange} required />
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label>CEP</label>
+                            <input type="text" name="cep" value={formData.cep} onChange={handleInputChange} maxLength={9} placeholder="00000-000" required />
+                        </div>
+
+                        <div className={styles.inputGroupFull}>
+                            <label>Rua / Logradouro</label>
+                            <input type="text" name="rua" value={formData.rua} onChange={handleInputChange} disabled={cepLocked.rua} required />
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label>Bairro</label>
+                            <input type="text" name="bairro" value={formData.bairro} onChange={handleInputChange} disabled={cepLocked.bairro} required />
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label>Cidade</label>
+                            <input type="text" name="cidade" value={formData.cidade} onChange={handleInputChange} disabled={cepLocked.cidade} required />
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label>Estado (UF)</label>
+                            <input type="text" name="estado" value={formData.estado} onChange={handleInputChange} maxLength={2} disabled={cepLocked.estado} required />
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label>Combustível do Veículo</label>
+                            <select name="tipoCombustivel" value={formData.tipoCombustivel} onChange={handleInputChange} required>
+                                <option value="NAO_INFORMADO">Não Informado</option>
+                                <option value="GASOLINA">Gasolina</option>
+                                <option value="ETANOL">Etanol</option>
+                                <option value="DIESEL">Diesel</option>
+                                <option value="ELETRICO">Elétrico</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* DADOS ESPECÍFICOS */}
+                    {(role === 'expositor' || role === 'cafeicultor' || role === 'imprensa') && (
+                        <div ref={dadosEspecificosRef}>
+                            <h3 className={styles.sectionTitle}>3. Informações Complementares ({role})</h3>
+                            <div className={styles.inputGrid}>
+
+                                {role === 'expositor' && (
+                                    <>
+                                        <div className={styles.inputGroup}>
+                                            <label>CNPJ</label>
+                                            <input ref={cnpjInputRef} type="text" name="cnpj" value={formData.cnpj} onChange={handleInputChange} required />
+                                        </div>
+                                        <div className={styles.inputGroup}>
+                                            <label>Nome da Empresa</label>
+                                            <input type="text" name="nomeEmpresa" value={formData.nomeEmpresa} onChange={handleInputChange} required />
+                                        </div>
+                                        <div className={styles.inputGroupFull}>
+                                            <label>Site da Empresa</label>
+                                            <input type="url" name="siteEmpresa" value={formData.siteEmpresa} onChange={handleInputChange} />
+                                        </div>
+                                    </>
+                                )}
+
+                                {role === 'cafeicultor' && (
+                                    <>
+                                        <div className={styles.inputGroup}>
+                                            <label>CCIR</label>
+                                            <input ref={ccirInputRef} type="text" name="ccir" value={formData.ccir} onChange={handleInputChange} required />
+                                        </div>
+                                        <div className={styles.inputGroupFull}>
+                                            <label>Nome da Propriedade</label>
+                                            <input type="text" name="nomePropriedade" value={formData.nomePropriedade} onChange={handleInputChange} required />
+                                        </div>
+                                    </>
+                                )}
+
+                                {role === 'imprensa' && (
+                                    <>
+                                        <div className={styles.inputGroup}>
+                                            <label>CNPJ</label>
+                                            <input ref={cnpjInputRef} type="text" name="cnpj" value={formData.cnpj} onChange={handleInputChange} required />
+                                        </div>
+                                        <div className={styles.inputGroup}>
+                                            <label>Nome do Veículo</label>
+                                            <input type="text" name="nomeVeiculo" value={formData.nomeVeiculo} onChange={handleInputChange} required />
+                                        </div>
+                                        <div className={styles.inputGroupFull}>
+                                            <label>Site da Empresa / Veículo</label>
+                                            <input type="url" name="siteEmpresa" value={formData.siteEmpresa} onChange={handleInputChange} />
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* TERMOS LGPD */}
+                    <div ref={lgpdRef} className={styles.lgpdSection}>
+                        <label className={styles.checkboxLabel}>
+                            <input
+                                type="checkbox"
+                                name="aceiteLgpd"
+                                checked={formData.aceiteLgpd}
+                                onChange={handleInputChange}
+                                required
+                            />
+                            <span className={styles.checkmark}></span>
+                            Declaro que li e concordo com a coleta e tratamento dos meus dados pessoais conforme a Lei Geral de Proteção de Dados (LGPD) e autorizo o envio de comunicações sobre o evento Alta Café.
+                        </label>
+                    </div>
+
+                    <button type="submit" className={styles.submitBtn} disabled={isPending}>
+                        {isPending ? 'Processando...' : 'Finalizar Credenciamento'}
+                    </button>
+                </div>
+            )}
+
+            {isSuccessModalOpen && lastSubmission && (
+                <SuccessModal
+                    isOpen={isSuccessModalOpen}
+                    onClose={() => setIsSuccessModalOpen(false)}
+                    userData={lastSubmission}
+                />
+            )}
+
+            {isErrorModalOpen && feedback && feedback.tipo === 'erro' && (
+                <ErrorModal
+                    isOpen={isErrorModalOpen}
+                    onClose={() => setIsErrorModalOpen(false)}
+                    messages={feedback.mensagem}
+                />
+            )}
+        </form>
+    );
+}

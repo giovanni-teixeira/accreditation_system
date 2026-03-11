@@ -1,0 +1,63 @@
+# 🐳 Guia de Comandos Docker e Manutenção de Servidor
+
+Este guia foi criado para que você possa entender e dar manutenção no seu servidor (VPS) ou ambiente local, documentando todos os comandos que utilizamos durante a construção da arquitetura do HAKATON.
+
+---
+
+## 🏗️ 1. Subindo e Parando a Aplicação
+
+### `docker compose up -d`
+- **O que faz:** Lê o arquivo `docker-compose.yml`, verifica quais containers precisam ser iniciados, cria as redes virtuais e sobe os serviços em modo *detached* (segundo plano).
+- **Quando uso:** Sempre que quiser ligar o sistema. Como usamos a tag `-d`, seu terminal não fica preso mostrando os logs infinitamente. Pode fechar o console que a aplicação continuará rodando!
+
+### `docker compose up -d --build`
+- **O que faz:** Faz o mesmo que o comando anterior, mas **força a recriação (re-build)** das imagens Docker antes de ligar.
+- **Quando uso:** Essencial após você modificar os códigos da aplicação (HTML, CSS, TypeScript, etc.) ou o arquivo `Dockerfile`. Ele reprocessa tudo do zero e só depois inicia o container novo.
+
+### `docker compose down`
+- **O que faz:** Desliga e remove os containers e a rede virtual criados. **Importante:** Se configurado corretamente, ele **não** apaga os volumes de dados persistentes (como o banco PostgreSQL).
+- **Quando uso:** Quando vou reiniciar toda a infraestrutura "limpa" ou mudar o servidor.
+
+---
+
+## 🛠️ 2. Manutenção e Re-builds Parciais (Avançado)
+
+Quando você quer atualizar apenas *uma* parte do sistema, sem perturbar o resto (reduzindo downtime na VPS):
+
+### `docker compose build nome_do_servico`
+- **Exemplo:** `docker compose build frontend` ou `docker compose build backend`
+- **O que faz:** Compila o código novo **apenas** daquele serviço específico indicado no `docker-compose.yml`, deixando os outros serviços rodando sem interrupção.
+- **Quando uso:** Modifiquei o layout do Frontend, mas quero que a API e o painel Admin continuem rodando intactos para os usuários do evento. Logo após o `build`, você roda um `docker compose up -d` para aplicar a substituição suave daquela peça.
+
+---
+
+## 🕵️‍♂️ 3. Investigando Problemas (Logs e Status)
+
+A principal ferramenta de um administrador de sistemas é saber **o porquê** alguma rota ou aplicação caiu.
+
+### `docker compose ps`
+- **O que faz:** Lista todos os containers administrados por esta pasta e mostra o "Status" (ex: `Up`, `Restarting`, `OOMKilled`, `Exited`).
+- **O que eu procuro:** Se algum serviço não está com o status `Up`, há algo errado. O status `Restarting` indica "Crash Loop" infinito: o container sobe, o NodeJS estoura um erro fatal e fecha, em seguida o Docker tenta religar - e falha novamente.
+
+### `docker compose logs nome_do_servico --tail 30`
+- **Exemplo:** `docker compose logs backend --tail 50` ou `docker compose logs nginx --tail 30`
+- **O que faz:** Emite na tela as últimas X linhas do log que o programa "printou" no console.
+- **O que eu procuro:** 
+  - **No Backend/Frontend:** Procuro "Error", "SyntaxError", "PrismaClientInitializationError", etc. Essa é a única forma de ver qual pacote ou erro no código fez o servidor Node "crachar" invisivelmente.
+  - **No Nginx proxy:** Procuro requisições com código `404` (Não Encontrado) ou `502` (Bad Gateway). O 502 significa que o Nginx recebeu uma requisição, bateu na porta do NodeJS, mas ele não respondeu (provavelmente o container caiu).
+
+---
+
+## 🧹 4. Interação Interna e Limpeza
+
+### `docker exec -it nome_do_container comando`
+- **Exemplo:** `docker exec -it frontend_main wget -qO- http://127.0.0.1:3000/`
+- **O que faz:** Permite rodar um comando Linux de "dentro" do container em tempo real, sem interferir.
+- **Quando uso:** Uso o `wget` interno para testar se uma aplicação (NodeJS) está servindo a página pela porta nativa antes de passar a culpa pro Proxy (Nginx). Ou até para rodar comandos como `sh` (Terminal) para explorar pastas internas.
+
+### `docker image prune -f`
+- **O que faz:** Limpa de forma segura imagens e pacotes Docker que ficaram obsoletos no seu disco flutuante ("dangling images"), liberando espaço no SSD da VPS.
+- **Quando uso:** Após vários deploys (onde compilamos e recompilamos o código), o Docker pode acumular Gigabytes de dados antigos. Uso isso para "varrer o chão" após um update grande.
+
+---
+Essas são as ferramentas de ouro da devops moderna! Com elas domadas, seu ecossistema permanecerá sempre saudável e previsível.

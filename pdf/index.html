@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Credencial Evento</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+
+:root{
+--cor-tipo:#007bff;
+}
+
+/* CONFIGURAÇÃO IMPRESSÃO */
+
+@page{
+size:A4;
+margin:0;
+}
+
+body{
+margin:0;
+font-family:Arial;
+-webkit-print-color-adjust:exact;
+}
+
+/* FOLHA */
+
+.folha-a4{
+
+width:210mm;
+height:297mm;
+
+display:grid;
+grid-template-columns:1fr 1fr;
+grid-template-rows:1fr 1fr;
+
+}
+
+/* QUADRANTE */
+
+.quadrante{
+
+width:105mm;
+height:148.5mm;
+
+padding:12mm;
+
+box-sizing:border-box;
+
+display:flex;
+flex-direction:column;
+
+border:0.1mm dashed #ccc;
+
+}
+
+/* LOGO */
+
+.logo-evento{
+max-width:85%;
+margin:auto;
+margin-bottom:6mm;
+}
+
+/* NOME */
+
+.nome-usuario{
+
+font-size:22pt;
+font-weight:bold;
+
+text-transform:uppercase;
+
+text-align:center;
+
+}
+
+/* EMPRESA */
+
+.cidade-empresa{
+
+font-size:18pt;
+text-align:center;
+margin-top:3mm;
+
+}
+
+/* QR */
+
+.qr-container{
+
+display:flex;
+justify-content:center;
+margin-top:8mm;
+
+}
+
+.qr-code{
+
+width:90px;
+height:90px;
+
+border:1px solid #000;
+padding:3px;
+
+}
+
+/* FAIXA TIPO */
+
+.faixa-tipo{
+
+background:var(--cor-tipo);
+
+color:white;
+
+text-align:center;
+
+font-size:24pt;
+
+font-weight:bold;
+
+margin-top:auto;
+
+width:calc(100% + 24mm);
+
+margin-left:-12mm;
+
+padding:15px 0;
+
+text-transform:uppercase;
+
+}
+
+/* TITULOS */
+
+.titulo-secao{
+
+font-size:14pt;
+font-weight:bold;
+
+text-align:center;
+
+text-decoration:underline;
+
+margin-bottom:4mm;
+
+}
+
+/* GRID LOGOS */
+
+.grid-logos{
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+flex-wrap:wrap;
+
+gap:20px;
+
+}
+
+.grid-logos img{
+
+max-width:90px;
+max-height:50px;
+
+object-fit:contain;
+
+}
+
+/* EVENTO */
+
+.label-evento{
+
+font-size:11pt;
+color:#666;
+font-weight:bold;
+
+}
+
+.valor-evento{
+
+font-size:15pt;
+font-weight:bold;
+
+margin-bottom:7mm;
+
+}
+
+/* REGRAS */
+
+.q4{
+
+font-size:10pt;
+
+text-align:justify;
+
+line-height:1.4;
+
+}
+
+.titulo-regras{
+
+text-align:center;
+font-weight:bold;
+
+margin-bottom:6mm;
+
+}
+
+/* BOTÕES */
+
+.controles{
+
+position:fixed;
+bottom:20px;
+right:20px;
+
+display:flex;
+gap:10px;
+
+}
+
+button{
+
+padding:12px 20px;
+
+font-size:14px;
+
+border:none;
+
+border-radius:6px;
+
+cursor:pointer;
+
+color:white;
+
+}
+
+.btn-print{background:#28a745;}
+.btn-pdf{background:#007bff;}
+
+/* PRINT */
+
+@media print{
+
+.controles{display:none;}
+.quadrante{border:transparent;}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="credencial" class="folha-a4">
+
+<!-- QUADRANTE 1 -->
+
+<div class="quadrante">
+
+<img src="imagens/6 alta café.png" class="logo-evento">
+
+<div class="nome-usuario">{{NOME}}</div>
+
+<div class="cidade-empresa">
+{{CIDADE}} - {{UF}} <br>
+<strong>{{EMPRESA}}</strong>
+</div>
+
+<div class="qr-container">
+<img src="{{URL_QR}}" class="qr-code">
+</div>
+
+<div id="tipoCredencial" class="faixa-tipo">
+{{TIPO}}
+</div>
+
+</div>
+
+
+<!-- QUADRANTE 2 -->
+
+<div class="quadrante">
+
+<img src="imagens/6 alta café.png" class="logo-evento">
+
+<div class="nome-usuario">{{NOME}}</div>
+
+<div class="cidade-empresa">
+{{CIDADE}} - {{UF}} <br>
+<strong>{{EMPRESA}}</strong>
+</div>
+
+<div class="qr-container">
+<img src="{{URL_QR}}" class="qr-code">
+</div>
+
+<div id="tipoCredencial" class="faixa-tipo">
+{{TIPO}}
+</div>
+
+</div>
+
+
+<!-- QUADRANTE 3 -->
+
+<div class="quadrante">
+
+<div class="label-evento">EVENTO</div>
+<div class="valor-evento">6ª ALTA CAFÉ</div>
+
+<div class="label-evento">LOCAL</div>
+<div class="valor-evento">CLUBE DE CAMPO DE FRANCA</div>
+
+<div class="label-evento">DATA INICIAL</div>
+<div class="valor-evento">24/03/2026</div>
+
+<div class="label-evento">DATA FINAL</div>
+<div class="valor-evento">26/03/2026</div>
+
+<div class="titulo-secao">APOIO DE MÍDIA</div>
+
+<div class="grid-logos">
+
+<img src="imagens/EPTV.png">
+<img src="imagens/epagro.png">
+<img src="imagens/Attalea.png">
+
+</div>
+
+</div>
+
+
+<!-- QUADRANTE 4 -->
+
+<div class="quadrante q4">
+
+<div class="titulo-regras">ESTA É SUA CREDENCIAL</div>
+
+<p>
+• Leve sua credencial impressa ao evento<br>
+• Dobre em 4<br>
+• Apresente no portão a sua credencial
+</p>
+
+<p>
+<strong>CREDENCIAL PESSOAL E INTRANSFERÍVEL</strong><br>
+• Uso obrigatório durante todo o evento. <br>
+• O portador concorda com o uso de sua imagem (fotos e vídeos) para divulgação do evento.
+</p>
+
+<div class="titulo-secao">PATROCINADORES</div>
+
+<div class="grid-logos">
+
+<img src="imagens/altacafe.png">
+<img src="imagens/aeagro.png">
+<img src="imagens/Sindicato Rural.png">
+<img src="imagens/Sami.png">
+<img src="imagens/AgroPL.png">
+<img src="imagens/Guapuã.png">
+<img src="imagens/OIMASA.png">
+<img src="imagens/Olimáquinas.png">
+<img src="imagens/Robusta.png">
+<img src="imagens/AAlves.png">
+
+</div>
+
+</div>
+
+</div>
+
+<!-- BOTÕES -->
+
+<div class="controles">
+
+<button class="btn-print" onclick="window.print()">
+IMPRIMIR
+</button>
+
+<button class="btn-pdf" onclick="baixarPDF()">
+BAIXAR PDF
+</button>
+
+</div>
+
+<script>
+
+/* CORES POR TIPO */
+
+const tipo = document.getElementById("tipoCredencial").innerText.toLowerCase()
+
+let cor="#007bff"
+
+if(tipo.includes("visitante")) cor="#007bff"
+if(tipo.includes("expositor")) cor="#28a745"
+if(tipo.includes("imprensa")) cor="#6f42c1"
+if(tipo.includes("staff")) cor="#fd7e14"
+
+document.documentElement.style.setProperty('--cor-tipo', cor)
+
+/* GERAR PDF */
+
+function baixarPDF(){
+
+const element = document.getElementById("credencial")
+
+const opt = {
+
+margin:0,
+filename:'credencial-evento.pdf',
+
+image:{type:'jpeg',quality:1},
+
+html2canvas:{scale:3},
+
+jsPDF:{
+unit:'mm',
+format:'a4',
+orientation:'portrait'
+}
+
+}
+
+html2pdf().set(opt).from(element).save()
+
+}
+
+</script>
+
+</body>
+</html>

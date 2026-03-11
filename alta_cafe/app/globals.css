@@ -1,0 +1,110 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Alta Café Theme - Warm, Premium, Agricultural */
+  --background: #F5F0E8;
+  --foreground: #3D2E24;
+  --card: #FFFFFF;
+  --card-foreground: #3D2E24;
+  --popover: #FFFFFF;
+  --popover-foreground: #3D2E24;
+  --primary: #119447;
+  --primary-foreground: #FFFFFF;
+  --secondary: #72B944;
+  --secondary-foreground: #FFFFFF;
+  --muted: #EDE8E0;
+  --muted-foreground: #6B5D52;
+  --accent: #9A5A2D;
+  --accent-foreground: #FFFFFF;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --border: #E7DED2;
+  --input: #E7DED2;
+  --ring: #119447;
+  --chart-1: #119447;
+  --chart-2: #72B944;
+  --chart-3: #9A5A2D;
+  --chart-4: #5E3924;
+  --chart-5: #C4A574;
+  --radius: 0.75rem;
+  
+  /* Sidebar - Dark Green Theme */
+  --sidebar: #0D3320;
+  --sidebar-foreground: #F5F0E8;
+  --sidebar-primary: #72B944;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #1A4D32;
+  --sidebar-accent-foreground: #F5F0E8;
+  --sidebar-border: #1A4D32;
+  --sidebar-ring: #72B944;
+  
+  /* Custom Alta Café tokens */
+  --coffee: #9A5A2D;
+  --coffee-dark: #5E3924;
+  --green-primary: #119447;
+  --green-secondary: #72B944;
+  --warm-bg: #F5F0E8;
+  --warm-border: #E7DED2;
+}
+
+
+
+@theme inline {
+  --font-sans: 'DM Sans', 'Geist', sans-serif;
+  --font-serif: 'Libre Baskerville', 'Georgia', serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --color-coffee: var(--coffee);
+  --color-coffee-dark: var(--coffee-dark);
+  --color-green-primary: var(--green-primary);
+  --color-green-secondary: var(--green-secondary);
+  --color-warm-bg: var(--warm-bg);
+  --color-warm-border: var(--warm-border);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

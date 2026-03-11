@@ -1,0 +1,160 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// model Credenciado {
+//   id              String   @id @default(uuid())
+//   nomeCompleto    String
+//   cpf             String   @unique
+//   rg              String
+//   celular         String
+//   email           String
+//   municipio       String
+//   uf              String
+//   aceitouLgpd     Boolean  @default(false)
+//   tipo            String   // Pode ser "Visitante", "Cafeicultor", "Expositor", "Imprensa"
+//   criadoEm        DateTime @default(now())
+//
+//   // Campos específicos de cada tipo
+//   // Expositores
+//   cnpj            String?
+//   nomeEmpresa     String?
+//   siteEmpresa     String?
+//
+//   // Cafeicultores
+//   ccir            String?
+//   nomePropriedade String?
+//
+//   // Imprensa (cnpj e siteEmpresa já contemplados acima)
+//   nomeVeiculo     String?
+// }
+
+enum TipoCategoria {
+  EXPOSITOR
+  VISITANTE
+  CAFEICULTOR
+  IMPRENSA
+  ORGANIZACAO
+  TERCEIRIZADO
+}
+
+enum PerfilAcesso {
+  LEITOR_CATRACA
+  ADMIN
+}
+
+enum TipoCombustivel {
+  GASOLINA
+  ETANOL
+  DIESEL
+  ELETRICO
+}
+
+model Evento {
+  id           String        @id @default(uuid()) @db.Uuid
+  nomeEvento   String        @unique @map("nome_evento")
+  isGratuito   Boolean       @default(true) @map("is_gratuito")
+  privateKey   String?       @map("private_key")
+  publicKey    String?       @map("public_key")
+  credenciados Credenciado[]
+
+  @@map("evento")
+}
+
+model UsuarioOrganizacao {
+  id           String       @id @default(uuid()) @db.Uuid
+  login        String       @unique
+  senhaHash    String       @map("senha_hash")
+  perfilAcesso PerfilAcesso @map("perfil_acesso")
+
+  @@map("usuario_organizacao")
+}
+
+model Credenciado {
+  id            String        @id @default(uuid()) @db.Uuid
+  eventoId      String        @map("evento_id") @db.Uuid
+  tipoCategoria TipoCategoria @map("tipo_categoria")
+  nomeCompleto  String        @map("nome_completo")
+  cpf           String        @unique
+  rg            String
+  celular       String
+  email         String
+  cnpj          String?
+  ccir          String?
+  aceiteLgpd    Boolean         @map("aceite_lgpd")
+  tipoCombustivel TipoCombustivel @map("tipo_combustivel")
+
+  evento          Evento           @relation(fields: [eventoId], references: [id], onDelete: Restrict)
+  endereco        Endereco?
+  credencial      Credencial?
+  descarbonizacao Descarbonizacao?
+
+  @@unique([eventoId, cpf])
+  @@index([eventoId])
+  @@index([email])
+  @@index([tipoCategoria])
+  @@map("credenciado")
+}
+
+model Endereco {
+  id            String      @id @default(uuid()) @db.Uuid
+  credenciadoId String      @unique @map("credenciado_id") @db.Uuid
+  cep           String
+  rua           String
+  bairro        String
+  cidade        String
+  estado        String
+
+  credenciado   Credenciado @relation(fields: [credenciadoId], references: [id], onDelete: Cascade)
+
+  @@map("endereco")
+}
+
+model Descarbonizacao {
+  id                  String          @id @default(uuid()) @db.Uuid
+  credenciadoId       String          @unique @map("credenciado_id") @db.Uuid
+  distanciaIdaVoltaKm Float           @map("distancia_ida_volta_km")
+  tipoCombustivel     TipoCombustivel @map("tipo_combustivel")
+
+  credenciado Credenciado @relation(fields: [credenciadoId], references: [id], onDelete: Cascade)
+
+  @@map("descarbonizacao")
+}
+
+model Credencial {
+  id                 String  @id @default(uuid()) @db.Uuid
+  credenciadoId      String  @unique @map("credenciado_id") @db.Uuid
+  ticketId           String  @unique @default(uuid()) @map("ticket_id") @db.Uuid
+  qrToken            String  @map("qr_token") @db.Text
+  downloads          Int     @default(0)
+  printCount         Int     @default(0) @map("print_count")
+  status             String  @default("ACTIVE")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  credenciado Credenciado @relation(fields: [credenciadoId], references: [id], onDelete: Cascade)
+  scans       QrScan[]
+
+  @@index([ticketId])
+  @@map("credencial")
+}
+
+model QrScan {
+  id           String   @id @default(uuid()) @db.Uuid
+  ticketId     String   @map("ticket_id") @db.Uuid
+  scannerId    String   @map("scanner_id")
+  scanType     String   @map("scan_type")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  credencial   Credencial @relation(fields: [ticketId], references: [ticketId], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@map("qrscans")
+}
