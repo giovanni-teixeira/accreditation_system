@@ -7,10 +7,10 @@ echo "🚀 Iniciando Deploy Automatizado..."
 echo "=========================================="
 
 # 1. Atualizar o código-fonte
-echo "📥 1. Puxando alterações do GitHub (Branch 'dev-backend-endereco')..."
+echo "📥 1. Puxando alterações do GitHub (Branch 'dev')..."
 git fetch origin
-git reset --hard origin/dev-backend-endereco
-git pull origin dev-backend-endereco
+git reset --hard origin/dev
+git pull origin dev
 
 # 1.5 Gerenciamento do Arquivo de Ambiente (.env) seguro
 echo "🔐 1.5 Copiando Variáveis de Ambiente (.env) seguras do servidor..."
