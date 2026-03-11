@@ -22,7 +22,12 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            cd ~/HAKATON
+            if [ ! -d "$HOME/HAKATON" ]; then
+              echo "Pasta do projeto não encontrada. Realizando o Clone Mágico Inicial..."
+              cd $HOME
+              git clone -b dev https://github.com/MaurilioSemeao/hakaton-alta-cafe.git HAKATON
+            fi
+            cd $HOME/HAKATON
             git fetch origin
             git checkout dev
             git pull origin dev
