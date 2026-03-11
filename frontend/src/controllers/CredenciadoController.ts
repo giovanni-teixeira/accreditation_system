@@ -2,6 +2,7 @@
 
 // src/controllers/CredenciadoController.ts
 import { Credenciado, Expositor, Cafeicultor, Visitante, Imprensa } from '@/models/Credenciado';
+import { API_ROUTES } from '@/config/api';
 
 export interface CadastroResponse {
     sucesso: boolean;
@@ -43,8 +44,8 @@ export async function cadastrarUsuario(formData: any): Promise<CadastroResponse>
             throw new Error('Perfil inválido no sistema.');
         }
 
-        // Requisição para o backend NestJS rodando na porta 3001
-        const res = await fetch(`/api/credenciados/${role}`, {
+        // Requisição centralizada para o backend
+        const res = await fetch(API_ROUTES.CREDENCIADOS.CRIAR(role), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

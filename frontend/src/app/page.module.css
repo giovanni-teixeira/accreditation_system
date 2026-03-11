@@ -157,3 +157,10 @@
     margin-bottom: 0.5rem;
   }
 }
+
+/* Redução de 80% para Desktop */
+@media (min-width: 769px) {
+  .main {
+    zoom: 0.8;
+  }
+}

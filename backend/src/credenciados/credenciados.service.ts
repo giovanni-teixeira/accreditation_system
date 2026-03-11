@@ -7,8 +7,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import * as nacl from 'tweetnacl';
 import * as util from 'tweetnacl-util';
-import { v4 as uuidv4 } from 'uuid';
-
+import * as crypto from 'crypto';
 @Injectable()
 export class CredenciadosService {
   constructor(private readonly prisma: PrismaService) { }
@@ -24,7 +23,7 @@ export class CredenciadosService {
   }
 
   private gerarCredencialAssinada(eventoId: string, privateKeyBase64: string, nome: string) {
-    const ticketId = uuidv4();
+    const ticketId = crypto.randomUUID();
     const payload = {
       e: eventoId,
       t: ticketId,

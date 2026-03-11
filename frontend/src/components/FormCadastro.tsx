@@ -3,7 +3,9 @@
 import { useState, useTransition, ChangeEvent, FormEvent, useRef, useEffect } from 'react';
 import styles from './FormCadastro.module.css';
 import { cadastrarUsuario, CadastroResponse } from '@/controllers/CredenciadoController';
+import { API_ROUTES } from '@/config/api';
 import SuccessModal from './SuccessModal';
+import ErrorModal from './ErrorModal';
 
 const ROLES = [
     { id: 'expositor', label: 'Expositor', icon: '🏢' },
@@ -38,7 +40,8 @@ export default function FormCadastro() {
     const formStartRef = useRef<HTMLDivElement>(null);
     const [isPending, startTransition] = useTransition();
     const [feedback, setFeedback] = useState<{ tipo: 'sucesso' | 'erro'; mensagem: string } | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+    const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     const [lastSubmission, setLastSubmission] = useState<any>(null);
     const [cepLocked, setCepLocked] = useState({ rua: false, bairro: false, cidade: false, estado: false });
 
@@ -78,7 +81,7 @@ export default function FormCadastro() {
         const zipCode = cepText.replace(/\D/g, '');
         if (zipCode.length === 8) {
             try {
-                const response = await fetch(`https://viacep.com.br/ws/${zipCode}/json/`);
+                const response = await fetch(API_ROUTES.EXTERNAL.VIA_CEP(zipCode));
                 const data = await response.json();
                 if (!data.erro) {
                     setFormData(prev => ({
@@ -192,13 +195,14 @@ export default function FormCadastro() {
 
             const result: CadastroResponse = await cadastrarUsuario(cleanData);
             setFeedback({ tipo: result.sucesso ? 'sucesso' : 'erro', mensagem: result.mensagem });
+
             if (result.sucesso) {
                 setLastSubmission({
                     ...formData,
                     role,
                     qrToken: result.dadosRecebidos?.credencial?.qrToken || ''
                 });
-                setIsModalOpen(true);
+                setIsSuccessModalOpen(true);
                 setTimeout(() => {
                     document.getElementById('cadastroForm')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }, 100);
@@ -209,6 +213,9 @@ export default function FormCadastro() {
                     cnpj: '', siteEmpresa: '', nomeEmpresa: '',
                     ccir: '', nomePropriedade: '', nomeVeiculo: ''
                 });
+            } else {
+                // Abre o modal de erro quando encontrar restrições no backend
+                setIsErrorModalOpen(true);
             }
         });
     };
@@ -381,28 +388,22 @@ export default function FormCadastro() {
                     <button type="submit" className={styles.submitBtn} disabled={isPending}>
                         {isPending ? 'Processando...' : 'Finalizar Credenciamento'}
                     </button>
-
-                    {feedback && (
-                        <div className={`${styles.feedbackMessage} ${feedback.tipo === 'sucesso' ? styles.success : styles.error}`}>
-                            {feedback.tipo === 'erro' && feedback.mensagem.includes(', ') ? (
-                                <ul className={styles.errorList}>
-                                    {feedback.mensagem.split(', ').map((msg, i) => (
-                                        <li key={i}>{msg}</li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                feedback.mensagem
-                            )}
-                        </div>
-                    )}
                 </div>
             )}
 
-            {isModalOpen && lastSubmission && (
+            {isSuccessModalOpen && lastSubmission && (
                 <SuccessModal
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
+                    isOpen={isSuccessModalOpen}
+                    onClose={() => setIsSuccessModalOpen(false)}
                     userData={lastSubmission}
+                />
+            )}
+
+            {isErrorModalOpen && feedback && feedback.tipo === 'erro' && (
+                <ErrorModal
+                    isOpen={isErrorModalOpen}
+                    onClose={() => setIsErrorModalOpen(false)}
+                    messages={feedback.mensagem}
                 />
             )}
         </form>
