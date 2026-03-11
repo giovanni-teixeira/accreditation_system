@@ -30,6 +30,10 @@ docker compose down
 echo "🏗️ 3. Reconstruindo imagens das aplicações alteradas e Subindo arquitetura..."
 docker compose up -d --build
 
+# 3.5 Sincronizando Banco de Dados (Migrações)
+echo "🗄️ 3.5 Estruturando e Sincronizando o Banco de Dados com Prisma..."
+docker exec backend_api npx prisma migrate deploy
+
 # 4. Limpeza de Imagens Órfãs
 echo "🧹 4. Limpando cache do Docker antigo..."
 docker image prune -f
