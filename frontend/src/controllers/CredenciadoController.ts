@@ -9,10 +9,6 @@ export interface CadastroResponse {
     dadosRecebidos?: any;
 }
 
-/**
- * Controller que lida com a requisição de cadastro vinda da View (Formulário).
- * Em um app completo, aqui interagiríamos com o banco de dados.
- */
 export async function cadastrarUsuario(formData: any): Promise<CadastroResponse> {
     try {
         const { role, ...dados } = formData;
@@ -41,14 +37,14 @@ export async function cadastrarUsuario(formData: any): Promise<CadastroResponse>
         // Regra de validação de domínio do frontend
         novoUsuario.validar();
 
-        // Limpa tipagens não necessárias que possam ter sobrado do objeto instanciado (tipo, id)
+
         const rotasPossiveis = ['visitante', 'cafeicultor', 'imprensa', 'expositor'];
         if (!rotasPossiveis.includes(role)) {
             throw new Error('Perfil inválido no sistema.');
         }
 
         // Requisição para o backend NestJS rodando na porta 3001
-        const res = await fetch(`http://localhost:3001/credenciados/${role}`, {
+        const res = await fetch(`/api/credenciados/${role}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -57,7 +53,7 @@ export async function cadastrarUsuario(formData: any): Promise<CadastroResponse>
         });
 
         if (!res.ok) {
-            // Em caso de Bad Request (400), tentamos parsear o erro retornado pelo class-validator ou Prisma.
+
             const erroRes = await res.json().catch(() => ({}));
 
             let errorMessage = erroRes.message || 'Erro ao comunicar com o servidor de credenciamento.';
