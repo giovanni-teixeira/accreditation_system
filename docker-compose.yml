@@ -10,8 +10,8 @@ services:
       POSTGRES_DB: alta_cafe
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    expose:
-      - "5432"
+    ports:
+      - "127.0.0.1:5432:5432"
 
   backend:
     build: ./backend
