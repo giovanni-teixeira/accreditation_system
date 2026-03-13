@@ -12,18 +12,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EnderecoRepository = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma.service");
-let EnderecoRepository = class EnderecoRepository {
+const base_repository_1 = require("./base.repository");
+let EnderecoRepository = class EnderecoRepository extends base_repository_1.BaseRepository {
     prisma;
     constructor(prisma) {
+        super(prisma, prisma.endereco);
         this.prisma = prisma;
     }
-    async create(data, credenciadoId) {
-        return this.prisma.endereco.create({
-            data: {
-                ...data,
-                credenciado: { connect: { id: credenciadoId } },
-            },
+    async findByCredenciadoId(credenciadoId) {
+        const result = await this.prisma.endereco.findUnique({
+            where: { credenciadoId },
         });
+        return result;
     }
 };
 exports.EnderecoRepository = EnderecoRepository;

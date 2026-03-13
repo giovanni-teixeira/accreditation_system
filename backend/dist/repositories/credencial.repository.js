@@ -12,24 +12,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CredencialRepository = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma.service");
-let CredencialRepository = class CredencialRepository {
+const base_repository_1 = require("./base.repository");
+let CredencialRepository = class CredencialRepository extends base_repository_1.BaseRepository {
     prisma;
     constructor(prisma) {
+        super(prisma, prisma.credencial);
         this.prisma = prisma;
     }
-    async create(data, credenciadoId) {
-        return this.prisma.credencial.create({
-            data: {
-                ...data,
-                credenciado: { connect: { id: credenciadoId } },
+    async findByTicketId(ticketId) {
+        const result = await this.prisma.credencial.findUnique({
+            where: { ticketId },
+            include: {
+                credenciado: true,
             },
         });
-    }
-    async findByTicketId(ticketId) {
-        return this.prisma.credencial.findUnique({
-            where: { ticketId },
-            include: { credenciado: true },
-        });
+        return result;
     }
 };
 exports.CredencialRepository = CredencialRepository;

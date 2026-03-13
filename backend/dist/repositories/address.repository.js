@@ -19,10 +19,11 @@ let AddressRepository = class AddressRepository extends base_repository_1.BaseRe
         super(prisma, prisma.enderecoCache);
         this.prisma = prisma;
     }
-    async findByCepAndCountry(cep, pais = 'Brasil') {
-        return this.prisma.enderecoCache.findUnique({
+    async findByCep(cep) {
+        const result = await this.prisma.enderecoCache.findUnique({
             where: { cep },
         });
+        return result;
     }
 };
 exports.AddressRepository = AddressRepository;

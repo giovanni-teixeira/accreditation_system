@@ -20,17 +20,20 @@ let UsuarioRepository = class UsuarioRepository extends base_repository_1.BaseRe
         this.prisma = prisma;
     }
     async findByLogin(login) {
-        return this.prisma.usuarioOrganizacao.findUnique({
+        const result = await this.prisma.usuarioOrganizacao.findUnique({
             where: { login },
         });
+        return result;
     }
     async findFirstAdmin() {
-        return this.prisma.usuarioOrganizacao.findFirst({
+        const result = await this.prisma.usuarioOrganizacao.findFirst({
             where: { perfilAcesso: 'ADMIN' },
         });
+        return result;
     }
     async findFirstUser(where) {
-        return this.prisma.usuarioOrganizacao.findFirst({ where });
+        const result = await this.prisma.usuarioOrganizacao.findFirst({ where });
+        return result;
     }
 };
 exports.UsuarioRepository = UsuarioRepository;

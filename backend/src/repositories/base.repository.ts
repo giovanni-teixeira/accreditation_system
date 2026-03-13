@@ -4,11 +4,16 @@ import { PrismaService } from '../prisma.service';
 export abstract class BaseRepository<T, CreateInput, UpdateInput> {
   constructor(
     protected readonly prisma: PrismaService,
-    protected readonly model: any, // Referência ao modelo do Prisma (ex: this.prisma.evento)
+    protected readonly model: any,
   ) {}
 
   async create(data: CreateInput, include?: any): Promise<T> {
-    return this.model.create({ data, include });
+    try {
+      return await this.model.create({ data, include });
+    } catch (error) {
+      // Aqui podemos interceptar erros específicos do Prisma e lançar exceções de domínio
+      throw error;
+    }
   }
 
   async findAll(include?: any): Promise<T[]> {

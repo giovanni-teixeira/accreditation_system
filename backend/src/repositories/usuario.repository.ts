@@ -1,28 +1,35 @@
 // src/repositories/usuario.repository.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Prisma, UsuarioOrganizacao } from '@prisma/client';
+import { Prisma, UsuarioOrganizacao as PrismaUsuario } from '@prisma/client';
 import { BaseRepository } from './base.repository';
+import { IUsuarioOrganizacao } from '../domain/entities/usuario-organizacao.entity';
 
 @Injectable()
-export class UsuarioRepository extends BaseRepository<UsuarioOrganizacao, Prisma.UsuarioOrganizacaoCreateInput, Prisma.UsuarioOrganizacaoUpdateInput> {
+export class UsuarioRepository extends BaseRepository<IUsuarioOrganizacao, Prisma.UsuarioOrganizacaoCreateInput, Prisma.UsuarioOrganizacaoUpdateInput> {
   constructor(protected readonly prisma: PrismaService) {
     super(prisma, prisma.usuarioOrganizacao);
   }
 
-  async findByLogin(login: string) {
-    return this.prisma.usuarioOrganizacao.findUnique({
+  async findByLogin(login: string): Promise<IUsuarioOrganizacao | null> {
+    const result = await this.prisma.usuarioOrganizacao.findUnique({
       where: { login },
     });
+
+    return result as IUsuarioOrganizacao | null;
   }
 
-  async findFirstAdmin() {
-    return this.prisma.usuarioOrganizacao.findFirst({
+  async findFirstAdmin(): Promise<IUsuarioOrganizacao | null> {
+    const result = await this.prisma.usuarioOrganizacao.findFirst({
       where: { perfilAcesso: 'ADMIN' },
     });
+
+    return result as IUsuarioOrganizacao | null;
   }
 
-  async findFirstUser(where: Prisma.UsuarioOrganizacaoWhereInput) {
-    return this.prisma.usuarioOrganizacao.findFirst({ where });
+  async findFirstUser(where: Prisma.UsuarioOrganizacaoWhereInput): Promise<IUsuarioOrganizacao | null> {
+    const result = await this.prisma.usuarioOrganizacao.findFirst({ where });
+    
+    return result as IUsuarioOrganizacao | null;
   }
 }

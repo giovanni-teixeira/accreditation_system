@@ -1,28 +1,11 @@
 import { PrismaService } from '../prisma.service';
-import { Prisma, UsuarioOrganizacao } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { BaseRepository } from './base.repository';
-export declare class UsuarioRepository extends BaseRepository<UsuarioOrganizacao, Prisma.UsuarioOrganizacaoCreateInput, Prisma.UsuarioOrganizacaoUpdateInput> {
+import { IUsuarioOrganizacao } from '../domain/entities/usuario-organizacao.entity';
+export declare class UsuarioRepository extends BaseRepository<IUsuarioOrganizacao, Prisma.UsuarioOrganizacaoCreateInput, Prisma.UsuarioOrganizacaoUpdateInput> {
     protected readonly prisma: PrismaService;
     constructor(prisma: PrismaService);
-    findByLogin(login: string): Promise<{
-        login: string;
-        senhaHash: string;
-        perfilAcesso: import(".prisma/client").$Enums.PerfilAcesso;
-        setor: string | null;
-        id: string;
-    } | null>;
-    findFirstAdmin(): Promise<{
-        login: string;
-        senhaHash: string;
-        perfilAcesso: import(".prisma/client").$Enums.PerfilAcesso;
-        setor: string | null;
-        id: string;
-    } | null>;
-    findFirstUser(where: Prisma.UsuarioOrganizacaoWhereInput): Promise<{
-        login: string;
-        senhaHash: string;
-        perfilAcesso: import(".prisma/client").$Enums.PerfilAcesso;
-        setor: string | null;
-        id: string;
-    } | null>;
+    findByLogin(login: string): Promise<IUsuarioOrganizacao | null>;
+    findFirstAdmin(): Promise<IUsuarioOrganizacao | null>;
+    findFirstUser(where: Prisma.UsuarioOrganizacaoWhereInput): Promise<IUsuarioOrganizacao | null>;
 }

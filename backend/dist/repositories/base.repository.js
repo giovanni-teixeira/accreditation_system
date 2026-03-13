@@ -9,7 +9,12 @@ class BaseRepository {
         this.model = model;
     }
     async create(data, include) {
-        return this.model.create({ data, include });
+        try {
+            return await this.model.create({ data, include });
+        }
+        catch (error) {
+            throw error;
+        }
     }
     async findAll(include) {
         return this.model.findMany({ include });

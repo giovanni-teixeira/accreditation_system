@@ -20,7 +20,12 @@ let EventoRepository = class EventoRepository extends base_repository_1.BaseRepo
         this.prisma = prisma;
     }
     async findFirst() {
-        return this.prisma.evento.findFirst();
+        const result = await this.prisma.evento.findFirst({
+            include: {
+                credenciados: true
+            }
+        });
+        return result;
     }
 };
 exports.EventoRepository = EventoRepository;

@@ -20,13 +20,14 @@ let CredenciadoRepository = class CredenciadoRepository extends base_repository_
         this.prisma = prisma;
     }
     async findByCpf(cpf) {
-        return this.prisma.credenciado.findUnique({
+        const result = await this.prisma.credenciado.findUnique({
             where: { cpf },
             include: {
                 credencial: true,
                 endereco: true,
             },
         });
+        return result;
     }
 };
 exports.CredenciadoRepository = CredenciadoRepository;

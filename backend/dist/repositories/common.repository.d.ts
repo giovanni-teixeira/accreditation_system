@@ -7,13 +7,13 @@ export declare class CommonRepository {
         id: string;
         latitude: number | null;
         longitude: number | null;
-        credenciadoId: string;
         cep: string;
         rua: string;
         bairro: string;
         cidade: string;
         estado: string;
         pais: string;
+        credenciadoId: string;
     }>;
     createCredencial(data: Prisma.CredencialCreateWithoutCredenciadoInput, credenciadoId: string): Promise<{
         id: string;
@@ -27,8 +27,8 @@ export declare class CommonRepository {
     }>;
     createDescarbonizacao(data: Prisma.DescarbonizacaoCreateWithoutCredenciadoInput, credenciadoId: string): Promise<{
         id: string;
-        credenciadoId: string;
         tipoCombustivel: import(".prisma/client").$Enums.TipoCombustivel;
+        credenciadoId: string;
         distanciaIdaVoltaKm: number;
         latitudeOrigem: number | null;
         longitudeOrigem: number | null;

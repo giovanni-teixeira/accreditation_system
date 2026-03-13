@@ -27,7 +27,7 @@ export class AddressService {
         const cleanCep = cep.replace(/\D/g, '');
 
         // 1. Verificar Cache no Banco
-        const cached = await this.addressRepository.findByCepAndCountry(cleanCep, country);
+        const cached = await this.addressRepository.findByCep(cleanCep);
         if (cached) {
             this.logger.log(`Endereço encontrado no cache: ${cleanCep}`);
             return {
@@ -37,8 +37,8 @@ export class AddressService {
                 cidade: cached.cidade,
                 estado: cached.estado,
                 pais: cached.pais,
-                latitude: cached.latitude,
-                longitude: cached.longitude,
+                latitude: cached.latitude ?? null,
+                longitude: cached.longitude ?? null,
             };
         }
 
@@ -50,7 +50,7 @@ export class AddressService {
                 await this.addressRepository.create({
                     ...brasilData,
                     pais: 'Brasil',
-                });
+                } as any);
                 return { ...brasilData, pais: 'Brasil' };
             }
         }

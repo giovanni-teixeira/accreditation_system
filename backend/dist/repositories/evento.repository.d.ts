@@ -1,17 +1,9 @@
 import { PrismaService } from '../prisma.service';
+import { Prisma } from '@prisma/client';
 import { BaseRepository } from './base.repository';
-import { Evento, Prisma } from '@prisma/client';
-export declare class EventoRepository extends BaseRepository<Evento, Prisma.EventoCreateInput, Prisma.EventoUpdateInput> {
+import { IEvento } from '../domain/entities/evento.entity';
+export declare class EventoRepository extends BaseRepository<IEvento, Prisma.EventoCreateInput, Prisma.EventoUpdateInput> {
     protected readonly prisma: PrismaService;
     constructor(prisma: PrismaService);
-    findFirst(): Promise<{
-        id: string;
-        nomeEvento: string;
-        isGratuito: boolean;
-        localEvento: string | null;
-        latitude: number | null;
-        longitude: number | null;
-        privateKey: string | null;
-        publicKey: string | null;
-    } | null>;
+    findFirst(): Promise<IEvento | null>;
 }

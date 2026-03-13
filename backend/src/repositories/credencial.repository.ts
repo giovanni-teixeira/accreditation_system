@@ -1,27 +1,24 @@
 // src/repositories/credencial.repository.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, Credencial as PrismaCredencial } from '@prisma/client';
+import { BaseRepository } from './base.repository';
+import { ICredencial } from '../domain/entities/credencial.entity';
 
 @Injectable()
-export class CredencialRepository {
-  constructor(private readonly prisma: PrismaService) {}
-  async create(
-    data: Prisma.CredencialCreateWithoutCredenciadoInput,
-    credenciadoId: string,
-  ) {
-    return this.prisma.credencial.create({
-      data: {
-        ...data,
-        credenciado: { connect: { id: credenciadoId } },
-      },
-    });
+export class CredencialRepository extends BaseRepository<ICredencial, Prisma.CredencialCreateInput, Prisma.CredencialUpdateInput> {
+  constructor(protected readonly prisma: PrismaService) {
+    super(prisma, prisma.credencial);
   }
 
-  async findByTicketId(ticketId: string) {
-    return this.prisma.credencial.findUnique({
+  async findByTicketId(ticketId: string): Promise<ICredencial | null> {
+    const result = await this.prisma.credencial.findUnique({
       where: { ticketId },
-      include: { credenciado: true },
+      include: {
+        credenciado: true,
+      },
     });
+
+    return result as ICredencial | null;
   }
 }

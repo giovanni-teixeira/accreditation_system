@@ -24,7 +24,7 @@ let AddressService = AddressService_1 = class AddressService {
     }
     async getAddress(cep, country = 'Brasil') {
         const cleanCep = cep.replace(/\D/g, '');
-        const cached = await this.addressRepository.findByCepAndCountry(cleanCep, country);
+        const cached = await this.addressRepository.findByCep(cleanCep);
         if (cached) {
             this.logger.log(`Endereço encontrado no cache: ${cleanCep}`);
             return {
@@ -34,8 +34,8 @@ let AddressService = AddressService_1 = class AddressService {
                 cidade: cached.cidade,
                 estado: cached.estado,
                 pais: cached.pais,
-                latitude: cached.latitude,
-                longitude: cached.longitude,
+                latitude: cached.latitude ?? null,
+                longitude: cached.longitude ?? null,
             };
         }
         if (country.toLowerCase() === 'brasil' || country.toUpperCase() === 'BR') {
