@@ -41,13 +41,12 @@ let CredenciadosController = class CredenciadosController {
             throw new common_1.BadRequestException('Já existe um credenciado com este CPF');
         const tokenDados = qrcode_util_1.QrCodeHelper.generateSignedToken(evento.id, evento.privateKey, dto.nomeCompleto);
         const addressData = await this.addressService.getAddress(dto.cep, 'Brasil');
-        let latOrigem = addressData?.latitude || null;
-        let lonOrigem = addressData?.longitude || null;
+        const latOrigem = addressData?.latitude || null;
+        const lonOrigem = addressData?.longitude || null;
         let distanciaKm = 0;
         let pegadaCo2 = 0;
-        const eventoAny = evento;
-        if (latOrigem && lonOrigem && eventoAny.latitude && eventoAny.longitude) {
-            distanciaKm = calculation_helper_1.CalculationHelper.calculateDistance(latOrigem, lonOrigem, eventoAny.latitude, eventoAny.longitude);
+        if (latOrigem && lonOrigem && evento.latitude && evento.longitude) {
+            distanciaKm = calculation_helper_1.CalculationHelper.calculateDistance(latOrigem, lonOrigem, evento.latitude, evento.longitude);
             pegadaCo2 = calculation_helper_1.CalculationHelper.calculateCo2Footprint(distanciaKm, dto.tipoCombustivel);
         }
         const { tipoCategoria, tipoCombustivel, cep, rua, bairro, cidade, estado, pais, ...dadosParticipante } = dto;
@@ -73,8 +72,8 @@ let CredenciadosController = class CredenciadosController {
                     estado: dto.estado,
                     latitude: latOrigem,
                     longitude: lonOrigem,
-                    pais: 'Brasil'
-                }
+                    pais: 'Brasil',
+                },
             },
             descarbonizacao: {
                 create: {
@@ -83,7 +82,7 @@ let CredenciadosController = class CredenciadosController {
                     latitudeOrigem: latOrigem,
                     longitudeOrigem: lonOrigem,
                     pegadaCo2: pegadaCo2,
-                }
+                },
             },
             credencial: {
                 create: {

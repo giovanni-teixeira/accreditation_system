@@ -25,7 +25,7 @@ export class CredenciadosController {
     private readonly credenciadoRepository: CredenciadoRepository,
     private readonly eventoRepository: EventoRepository,
     private readonly addressService: AddressService,
-  ) { }
+  ) {}
 
   @Post(ROUTES.CREDENCIADOS.CRIAR)
   @ApiOperation({ summary: 'Cadastro Unificado de Credenciados' })
@@ -46,21 +46,23 @@ export class CredenciadosController {
 
     // 4. Buscar Localização (Geo) do Credenciado e do Evento
     const addressData = await this.addressService.getAddress(dto.cep, 'Brasil');
-    
-    let latOrigem = addressData?.latitude || null;
-    let lonOrigem = addressData?.longitude || null;
+
+    const latOrigem = addressData?.latitude || null;
+    const lonOrigem = addressData?.longitude || null;
     let distanciaKm = 0;
     let pegadaCo2 = 0;
 
-    // Forçamos o tipo para garantir que o TS veja os campos novos do Prisma
-    const eventoAny = evento as any;
-
-    if (latOrigem && lonOrigem && eventoAny.latitude && eventoAny.longitude) {
+    if (latOrigem && lonOrigem && evento.latitude && evento.longitude) {
       distanciaKm = CalculationHelper.calculateDistance(
-        latOrigem, lonOrigem, 
-        eventoAny.latitude, eventoAny.longitude
+        latOrigem,
+        lonOrigem,
+        evento.latitude,
+        evento.longitude,
       );
-      pegadaCo2 = CalculationHelper.calculateCo2Footprint(distanciaKm, dto.tipoCombustivel);
+      pegadaCo2 = CalculationHelper.calculateCo2Footprint(
+        distanciaKm,
+        dto.tipoCombustivel,
+      );
     }
 
     const {
@@ -75,48 +77,51 @@ export class CredenciadosController {
       ...dadosParticipante
     } = dto;
 
-    const res = await this.credenciadoRepository.create({
-      nomeCompleto: dto.nomeCompleto,
-      cpf: dto.cpf,
-      rg: dto.rg,
-      celular: dto.celular,
-      email: dto.email,
-      cnpj: dto.cnpj,
-      ccir: dto.ccir,
-      nomeEmpresa: dto.nomeEmpresa,
-      siteEmpresa: dto.siteEmpresa,
-      aceiteLgpd: true,
-      tipoCategoria: tipoCategoria,
-      evento: { connect: { id: evento.id } },
-      endereco: { 
-        create: { 
-          cep: dto.cep, 
-          rua: dto.rua, 
-          bairro: dto.bairro, 
-          cidade: dto.cidade, 
-          estado: dto.estado,
-          latitude: latOrigem,
-          longitude: lonOrigem,
-          pais: 'Brasil'
-        } 
-      },
-      descarbonizacao: {
-        create: {
-          distanciaIdaVoltaKm: distanciaKm * 2,
-          tipoCombustivel: tipoCombustivel,
-          latitudeOrigem: latOrigem,
-          longitudeOrigem: lonOrigem,
-          pegadaCo2: pegadaCo2,
-        } as any
-      },
-      credencial: {
-        create: {
-          ticketId: tokenDados.ticketId,
-          qrToken: tokenDados.qrToken,
-          status: 'ACTIVE',
+    const res = await this.credenciadoRepository.create(
+      {
+        nomeCompleto: dto.nomeCompleto,
+        cpf: dto.cpf,
+        rg: dto.rg,
+        celular: dto.celular,
+        email: dto.email,
+        cnpj: dto.cnpj,
+        ccir: dto.ccir,
+        nomeEmpresa: dto.nomeEmpresa,
+        siteEmpresa: dto.siteEmpresa,
+        aceiteLgpd: true,
+        tipoCategoria: tipoCategoria,
+        evento: { connect: { id: evento.id } },
+        endereco: {
+          create: {
+            cep: dto.cep,
+            rua: dto.rua,
+            bairro: dto.bairro,
+            cidade: dto.cidade,
+            estado: dto.estado,
+            latitude: latOrigem,
+            longitude: lonOrigem,
+            pais: 'Brasil',
+          },
+        },
+        descarbonizacao: {
+          create: {
+            distanciaIdaVoltaKm: distanciaKm * 2,
+            tipoCombustivel: tipoCombustivel as TipoCombustivel,
+            latitudeOrigem: latOrigem,
+            longitudeOrigem: lonOrigem,
+            pegadaCo2: pegadaCo2,
+          },
+        },
+        credencial: {
+          create: {
+            ticketId: tokenDados.ticketId,
+            qrToken: tokenDados.qrToken,
+            status: 'ACTIVE',
+          },
         },
       },
-    } as any, { credencial: true, endereco: true, descarbonizacao: true } as any);
+      { credencial: true, endereco: true, descarbonizacao: true },
+    );
 
     return new CredenciadoResponseDto(res);
   }

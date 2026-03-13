@@ -117,14 +117,14 @@ export class AuthController implements OnModuleInit {
           latitude: -20.651167,
           longitude: -47.477722,
         });
-      } else if (!evento.privateKey || !evento.publicKey || !(evento as any).latitude || !(evento as any).localEvento) {
+      } else if (!evento.privateKey || !evento.publicKey || !evento.latitude || !evento.localEvento) {
         await this.eventoRepository.update(evento.id, {
           privateKey: seedData.privateKey,
           publicKey: seedData.publicKey,
           localEvento: 'Clube de Campo, Franca, SP',
           latitude: -20.651167,
           longitude: -47.477722,
-        } as any);
+        });
       }
     }
 
@@ -176,7 +176,7 @@ export class AuthController implements OnModuleInit {
                 status: 'ACTIVE',
               },
             },
-          } as any);
+          });
           console.log(`Credencial do Admin gerada com sucesso.`);
         }
       }
@@ -230,7 +230,7 @@ export class AuthController implements OnModuleInit {
                 status: 'ACTIVE',
               },
             },
-          } as any);
+          });
           console.log(`Credencial do Scanner gerada com sucesso.`);
         }
       }

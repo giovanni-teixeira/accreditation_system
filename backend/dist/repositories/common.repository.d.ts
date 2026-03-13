@@ -17,21 +17,21 @@ export declare class CommonRepository {
     }>;
     createCredencial(data: Prisma.CredencialCreateWithoutCredenciadoInput, credenciadoId: string): Promise<{
         id: string;
-        credenciadoId: string;
         ticketId: string;
         qrToken: string;
         downloads: number;
         printCount: number;
         status: string;
         createdAt: Date;
+        credenciadoId: string;
     }>;
     createDescarbonizacao(data: Prisma.DescarbonizacaoCreateWithoutCredenciadoInput, credenciadoId: string): Promise<{
         id: string;
-        tipoCombustivel: import(".prisma/client").$Enums.TipoCombustivel;
-        credenciadoId: string;
         distanciaIdaVoltaKm: number;
+        tipoCombustivel: import(".prisma/client").$Enums.TipoCombustivel;
         latitudeOrigem: number | null;
         longitudeOrigem: number | null;
         pegadaCo2: number | null;
+        credenciadoId: string;
     }>;
 }

@@ -32,9 +32,15 @@ let AddressController = class AddressController {
 exports.AddressController = AddressController;
 __decorate([
     (0, common_1.Get)(':zipCode'),
-    (0, swagger_1.ApiOperation)({ summary: 'Busca endereço por CEP/Postcode com fallback e cache' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Busca endereço por CEP/Postcode com fallback e cache',
+    }),
     (0, swagger_1.ApiParam)({ name: 'zipCode', description: 'Código postal (CEP ou Postcode)' }),
-    (0, swagger_1.ApiQuery)({ name: 'country', required: false, description: 'País (Default: Brasil)' }),
+    (0, swagger_1.ApiQuery)({
+        name: 'country',
+        required: false,
+        description: 'País (Default: Brasil)',
+    }),
     __param(0, (0, common_1.Param)('zipCode')),
     __param(1, (0, common_1.Query)('country')),
     __metadata("design:type", Function),
