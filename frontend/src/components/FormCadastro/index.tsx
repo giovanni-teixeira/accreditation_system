@@ -63,9 +63,22 @@ export default function FormCadastro({ onResult }: FormCadastroProps) {
     const ccirInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (role && dadosPessoaisRef.current) {
-            dadosPessoaisRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            setTimeout(() => nomeInputRef.current?.focus(), 500);
+        if (role) {
+            // Resetar campos da seção 3 ao trocar de perfil (UX Improvement)
+            setFormData(prev => ({
+                ...prev,
+                cnpj: '',
+                siteEmpresa: '',
+                nomeEmpresa: '',
+                ccir: '',
+                nomePropriedade: '',
+                nomeVeiculo: ''
+            }));
+
+            if (dadosPessoaisRef.current) {
+                dadosPessoaisRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                setTimeout(() => nomeInputRef.current?.focus(), 500);
+            }
         }
     }, [role]);
 
