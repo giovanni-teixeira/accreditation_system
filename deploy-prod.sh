@@ -13,15 +13,15 @@ git reset --hard origin/main
 
 # 1.5 Gerenciamento do Arquivo de Ambiente (.env) de Produção
 echo "🔐 1.5 Configurando variáveis de produção..."
-if [ -f "$HOME/alta-cafe-config/prod.env" ]; then
+if [ -f "./.env" ]; then
+  cp "./.env" "backend/.env"
+  echo "✅ Arquivo backend/.env atualizado com as Secrets do GitHub."
+elif [ -f "$HOME/alta-cafe-config/prod.env" ]; then
   cp "$HOME/alta-cafe-config/prod.env" "backend/.env"
-  echo "✅ Arquivo backend/.env atualizado com prod.env."
+  echo "✅ Arquivo backend/.env atualizado com prod.env manual."
 elif [ -f "$HOME/alta-cafe-config/.env" ]; then
   cp "$HOME/alta-cafe-config/.env" "backend/.env"
   echo "✅ Arquivo backend/.env atualizado com .env padrão (config)."
-elif [ -f "./.env" ]; then
-  cp "./.env" "backend/.env"
-  echo "✅ Arquivo backend/.env atualizado com .env da raiz do projeto."
 fi
 
 # 2. Derrubando containers
