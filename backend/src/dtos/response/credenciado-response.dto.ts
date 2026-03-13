@@ -11,6 +11,7 @@ export class CredenciadoResponseDto {
   endereco?: any;
   credencial?: any;
   nomeEmpresa?: string;
+  setor?: string;
 
   constructor(partial: any) {
     this.id = partial.id;
@@ -20,6 +21,7 @@ export class CredenciadoResponseDto {
     this.tipoCategoria = partial.tipoCategoria;
     this.tipoCombustivel = partial.tipoCombustivel;
     this.nomeEmpresa = partial.nomeEmpresa;
+    this.setor = partial.setor;
     this.endereco = partial.endereco;
     this.credencial = partial.credencial
       ? {

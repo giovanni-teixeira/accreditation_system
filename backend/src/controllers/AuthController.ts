@@ -13,6 +13,7 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import * as fs from 'fs';
 import * as path from 'path';
+import { QrCodeHelper } from '../utils/qrcode.util';
 import {
   ApiTags,
   ApiOperation,
@@ -23,6 +24,7 @@ import { LoginDto } from '../dtos/request/login.dto';
 import { RegisterDto } from '../dtos/request/register.dto';
 import { UsuarioRepository } from '../repositories/usuario.repository';
 import { EventoRepository } from '../repositories/evento.repository';
+import { CredenciadoRepository } from '../repositories/credenciado.repository';
 import { UsuarioResponseDto } from '../dtos/response/usuario-response.dto';
 // Nota: Os Guards e Decorators serão movidos em breve, por enquanto mantemos o import corrigido se necessário
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -37,6 +39,7 @@ export class AuthController implements OnModuleInit {
   constructor(
     private readonly usuarioRepository: UsuarioRepository,
     private readonly eventoRepository: EventoRepository,
+    private readonly credenciadoRepository: CredenciadoRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) { }
@@ -117,6 +120,7 @@ export class AuthController implements OnModuleInit {
       }
     }
 
+    // --- SEED ADMIN ---
     const adminLogin = this.configService.get<string>('ADMIN_LOGIN');
     if (adminLogin) {
       const adminExists = await this.usuarioRepository.findByLogin(adminLogin);
@@ -124,16 +128,48 @@ export class AuthController implements OnModuleInit {
         console.log(`Gerando Usuário Admin: ${adminLogin}...`);
         const password = this.configService.get<string>('ADMIN_PASSWORD');
         const hash = await bcrypt.hash(password || 'admin123', 10);
+
+        // 1. Criar Login
         await this.usuarioRepository.create({
           login: adminLogin,
           senhaHash: hash,
           perfilAcesso: 'ADMIN',
-          nomeCompleto: this.configService.get<string>('ADMIN_NAME'),
-          email: this.configService.get<string>('ADMIN_EMAIL'),
+          setor: 'ADMINISTRAÇÃO',
         });
+
+        // 2. Criar Identidade (Credenciado) + Credencial (QR)
+        const evento = await this.eventoRepository.findFirst();
+        const adminCpf = this.configService.get<string>('ADMIN_CPF') || '00000000000';
+        const adminName = this.configService.get<string>('ADMIN_NAME') || 'ADMINISTRADOR';
+
+        const credExists = await this.credenciadoRepository.findByCpf(adminCpf);
+        if (!credExists && evento) {
+          const tokenDados = QrCodeHelper.generateSignedToken(evento.id, evento.privateKey!, adminName);
+          await this.credenciadoRepository.create({
+            nomeCompleto: adminName,
+            cpf: adminCpf,
+            rg: '00000000',
+            celular: '00000000000',
+            email: this.configService.get<string>('ADMIN_EMAIL') || 'admin@sistema.com',
+            tipoCategoria: 'ORGANIZACAO',
+            setor: 'ADMINISTRAÇÃO',
+            aceiteLgpd: true,
+            tipoCombustivel: 'GASOLINA',
+            evento: { connect: { id: evento.id } },
+            credencial: {
+              create: {
+                ticketId: tokenDados.ticketId,
+                qrToken: tokenDados.qrToken,
+                status: 'ACTIVE',
+              },
+            },
+          });
+          console.log(`Credencial do Admin gerada com sucesso.`);
+        }
       }
     }
 
+    // --- SEED SCANNER ---
     const scannerLogin = this.configService.get<string>('SCANNER_LOGIN');
     if (scannerLogin) {
       const scannerExists = await this.usuarioRepository.findByLogin(scannerLogin);
@@ -141,12 +177,44 @@ export class AuthController implements OnModuleInit {
         console.log(`Gerando Usuário Scanner: ${scannerLogin}...`);
         const password = this.configService.get<string>('SCANNER_PASSWORD');
         const hash = await bcrypt.hash(password || 'scanner123', 10);
+
+        // 1. Criar Login
         await this.usuarioRepository.create({
           login: scannerLogin,
           senhaHash: hash,
           perfilAcesso: 'LEITOR_CATRACA',
-          nomeCompleto: this.configService.get<string>('SCANNER_NAME'),
+          setor: 'PORTARIA',
         });
+
+        // 2. Criar Identidade (Credenciado) + Credencial (QR)
+        const evento = await this.eventoRepository.findFirst();
+        const scannerCpf = this.configService.get<string>('SCANNER_CPF') || '11111111111';
+        const scannerName = this.configService.get<string>('SCANNER_NAME') || 'LEITOR CATRACA';
+
+        const credExists = await this.credenciadoRepository.findByCpf(scannerCpf);
+        if (!credExists && evento) {
+          const tokenDados = QrCodeHelper.generateSignedToken(evento.id, evento.privateKey!, scannerName);
+          await this.credenciadoRepository.create({
+            nomeCompleto: scannerName,
+            cpf: scannerCpf,
+            rg: '11111111',
+            celular: '11111111111',
+            email: 'scanner@sistema.com',
+            tipoCategoria: 'ORGANIZACAO',
+            setor: 'PORTARIA',
+            aceiteLgpd: true,
+            tipoCombustivel: 'GASOLINA',
+            evento: { connect: { id: evento.id } },
+            credencial: {
+              create: {
+                ticketId: tokenDados.ticketId,
+                qrToken: tokenDados.qrToken,
+                status: 'ACTIVE',
+              },
+            },
+          });
+          console.log(`Credencial do Scanner gerada com sucesso.`);
+        }
       }
     }
   }

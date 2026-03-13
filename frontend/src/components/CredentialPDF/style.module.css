@@ -14,7 +14,7 @@
 .quadrante {
     width: 105mm;
     height: 148.5mm;
-    padding: 8mm;
+    padding: 5mm;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -30,7 +30,7 @@
 }
 
 .logoEvento {
-    max-height: 55px;
+    max-height: 75px;
     width: auto;
     display: block;
 }
@@ -56,7 +56,7 @@
 .qrContainer {
     display: flex;
     justify-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .qrCode {
@@ -75,7 +75,7 @@
     font-weight: bold;
     width: calc(100% + 16mm);
     margin-left: -8mm;
-    margin-bottom: -8mm;
+    margin-bottom: -5mm;
     padding: 12px 0;
     text-transform: uppercase;
 }
@@ -85,7 +85,7 @@
     font-weight: bold;
     text-align: center;
     text-decoration: underline;
-    margin-bottom: 8mm;
+    margin-bottom: 4mm;
     color: var(--coffee-brown);
 }
 
@@ -95,7 +95,7 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 30px;
-    margin-bottom: 12mm;
+    margin-bottom: 6mm;
 }
 
 .gridLogos img {

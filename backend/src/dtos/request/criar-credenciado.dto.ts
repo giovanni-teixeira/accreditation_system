@@ -85,4 +85,9 @@ export class CriarCredenciadoDto {
   @IsOptional()
   @IsString()
   ccir?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  setor?: string;
 }

@@ -74,14 +74,7 @@ model UsuarioOrganizacao {
   login        String       @unique
   senhaHash    String       @map("senha_hash")
   perfilAcesso PerfilAcesso @map("perfil_acesso")
-
-  // Campos para Credencial Organizacional
-  nomeCompleto String? @map("nome_completo")
-  cpf          String? @unique
-  rg           String?
-  celular      String?
-  email        String?
-  setor        String?
+  setor        String?      @map("setor")
 
   @@map("usuario_organizacao")
 }
@@ -99,6 +92,7 @@ model Credenciado {
   ccir            String?
   nomeEmpresa     String?         @map("nome_empresa")
   siteEmpresa     String?         @map("site_empresa")
+  setor           String?         @map("setor")
   aceiteLgpd      Boolean         @map("aceite_lgpd")
   tipoCombustivel TipoCombustivel @map("tipo_combustivel")
 

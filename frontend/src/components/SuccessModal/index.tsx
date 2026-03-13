@@ -70,7 +70,8 @@ const SuccessModal = ({ isOpen, onClose, userData }: SuccessModalProps) => {
                 letterRendering: true,
                 allowTaint: false
             },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true }
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
+            pagebreak: { mode: 'avoid' }
         } as any;
 
         html2pdf().from(templateRef.current).set(opt).save();
