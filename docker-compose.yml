@@ -24,6 +24,7 @@ services:
     build: ./backend
     container_name: backend_api
     restart: always
+    env_file: .env
     environment:
       # [LOCAL/VPS] Certifique-se de que o host aqui seja 'postgres' (nome do serviço)
       DATABASE_URL: "postgresql://postgres:1234@postgres:5432/alta_cafe?schema=public"
