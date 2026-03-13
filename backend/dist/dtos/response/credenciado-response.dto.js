@@ -18,7 +18,6 @@ class CredenciadoResponseDto {
         this.cpf = partial.cpf;
         this.email = partial.email;
         this.tipoCategoria = partial.tipoCategoria;
-        this.tipoCombustivel = partial.tipoCombustivel;
         this.nomeEmpresa = partial.nomeEmpresa;
         this.endereco = partial.endereco;
         this.descarbonizacao = partial.descarbonizacao;

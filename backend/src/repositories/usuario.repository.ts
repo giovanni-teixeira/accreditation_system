@@ -3,10 +3,14 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Prisma, UsuarioOrganizacao as PrismaUsuario } from '@prisma/client';
 import { BaseRepository } from './base.repository';
-import { IUsuarioOrganizacao } from '../domain/entities/usuario-organizacao.entity';
+import { IUsuarioOrganizacao } from '../interfaces';
 
 @Injectable()
-export class UsuarioRepository extends BaseRepository<IUsuarioOrganizacao, Prisma.UsuarioOrganizacaoCreateInput, Prisma.UsuarioOrganizacaoUpdateInput> {
+export class UsuarioRepository extends BaseRepository<
+  IUsuarioOrganizacao,
+  Prisma.UsuarioOrganizacaoCreateInput,
+  Prisma.UsuarioOrganizacaoUpdateInput
+> {
   constructor(protected readonly prisma: PrismaService) {
     super(prisma, prisma.usuarioOrganizacao);
   }
@@ -27,9 +31,11 @@ export class UsuarioRepository extends BaseRepository<IUsuarioOrganizacao, Prism
     return result as IUsuarioOrganizacao | null;
   }
 
-  async findFirstUser(where: Prisma.UsuarioOrganizacaoWhereInput): Promise<IUsuarioOrganizacao | null> {
+  async findFirstUser(
+    where: Prisma.UsuarioOrganizacaoWhereInput,
+  ): Promise<IUsuarioOrganizacao | null> {
     const result = await this.prisma.usuarioOrganizacao.findFirst({ where });
-    
+
     return result as IUsuarioOrganizacao | null;
   }
 }

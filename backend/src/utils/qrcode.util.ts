@@ -14,13 +14,21 @@ export const QrCodeHelper = {
     ticketId: string,
     privateKeyBase64: string,
   ): string {
-    const messageStr = `${eventoId}|${ticketId}`;
-    const message = util.decodeUTF8(messageStr);
-    const privateKey = util.decodeBase64(privateKeyBase64);
+    try {
+      if (!privateKeyBase64) {
+        throw new Error('Chave privada do evento não encontrada.');
+      }
 
-    const signature = nacl.sign.detached(message, privateKey);
+      const messageStr = `${eventoId}|${ticketId}`;
+      const message = util.decodeUTF8(messageStr);
+      const privateKey = util.decodeBase64(privateKeyBase64);
 
-    return `${messageStr}.${util.encodeBase64(signature)}`;
+      const signature = nacl.sign.detached(message, privateKey);
+
+      return `${messageStr}.${util.encodeBase64(signature)}`;
+    } catch (error) {
+      throw new Error(`Falha na geração da assinatura do QR: ${error.message}`);
+    }
   },
 
   generateSignedToken(
@@ -28,9 +36,13 @@ export const QrCodeHelper = {
     privateKeyBase64: string,
     _nome: string,
   ): QrCodeResult {
-    const ticketId = crypto.randomBytes(5).toString('hex').toUpperCase();
-    const qrToken = this.signPayload(eventoId, ticketId, privateKeyBase64);
+    try {
+      const ticketId = crypto.randomBytes(5).toString('hex').toUpperCase();
+      const qrToken = this.signPayload(eventoId, ticketId, privateKeyBase64);
 
-    return { ticketId, qrToken };
+      return { ticketId, qrToken };
+    } catch (error) {
+      throw error;
+    }
   },
 };

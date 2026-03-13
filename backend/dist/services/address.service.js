@@ -23,47 +23,55 @@ let AddressService = AddressService_1 = class AddressService {
         this.configService = configService;
     }
     async getAddress(cep, country = 'Brasil') {
-        const cleanCep = cep.replace(/\D/g, '');
-        const cached = await this.addressRepository.findByCep(cleanCep);
-        if (cached) {
-            this.logger.log(`Endereço encontrado no cache: ${cleanCep}`);
-            return {
-                cep: cached.cep,
-                rua: cached.rua,
-                bairro: cached.bairro,
-                cidade: cached.cidade,
-                estado: cached.estado,
-                pais: cached.pais,
-                latitude: cached.latitude ?? null,
-                longitude: cached.longitude ?? null,
-            };
-        }
-        if (country.toLowerCase() === 'brasil' || country.toUpperCase() === 'BR') {
-            const brasilData = await this.tryBrazilianApis(cleanCep);
-            if (brasilData) {
-                await this.addressRepository.create({
-                    ...brasilData,
-                    pais: 'Brasil',
-                });
-                return { ...brasilData, pais: 'Brasil' };
+        try {
+            const cleanCep = cep.replace(/\D/g, '');
+            const cached = await this.addressRepository.findByCep(cleanCep);
+            if (cached) {
+                this.logger.log(`Endereço encontrado no cache: ${cleanCep}`);
+                return {
+                    cep: cached.cep,
+                    rua: cached.rua,
+                    bairro: cached.bairro,
+                    cidade: cached.cidade,
+                    estado: cached.estado,
+                    pais: cached.pais,
+                    latitude: cached.latitude ?? null,
+                    longitude: cached.longitude ?? null,
+                };
             }
-        }
-        const internationalData = await this.tryInternationalApi(cep, country);
-        if (internationalData) {
-            if (internationalData.latitude === null || internationalData.longitude === null) {
-                const geo = await this.geocodeAddress(internationalData.rua, internationalData.cidade, internationalData.estado, country);
-                if (geo) {
-                    internationalData.latitude = geo.latitude;
-                    internationalData.longitude = geo.longitude;
+            if (country.toLowerCase() === 'brasil' ||
+                country.toUpperCase() === 'BR') {
+                const brasilData = await this.tryBrazilianApis(cleanCep);
+                if (brasilData) {
+                    await this.addressRepository.create({
+                        ...brasilData,
+                        pais: 'Brasil',
+                    });
+                    return { ...brasilData, pais: 'Brasil' };
                 }
             }
-            await this.addressRepository.create({
-                ...internationalData,
-                pais: country,
-            });
-            return { ...internationalData, pais: country };
+            const internationalData = await this.tryInternationalApi(cep, country);
+            if (internationalData) {
+                if (internationalData.latitude === null ||
+                    internationalData.longitude === null) {
+                    const geo = await this.geocodeAddress(internationalData.rua, internationalData.cidade, internationalData.estado, country);
+                    if (geo) {
+                        internationalData.latitude = geo.latitude;
+                        internationalData.longitude = geo.longitude;
+                    }
+                }
+                await this.addressRepository.create({
+                    ...internationalData,
+                    pais: country,
+                });
+                return { ...internationalData, pais: country };
+            }
+            return null;
         }
-        return null;
+        catch (error) {
+            this.logger.error(`Erro crítico ao buscar endereço (${cep}): ${error.message}`);
+            throw error;
+        }
     }
     async tryBrazilianApis(cep) {
         try {
@@ -77,8 +85,12 @@ let AddressService = AddressService_1 = class AddressService {
                     bairro: data.neighborhood || '',
                     cidade: data.city || '',
                     estado: data.state || '',
-                    latitude: data.location?.coordinates?.latitude ? parseFloat(data.location.coordinates.latitude) : null,
-                    longitude: data.location?.coordinates?.longitude ? parseFloat(data.location.coordinates.longitude) : null,
+                    latitude: data.location?.coordinates?.latitude
+                        ? parseFloat(data.location.coordinates.latitude)
+                        : null,
+                    longitude: data.location?.coordinates?.longitude
+                        ? parseFloat(data.location.coordinates.longitude)
+                        : null,
                 };
                 if (result.latitude === null || result.longitude === null) {
                     const geo = await this.geocodeAddress(result.rua, result.cidade, result.estado, 'Brasil');
@@ -127,14 +139,14 @@ let AddressService = AddressService_1 = class AddressService {
             const url = `https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`;
             const response = await fetch(url, {
                 headers: {
-                    'User-Agent': 'Hakaton-Alta-Cafe-App'
-                }
+                    'User-Agent': 'Hakaton-Alta-Cafe-App',
+                },
             });
-            const data = await response.json();
+            const data = (await response.json());
             if (data && data.length > 0) {
                 return {
                     latitude: parseFloat(data[0].lat),
-                    longitude: parseFloat(data[0].lon)
+                    longitude: parseFloat(data[0].lon),
                 };
             }
         }

@@ -1,7 +1,7 @@
 import { PrismaService } from '../prisma.service';
 import { Prisma } from '@prisma/client';
 import { BaseRepository } from './base.repository';
-import { IEndereco } from '../domain/entities/endereco.entity';
+import { IEndereco } from '../interfaces';
 export declare class AddressRepository extends BaseRepository<IEndereco, Prisma.EnderecoCacheCreateInput, Prisma.EnderecoCacheUpdateInput> {
     protected readonly prisma: PrismaService;
     constructor(prisma: PrismaService);

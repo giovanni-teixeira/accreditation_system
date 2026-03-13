@@ -1,7 +1,7 @@
 import { PrismaService } from '../prisma.service';
 import { Prisma } from '@prisma/client';
 import { BaseRepository } from './base.repository';
-import { ICredencial } from '../domain/entities/credencial.entity';
+import { ICredencial } from '../interfaces';
 export declare class CredencialRepository extends BaseRepository<ICredencial, Prisma.CredencialCreateInput, Prisma.CredencialUpdateInput> {
     protected readonly prisma: PrismaService;
     constructor(prisma: PrismaService);

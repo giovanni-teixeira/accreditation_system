@@ -81,7 +81,8 @@ let AuthController = class AuthController {
     async login(loginDto) {
         try {
             const user = await this.usuarioRepository.findByLogin(loginDto.login);
-            if (!user || !(await bcrypt.compare(loginDto.senhaHash, user.senhaHash))) {
+            if (!user ||
+                !(await bcrypt.compare(loginDto.senhaHash, user.senhaHash))) {
                 throw new business_exception_1.BusinessException('Usuário ou senha inválidos. Por favor, verifique suas credenciais.', 401);
             }
             const payload = {
@@ -140,7 +141,10 @@ let AuthController = class AuthController {
                     longitude: -47.477722,
                 });
             }
-            else if (!evento.privateKey || !evento.publicKey || !evento.latitude || !evento.localEvento) {
+            else if (!evento.privateKey ||
+                !evento.publicKey ||
+                !evento.latitude ||
+                !evento.localEvento) {
                 await this.eventoRepository.update(evento.id, {
                     privateKey: seedData.privateKey,
                     publicKey: seedData.publicKey,
@@ -174,7 +178,8 @@ let AuthController = class AuthController {
                         cpf: adminCpf,
                         rg: '00000000',
                         celular: '00000000000',
-                        email: this.configService.get('ADMIN_EMAIL') || 'admin@sistema.com',
+                        email: this.configService.get('ADMIN_EMAIL') ||
+                            'admin@sistema.com',
                         tipoCategoria: 'ORGANIZACAO',
                         aceiteLgpd: true,
                         evento: { connect: { id: evento.id } },
@@ -183,7 +188,7 @@ let AuthController = class AuthController {
                                 distanciaIdaVoltaKm: 0,
                                 tipoCombustivel: 'GASOLINA',
                                 pegadaCo2: 0,
-                            }
+                            },
                         },
                         credencial: {
                             create: {
@@ -230,7 +235,7 @@ let AuthController = class AuthController {
                                 distanciaIdaVoltaKm: 0,
                                 tipoCombustivel: 'GASOLINA',
                                 pegadaCo2: 0,
-                            }
+                            },
                         },
                         credencial: {
                             create: {

@@ -15,6 +15,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { QrCodeHelper } from '../utils/qrcode.util';
 import { BusinessException } from '../common/exceptions/business.exception';
+import { IEvento, IUsuarioOrganizacao, ICredenciado } from '../interfaces';
 import {
   ApiTags,
   ApiOperation,
@@ -43,7 +44,7 @@ export class AuthController implements OnModuleInit {
     private readonly credenciadoRepository: CredenciadoRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   @Post(ROUTES.AUTH.LOGIN)
   @HttpCode(HttpStatus.OK)
@@ -55,8 +56,14 @@ export class AuthController implements OnModuleInit {
   async login(@Body() loginDto: LoginDto) {
     try {
       const user = await this.usuarioRepository.findByLogin(loginDto.login);
-      if (!user || !(await bcrypt.compare(loginDto.senhaHash, user.senhaHash))) {
-        throw new BusinessException('Usuário ou senha inválidos. Por favor, verifique suas credenciais.', 401);
+      if (
+        !user ||
+        !(await bcrypt.compare(loginDto.senhaHash, user.senhaHash))
+      ) {
+        throw new BusinessException(
+          'Usuário ou senha inválidos. Por favor, verifique suas credenciais.',
+          401,
+        );
       }
 
       const payload = {
@@ -106,7 +113,9 @@ export class AuthController implements OnModuleInit {
       return new UsuarioResponseDto(novoUsuario);
     } catch (error) {
       if (error instanceof BusinessException) throw error;
-      throw new BusinessException(`Erro ao registrar usuário: ${error.message}`);
+      throw new BusinessException(
+        `Erro ao registrar usuário: ${error.message}`,
+      );
     }
   }
 
@@ -128,7 +137,12 @@ export class AuthController implements OnModuleInit {
           latitude: -20.651167,
           longitude: -47.477722,
         });
-      } else if (!evento.privateKey || !evento.publicKey || !evento.latitude || !evento.localEvento) {
+      } else if (
+        !evento.privateKey ||
+        !evento.publicKey ||
+        !evento.latitude ||
+        !evento.localEvento
+      ) {
         await this.eventoRepository.update(evento.id, {
           privateKey: seedData.privateKey,
           publicKey: seedData.publicKey,
@@ -158,18 +172,26 @@ export class AuthController implements OnModuleInit {
 
         // 2. Criar Identidade (Credenciado) + Credencial (QR)
         const evento = await this.eventoRepository.findFirst();
-        const adminCpf = this.configService.get<string>('ADMIN_CPF') || '00000000000';
-        const adminName = this.configService.get<string>('ADMIN_NAME') || 'ADMINISTRADOR';
+        const adminCpf =
+          this.configService.get<string>('ADMIN_CPF') || '00000000000';
+        const adminName =
+          this.configService.get<string>('ADMIN_NAME') || 'ADMINISTRADOR';
 
         const credExists = await this.credenciadoRepository.findByCpf(adminCpf);
         if (!credExists && evento) {
-          const tokenDados = QrCodeHelper.generateSignedToken(evento.id, evento.privateKey!, adminName);
+          const tokenDados = QrCodeHelper.generateSignedToken(
+            evento.id,
+            evento.privateKey!,
+            adminName,
+          );
           await this.credenciadoRepository.create({
             nomeCompleto: adminName,
             cpf: adminCpf,
             rg: '00000000',
             celular: '00000000000',
-            email: this.configService.get<string>('ADMIN_EMAIL') || 'admin@sistema.com',
+            email:
+              this.configService.get<string>('ADMIN_EMAIL') ||
+              'admin@sistema.com',
             tipoCategoria: 'ORGANIZACAO',
             aceiteLgpd: true,
             evento: { connect: { id: evento.id } },
@@ -178,7 +200,7 @@ export class AuthController implements OnModuleInit {
                 distanciaIdaVoltaKm: 0,
                 tipoCombustivel: 'GASOLINA',
                 pegadaCo2: 0,
-              }
+              },
             },
             credencial: {
               create: {
@@ -196,7 +218,8 @@ export class AuthController implements OnModuleInit {
     // --- SEED SCANNER ---
     const scannerLogin = this.configService.get<string>('SCANNER_LOGIN');
     if (scannerLogin) {
-      const scannerExists = await this.usuarioRepository.findByLogin(scannerLogin);
+      const scannerExists =
+        await this.usuarioRepository.findByLogin(scannerLogin);
       if (!scannerExists) {
         console.log(`Gerando Usuário Scanner: ${scannerLogin}...`);
         const password = this.configService.get<string>('SCANNER_PASSWORD');
@@ -212,12 +235,19 @@ export class AuthController implements OnModuleInit {
 
         // 2. Criar Identidade (Credenciado) + Credencial (QR)
         const evento = await this.eventoRepository.findFirst();
-        const scannerCpf = this.configService.get<string>('SCANNER_CPF') || '11111111111';
-        const scannerName = this.configService.get<string>('SCANNER_NAME') || 'LEITOR CATRACA';
+        const scannerCpf =
+          this.configService.get<string>('SCANNER_CPF') || '11111111111';
+        const scannerName =
+          this.configService.get<string>('SCANNER_NAME') || 'LEITOR CATRACA';
 
-        const credExists = await this.credenciadoRepository.findByCpf(scannerCpf);
+        const credExists =
+          await this.credenciadoRepository.findByCpf(scannerCpf);
         if (!credExists && evento) {
-          const tokenDados = QrCodeHelper.generateSignedToken(evento.id, evento.privateKey!, scannerName);
+          const tokenDados = QrCodeHelper.generateSignedToken(
+            evento.id,
+            evento.privateKey!,
+            scannerName,
+          );
           await this.credenciadoRepository.create({
             nomeCompleto: scannerName,
             cpf: scannerCpf,
@@ -232,7 +262,7 @@ export class AuthController implements OnModuleInit {
                 distanciaIdaVoltaKm: 0,
                 tipoCombustivel: 'GASOLINA',
                 pegadaCo2: 0,
-              }
+              },
             },
             credencial: {
               create: {

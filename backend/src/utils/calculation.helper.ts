@@ -8,7 +8,12 @@ export class CalculationHelper {
    * Calcula a distância entre dois pontos usando a fórmula de Haversine
    * e aplica o fator de correção rodoviário.
    */
-  static calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  static calculateDistance(
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number,
+  ): number {
     if (!lat1 || !lon1 || !lat2 || !lon2) return 0;
 
     const dLat = this.toRad(lat2 - lat1);
@@ -24,26 +29,20 @@ export class CalculationHelper {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const distanceStraightKm = this.EARTH_RADIUS_KM * c;
 
-    // Aplica o fator de correção (Detour Factor) para estimar distância rodoviária
     return Number((distanceStraightKm * this.DETOUR_FACTOR).toFixed(2));
   }
 
-  /**
-   * Fatores de emissão aproximados (kg CO2 por Km)
-   * Baseado em médias de mercado para veículos leves no Brasil.
-   */
   static calculateCo2Footprint(distanceKm: number, fuelType: string): number {
     const emissionFactors: Record<string, number> = {
       GASOLINA: 0.12,
       ETANOL: 0.02,
       DIESEL: 0.15,
       ELETRICO: 0.01,
-      NAO_INFORMADO: 0.10,
+      NAO_INFORMADO: 0.1,
     };
 
-    const factor = emissionFactors[fuelType.toUpperCase()] || 0.10;
-    
-    // Ida e Volta (* 2)
+    const factor = emissionFactors[fuelType.toUpperCase()] || 0.1;
+
     return Number((distanceKm * 2 * factor).toFixed(3));
   }
 

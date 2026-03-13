@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Prisma, EnderecoCache as PrismaEnderecoCache } from '@prisma/client';
 import { BaseRepository } from './base.repository';
-import { IEndereco } from '../domain/entities/endereco.entity';
+import { IEndereco } from '../interfaces';
 
 @Injectable()
 export class AddressRepository extends BaseRepository<
@@ -12,12 +12,11 @@ export class AddressRepository extends BaseRepository<
   Prisma.EnderecoCacheUpdateInput
 > {
   constructor(protected readonly prisma: PrismaService) {
-    // Usamos o model enderecoCache para persistir o histórico de CEPs
-    super(prisma, (prisma as any).enderecoCache);
+    super(prisma, prisma.enderecoCache);
   }
 
   async findByCep(cep: string): Promise<IEndereco | null> {
-    const result = await (this.prisma as any).enderecoCache.findUnique({
+    const result = await this.prisma.enderecoCache.findUnique({
       where: { cep },
     });
 

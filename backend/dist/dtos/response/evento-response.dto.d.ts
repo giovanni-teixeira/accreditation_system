@@ -1,7 +1,8 @@
+import { IEvento } from '../../interfaces';
 export declare class EventoResponseDto {
     id: string;
     nomeEvento: string;
     isGratuito: boolean;
     publicKey: string | null;
-    constructor(partial: any);
+    constructor(partial: IEvento);
 }

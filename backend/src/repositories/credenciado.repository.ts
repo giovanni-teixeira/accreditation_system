@@ -3,10 +3,14 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Prisma, Credenciado as PrismaCredenciado } from '@prisma/client';
 import { BaseRepository } from './base.repository';
-import { ICredenciado } from '../domain/entities/credenciado.entity';
+import { ICredenciado } from '../interfaces';
 
 @Injectable()
-export class CredenciadoRepository extends BaseRepository<ICredenciado, Prisma.CredenciadoCreateInput, Prisma.CredenciadoUpdateInput> {
+export class CredenciadoRepository extends BaseRepository<
+  ICredenciado,
+  Prisma.CredenciadoCreateInput,
+  Prisma.CredenciadoUpdateInput
+> {
   constructor(protected readonly prisma: PrismaService) {
     super(prisma, prisma.credenciado);
   }

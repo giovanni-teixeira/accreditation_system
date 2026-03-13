@@ -5,10 +5,10 @@ import { BusinessException } from '../common/exceptions/business.exception';
 export abstract class BaseRepository<T, CreateInput, UpdateInput> {
   constructor(
     protected readonly prisma: PrismaService,
-    protected readonly model: any,
+    protected readonly model: any, // Infelizmente Prisma Delegates não compartilham uma interface base comum simples
   ) {}
 
-  async create(data: CreateInput, include?: any): Promise<T> {
+  async create(data: CreateInput, include?: object): Promise<T> {
     try {
       return await this.model.create({ data, include });
     } catch (error) {
@@ -20,7 +20,7 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
     }
   }
 
-  async findAll(include?: any): Promise<T[]> {
+  async findAll(include?: object): Promise<T[]> {
     try {
       return await this.model.findMany({ include });
     } catch (error) {
@@ -28,7 +28,7 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
     }
   }
 
-  async findById(id: string, include?: any): Promise<T | null> {
+  async findById(id: string, include?: object): Promise<T | null> {
     try {
       const result = await this.model.findUnique({
         where: { id },

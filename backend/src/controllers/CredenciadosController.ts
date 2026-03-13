@@ -16,6 +16,7 @@ import { QrCodeHelper } from '../utils/qrcode.util';
 import { AddressService } from '../services/address.service';
 import { CalculationHelper } from '../utils/calculation.helper';
 import { BusinessException } from '../common/exceptions/business.exception';
+import { IEvento, ICredenciado } from '../interfaces';
 
 import { ROUTES } from '../routes/routes.constants';
 
@@ -34,10 +35,14 @@ export class CredenciadosController {
   async cadastrar(@Body() dto: CriarCredenciadoDto) {
     try {
       const evento = await this.eventoRepository.findFirst();
-      if (!evento) throw new BusinessException('Evento não encontrado no sistema.');
+      if (!evento)
+        throw new BusinessException('Evento não encontrado no sistema.');
 
       const existe = await this.credenciadoRepository.findByCpf(dto.cpf);
-      if (existe) throw new BusinessException('Já existe um credenciado com este CPF informado.');
+      if (existe)
+        throw new BusinessException(
+          'Já existe um credenciado com este CPF informado.',
+        );
 
       const tokenDados = QrCodeHelper.generateSignedToken(
         evento.id,
@@ -45,8 +50,10 @@ export class CredenciadosController {
         dto.nomeCompleto,
       );
 
-      // 4. Buscar Localização (Geo) do Credenciado e do Evento
-      const addressData = await this.addressService.getAddress(dto.cep, 'Brasil');
+      const addressData = await this.addressService.getAddress(
+        dto.cep,
+        'Brasil',
+      );
 
       const latOrigem = addressData?.latitude || null;
       const lonOrigem = addressData?.longitude || null;
@@ -107,7 +114,7 @@ export class CredenciadosController {
           descarbonizacao: {
             create: {
               distanciaIdaVoltaKm: distanciaKm * 2,
-              tipoCombustivel: tipoCombustivel as TipoCombustivel,
+              tipoCombustivel: tipoCombustivel,
               latitudeOrigem: latOrigem,
               longitudeOrigem: lonOrigem,
               pegadaCo2: pegadaCo2,
@@ -127,7 +134,9 @@ export class CredenciadosController {
       return new CredenciadoResponseDto(res);
     } catch (error) {
       if (error instanceof BusinessException) throw error;
-      throw new BusinessException(`Erro ao processar o cadastro: ${error.message}`);
+      throw new BusinessException(
+        `Erro ao processar o cadastro: ${error.message}`,
+      );
     }
   }
 
@@ -137,11 +146,17 @@ export class CredenciadosController {
   async buscarPorCpf(@Param('cpf') cpf: string) {
     try {
       const res = await this.credenciadoRepository.findByCpf(cpf);
-      if (!res) throw new BusinessException('Nenhum credenciado encontrado para o CPF informado.', 404);
+      if (!res)
+        throw new BusinessException(
+          'Nenhum credenciado encontrado para o CPF informado.',
+          404,
+        );
       return new CredenciadoResponseDto(res);
     } catch (error) {
       if (error instanceof BusinessException) throw error;
-      throw new BusinessException(`Erro ao buscar credenciado: ${error.message}`);
+      throw new BusinessException(
+        `Erro ao buscar credenciado: ${error.message}`,
+      );
     }
   }
 }
