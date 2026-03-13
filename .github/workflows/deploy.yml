@@ -30,6 +30,6 @@ jobs:
             cd $HOME/HAKATON
             git fetch origin
             git checkout dev
-            git pull origin dev
+            git reset --hard origin/dev
             chmod +x deploy.sh
             ./deploy.sh

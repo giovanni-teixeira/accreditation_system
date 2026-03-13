@@ -1,0 +1,34 @@
+name: Deploy Production (Main)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Deploy to Production Server via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST_PROD }}
+          username: ${{ secrets.SERVER_USER_PROD }}
+          password: ${{ secrets.SERVER_PASSWORD_PROD }}
+          script: |
+            if [ ! -d "$HOME/alta-cafe-prod" ]; then
+              echo "Pasta de produção não encontrada. Realizando Clone Inicial..."
+              cd $HOME
+              git clone -b main https://github.com/MaurilioSemeao/hakaton-alta-cafe.git alta-cafe-prod
+            fi
+            cd $HOME/alta-cafe-prod
+            git fetch origin
+            git checkout main
+            git reset --hard origin/main
+            git pull origin main
+            chmod +x deploy-prod.sh
+            ./deploy-prod.sh

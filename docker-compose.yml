@@ -5,9 +5,9 @@ services:
     container_name: postgres_db
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "1234"
-      POSTGRES_DB: alta_cafe
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -27,7 +27,7 @@ services:
     env_file: .env
     environment:
       # [LOCAL/VPS] Certifique-se de que o host aqui seja 'postgres' (nome do serviço)
-      DATABASE_URL: "postgresql://postgres:1234@postgres:5432/alta_cafe?schema=public"
+      DATABASE_URL: ${DATABASE_URL}
     depends_on:
       postgres:
         condition: service_healthy

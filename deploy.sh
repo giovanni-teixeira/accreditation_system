@@ -13,12 +13,15 @@ git reset --hard origin/dev
 git pull origin dev
 
 # 1.5 Gerenciamento do Arquivo de Ambiente (.env) seguro
-echo "🔐 1.5 Copiando Variáveis de Ambiente (.env) seguras do servidor..."
+echo "🔐 1.5 Sincronizando Variáveis de Ambiente (.env)..."
 if [ -f "$HOME/alta-cafe-config/.env" ]; then
   cp "$HOME/alta-cafe-config/.env" "backend/.env"
-  echo "✅ Arquivo backend/.env atualizado com sucesso a partir de $HOME/alta-cafe-config/.env."
+  echo "✅ Arquivo backend/.env atualizado a partir de $HOME/alta-cafe-config/.env."
+elif [ -f "./.env" ]; then
+  cp "./.env" "backend/.env"
+  echo "✅ Arquivo backend/.env atualizado a partir do diretório raiz local."
 else
-  echo "⚠️ AVISO: Arquivo $HOME/alta-cafe-config/.env não encontrado no servidor! A aplicação pode falhar ao conectar no banco."
+  echo "⚠️ AVISO: Arquivo .env não encontrado! A aplicação pode falhar."
 fi
 
 
