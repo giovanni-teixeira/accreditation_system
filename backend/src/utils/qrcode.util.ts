@@ -3,11 +3,6 @@ import * as nacl from 'tweetnacl';
 import * as util from 'tweetnacl-util';
 import * as crypto from 'crypto';
 
-export interface QrCodePayload {
-  e: string;
-  t: string;
-  n: string;
-}
 
 export interface QrCodeResult {
   ticketId: string;
@@ -15,37 +10,30 @@ export interface QrCodeResult {
 }
 
 export const QrCodeHelper = {
-  generatePayload(
-    eventoId: string,
-    ticketId: string,
-    nome: string,
-  ): QrCodePayload {
-    return {
-      e: eventoId,
-      t: ticketId,
-      n: nome,
-    };
-  },
-
-  //Assina um payload e retorna o token formatado.
-
-  signPayload(payload: QrCodePayload, privateKeyBase64: string): string {
-    const message = util.decodeUTF8(JSON.stringify(payload));
+  /**
+   * Assina um identificador compacto (eventoId|ticketId) e retorna o token formatado.
+   * Formato Final: eventoId|ticketId.assinaturaBase64
+   */
+  signPayload(eventoId: string, ticketId: string, privateKeyBase64: string): string {
+    // Formato ultra-compacto: remove overhead de JSON
+    const messageStr = `${eventoId}|${ticketId}`;
+    const message = util.decodeUTF8(messageStr);
     const privateKey = util.decodeBase64(privateKeyBase64);
+    
     const signature = nacl.sign.detached(message, privateKey);
 
-    // Formato: payloadBase64.signatureBase64
-    return `${util.encodeBase64(message)}.${util.encodeBase64(signature)}`;
+    // Formato: identificador.assinatura (Economiza espaço no QR)
+    return `${messageStr}.${util.encodeBase64(signature)}`;
   },
 
   generateSignedToken(
     eventoId: string,
     privateKeyBase64: string,
-    nome: string,
+    _nome: string, // Mantido na assinatura para compatibilidade, mas não usado no QR
   ): QrCodeResult {
-    const ticketId = crypto.randomUUID();
-    const payload = this.generatePayload(eventoId, ticketId, nome);
-    const qrToken = this.signPayload(payload, privateKeyBase64);
+    // TicketId curto (10 chars hex) em vez de UUID (36 chars)
+    const ticketId = crypto.randomBytes(5).toString('hex').toUpperCase();
+    const qrToken = this.signPayload(eventoId, ticketId, privateKeyBase64);
 
     return { ticketId, qrToken };
   },

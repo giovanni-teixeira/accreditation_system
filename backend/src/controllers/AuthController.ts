@@ -111,12 +111,20 @@ export class AuthController implements OnModuleInit {
       const evento = await this.eventoRepository.findFirst();
       if (!evento) {
         console.log('Semeadura Inicial: Criando Evento Padrão...');
-        await this.eventoRepository.create(seedData);
-      } else if (!evento.privateKey || !evento.publicKey) {
+        await this.eventoRepository.create({
+          ...seedData,
+          localEvento: 'Clube de Campo, Franca, SP',
+          latitude: -20.651167,
+          longitude: -47.477722,
+        });
+      } else if (!evento.privateKey || !evento.publicKey || !(evento as any).latitude || !(evento as any).localEvento) {
         await this.eventoRepository.update(evento.id, {
           privateKey: seedData.privateKey,
           publicKey: seedData.publicKey,
-        });
+          localEvento: 'Clube de Campo, Franca, SP',
+          latitude: -20.651167,
+          longitude: -47.477722,
+        } as any);
       }
     }
 
@@ -152,10 +160,15 @@ export class AuthController implements OnModuleInit {
             celular: '00000000000',
             email: this.configService.get<string>('ADMIN_EMAIL') || 'admin@sistema.com',
             tipoCategoria: 'ORGANIZACAO',
-            setor: 'ADMINISTRAÇÃO',
             aceiteLgpd: true,
-            tipoCombustivel: 'GASOLINA',
             evento: { connect: { id: evento.id } },
+            descarbonizacao: {
+              create: {
+                distanciaIdaVoltaKm: 0,
+                tipoCombustivel: 'GASOLINA',
+                pegadaCo2: 0,
+              }
+            },
             credencial: {
               create: {
                 ticketId: tokenDados.ticketId,
@@ -163,7 +176,7 @@ export class AuthController implements OnModuleInit {
                 status: 'ACTIVE',
               },
             },
-          });
+          } as any);
           console.log(`Credencial do Admin gerada com sucesso.`);
         }
       }
@@ -201,10 +214,15 @@ export class AuthController implements OnModuleInit {
             celular: '11111111111',
             email: 'scanner@sistema.com',
             tipoCategoria: 'ORGANIZACAO',
-            setor: 'PORTARIA',
             aceiteLgpd: true,
-            tipoCombustivel: 'GASOLINA',
             evento: { connect: { id: evento.id } },
+            descarbonizacao: {
+              create: {
+                distanciaIdaVoltaKm: 0,
+                tipoCombustivel: 'GASOLINA',
+                pegadaCo2: 0,
+              }
+            },
             credencial: {
               create: {
                 ticketId: tokenDados.ticketId,
@@ -212,7 +230,7 @@ export class AuthController implements OnModuleInit {
                 status: 'ACTIVE',
               },
             },
-          });
+          } as any);
           console.log(`Credencial do Scanner gerada com sucesso.`);
         }
       }

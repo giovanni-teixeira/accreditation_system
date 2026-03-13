@@ -9,6 +9,9 @@ import { UsuarioRepository } from './repositories/usuario.repository';
 import { EventoRepository } from './repositories/evento.repository';
 import { CredenciadoRepository } from './repositories/credenciado.repository';
 import { CommonRepository } from './repositories/common.repository';
+import { AddressRepository } from './repositories/address.repository';
+import { AddressService } from './services/address.service';
+import { AddressController } from './controllers/AddressController';
 import { JwtStrategy } from './controllers/guards/jwt.strategy';
 
 @Module({
@@ -20,13 +23,15 @@ import { JwtStrategy } from './controllers/guards/jwt.strategy';
       signOptions: { expiresIn: '24h' },
     }),
   ],
-  controllers: [AuthController, CredenciadosController],
+  controllers: [AuthController, CredenciadosController, AddressController],
   providers: [
     PrismaService,
     UsuarioRepository,
     EventoRepository,
     CredenciadoRepository,
     CommonRepository,
+    AddressRepository,
+    AddressService,
     JwtStrategy,
   ],
 })

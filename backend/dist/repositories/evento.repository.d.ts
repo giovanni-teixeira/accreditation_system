@@ -8,6 +8,9 @@ export declare class EventoRepository extends BaseRepository<Evento, Prisma.Even
         id: string;
         nomeEvento: string;
         isGratuito: boolean;
+        localEvento: string | null;
+        latitude: number | null;
+        longitude: number | null;
         privateKey: string | null;
         publicKey: string | null;
     } | null>;

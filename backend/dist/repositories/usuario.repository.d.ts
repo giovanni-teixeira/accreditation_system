@@ -8,18 +8,21 @@ export declare class UsuarioRepository extends BaseRepository<UsuarioOrganizacao
         login: string;
         senhaHash: string;
         perfilAcesso: import(".prisma/client").$Enums.PerfilAcesso;
+        setor: string | null;
         id: string;
     } | null>;
     findFirstAdmin(): Promise<{
         login: string;
         senhaHash: string;
         perfilAcesso: import(".prisma/client").$Enums.PerfilAcesso;
+        setor: string | null;
         id: string;
     } | null>;
     findFirstUser(where: Prisma.UsuarioOrganizacaoWhereInput): Promise<{
         login: string;
         senhaHash: string;
         perfilAcesso: import(".prisma/client").$Enums.PerfilAcesso;
+        setor: string | null;
         id: string;
     } | null>;
 }

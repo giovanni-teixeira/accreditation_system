@@ -7,11 +7,11 @@ export class CredenciadoResponseDto {
   cpf: string;
   email: string;
   tipoCategoria: TipoCategoria;
-  tipoCombustivel: TipoCombustivel;
+  tipoCombustivel?: TipoCombustivel;
   endereco?: any;
   credencial?: any;
+  descarbonizacao?: any;
   nomeEmpresa?: string;
-  setor?: string;
 
   constructor(partial: any) {
     this.id = partial.id;
@@ -21,13 +21,13 @@ export class CredenciadoResponseDto {
     this.tipoCategoria = partial.tipoCategoria;
     this.tipoCombustivel = partial.tipoCombustivel;
     this.nomeEmpresa = partial.nomeEmpresa;
-    this.setor = partial.setor;
     this.endereco = partial.endereco;
+    this.descarbonizacao = partial.descarbonizacao;
     this.credencial = partial.credencial
       ? {
         ticketId: partial.credencial.ticketId,
         status: partial.credencial.status,
-        qrToken: partial.credencial.qrToken, // Retornamos apenas o necessário
+        qrToken: partial.credencial.qrToken,
       }
       : null;
   }

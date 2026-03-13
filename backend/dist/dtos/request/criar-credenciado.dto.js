@@ -24,11 +24,14 @@ class CriarCredenciadoDto {
     bairro;
     cidade;
     estado;
+    pais;
     aceiteLgpd;
     tipoCombustivel;
     tipoCategoria;
     cnpj;
     ccir;
+    nomeEmpresa;
+    siteEmpresa;
 }
 exports.CriarCredenciadoDto = CriarCredenciadoDto;
 __decorate([
@@ -94,6 +97,12 @@ __decorate([
 ], CriarCredenciadoDto.prototype, "estado", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)({ message: 'O país é obrigatório' }),
+    __metadata("design:type", String)
+], CriarCredenciadoDto.prototype, "pais", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], CriarCredenciadoDto.prototype, "aceiteLgpd", void 0);
@@ -121,4 +130,16 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CriarCredenciadoDto.prototype, "ccir", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CriarCredenciadoDto.prototype, "nomeEmpresa", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CriarCredenciadoDto.prototype, "siteEmpresa", void 0);
 //# sourceMappingURL=criar-credenciado.dto.js.map

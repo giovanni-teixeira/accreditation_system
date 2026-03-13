@@ -7,12 +7,15 @@ export declare class CredenciadoRepository extends BaseRepository<Credenciado, P
     findByCpf(cpf: string): Promise<({
         endereco: {
             id: string;
+            latitude: number | null;
+            longitude: number | null;
+            credenciadoId: string;
             cep: string;
             rua: string;
             bairro: string;
             cidade: string;
             estado: string;
-            credenciadoId: string;
+            pais: string;
         } | null;
         credencial: {
             id: string;
@@ -25,19 +28,18 @@ export declare class CredenciadoRepository extends BaseRepository<Credenciado, P
             createdAt: Date;
         } | null;
     } & {
-        id: string;
         nomeCompleto: string;
         cpf: string;
         rg: string;
         celular: string;
         email: string;
-        aceiteLgpd: boolean;
-        tipoCombustivel: import(".prisma/client").$Enums.TipoCombustivel;
+        id: string;
+        eventoId: string;
         tipoCategoria: import(".prisma/client").$Enums.TipoCategoria;
         cnpj: string | null;
         ccir: string | null;
-        eventoId: string;
         nomeEmpresa: string | null;
         siteEmpresa: string | null;
+        aceiteLgpd: boolean;
     }) | null>;
 }

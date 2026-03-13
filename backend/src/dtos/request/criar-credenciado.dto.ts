@@ -63,6 +63,11 @@ export class CriarCredenciadoDto {
   estado: string;
 
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty({ message: 'O país é obrigatório' })
+  pais: string;
+
+  @ApiProperty()
   @IsBoolean()
   aceiteLgpd: boolean;
 
@@ -89,5 +94,10 @@ export class CriarCredenciadoDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  setor?: string;
+  nomeEmpresa?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  siteEmpresa?: string;
 }

@@ -22,6 +22,7 @@ interface FormDataState {
     celular: string;
     email: string;
     cep: string;
+    pais: string;
     rua: string;
     bairro: string;
     cidade: string;
@@ -47,7 +48,7 @@ export default function FormCadastro({ onResult }: FormCadastroProps) {
 
     const [formData, setFormData] = useState<FormDataState>({
         nomeCompleto: '', cpf: '', rg: '', celular: '', email: '',
-        cep: '', rua: '', bairro: '', cidade: '', estado: '',
+        cep: '', pais: 'Brasil', rua: '', bairro: '', cidade: '', estado: '',
         tipoCombustivel: 'NAO_INFORMADO', aceiteLgpd: false,
         cnpj: '', siteEmpresa: '', nomeEmpresa: '',
         ccir: '', nomePropriedade: '', nomeVeiculo: ''
@@ -68,33 +69,35 @@ export default function FormCadastro({ onResult }: FormCadastroProps) {
         }
     }, [role]);
 
-    const fetchViaCep = async (cepText: string) => {
-        const zipCode = MaskUtils.unmask(cepText);
-        if (zipCode.length === 8) {
-            try {
-                const response = await fetch(API_ROUTES.EXTERNAL.VIA_CEP(zipCode));
-                const data = await response.json();
-                if (!data.erro) {
-                    setFormData(prev => ({
-                        ...prev,
-                        rua: data.logradouro || prev.rua,
-                        bairro: data.bairro || prev.bairro,
-                        cidade: data.localidade || prev.cidade,
-                        estado: data.uf || prev.estado
-                    }));
-                    setCepLocked({
-                        rua: !!data.logradouro,
-                        bairro: !!data.bairro,
-                        cidade: !!data.localidade,
-                        estado: !!data.uf
-                    });
-                } else {
-                    setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
-                }
-            } catch (err) {
-                console.error('Erro ao buscar CEP:', err);
-                setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
-            }
+    const fetchAddress = async (cepText: string) => {
+        const zipCode = cepText.replace(/\D/g, '');
+
+        // No Brasil, espera 8 dígitos. Fora, deixamos livre mas avisamos o backend.
+        if (formData.pais === 'Brasil' && zipCode.length !== 8) return;
+
+        try {
+            const res = await fetch(API_ROUTES.ADDRESS.BUSCAR(zipCode, formData.pais));
+            if (!res.ok) throw new Error('Não encontrado');
+            
+            const data = await res.json();
+
+            setFormData(prev => ({
+                ...prev,
+                rua: data.rua || prev.rua,
+                bairro: data.bairro || prev.bairro,
+                cidade: data.cidade || prev.cidade,
+                estado: data.estado || prev.estado
+            }));
+            
+            setCepLocked({
+                rua: !!data.rua,
+                bairro: !!data.bairro,
+                cidade: !!data.cidade,
+                estado: !!data.estado
+            });
+        } catch (err) {
+            console.error('Erro na consulta de endereço centralizada:', err);
+            setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
         }
     };
 
@@ -105,8 +108,10 @@ export default function FormCadastro({ onResult }: FormCadastroProps) {
         let finalValue = value;
 
         // Delega a aplicação de máscaras para o utilitário MaskUtils
-        if (name === 'cep') finalValue = MaskUtils.cep(value);
-        else if (name === 'cpf') finalValue = MaskUtils.cpf(value);
+        // Delega a aplicação de máscaras para o utilitário MaskUtils
+        if (name === 'cep') {
+            finalValue = formData.pais === 'Brasil' ? MaskUtils.cep(value) : value.toUpperCase();
+        } else if (name === 'cpf') finalValue = MaskUtils.cpf(value);
         else if (name === 'celular') finalValue = MaskUtils.celular(value);
         else if (name === 'rg') finalValue = MaskUtils.rg(value);
         else if (name === 'cnpj') finalValue = MaskUtils.cnpj(value);
@@ -117,9 +122,9 @@ export default function FormCadastro({ onResult }: FormCadastroProps) {
             [name]: type === 'checkbox' ? checked : finalValue
         }));
 
-        if (name === 'cep' && finalValue.length === 9) {
-            fetchViaCep(finalValue);
-        } else if (name === 'cep' && finalValue.length < 9) {
+        if (name === 'cep' && ((formData.pais === 'Brasil' && finalValue.length === 9) || (formData.pais !== 'Brasil' && finalValue.length >= 4))) {
+            fetchAddress(finalValue);
+        } else if (name === 'cep') {
             setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
         }
     };
@@ -157,7 +162,7 @@ export default function FormCadastro({ onResult }: FormCadastroProps) {
             if (result.sucesso) {
                 setFormData({
                     nomeCompleto: '', cpf: '', rg: '', celular: '', email: '',
-                    cep: '', rua: '', bairro: '', cidade: '', estado: '',
+                    cep: '', pais: 'Brasil', rua: '', bairro: '', cidade: '', estado: '',
                     tipoCombustivel: 'NAO_INFORMADO', aceiteLgpd: false,
                     cnpj: '', siteEmpresa: '', nomeEmpresa: '',
                     ccir: '', nomePropriedade: '', nomeVeiculo: ''
@@ -225,8 +230,19 @@ export default function FormCadastro({ onResult }: FormCadastroProps) {
                             </div>
 
                             <div className={styles.inputGroup}>
-                                <label>CEP</label>
-                                <input type="text" name="cep" value={formData.cep} onChange={handleInputChange} maxLength={9} placeholder="00000-000" required />
+                                <label>País</label>
+                                <select name="pais" value={formData.pais} onChange={handleInputChange} required>
+                                    <option value="Brasil">Brasil</option>
+                                    <option value="Argentina">Argentina</option>
+                                    <option value="Colômbia">Colômbia</option>
+                                    <option value="Estados Unidos">Estados Unidos</option>
+                                    <option value="Outro">Outro</option>
+                                </select>
+                            </div>
+
+                            <div className={styles.inputGroup}>
+                                <label>{formData.pais === 'Brasil' ? 'CEP' : 'ZIP / Postcode'}</label>
+                                <input type="text" name="cep" value={formData.cep} onChange={handleInputChange} maxLength={ formData.pais === 'Brasil' ? 9 : 15} placeholder={formData.pais === 'Brasil' ? "00000-000" : "Código Postal"} required />
                             </div>
 
                             <div className={styles.inputGroupFull}>

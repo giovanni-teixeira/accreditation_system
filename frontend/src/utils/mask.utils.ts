@@ -6,10 +6,23 @@ export class MaskUtils {
      * Aplica máscara de CEP: 00000-000
      */
     static cep(value: string): string {
-        return value
-            .replace(/\D/g, '')
-            .replace(/^(\d{5})(\d)/, '$1-$2')
-            .slice(0, 9);
+        const clean = value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+
+        // Se for 8 dígitos numéricos, aplica máscara brasileira
+        if (/^\d{8}$/.test(clean)) {
+            return clean.replace(/^(\d{5})(\d{3})/, '$1-$2');
+        }
+
+        // Se estiver no processo de digitação numérica, ajuda na máscara
+        if (/^\d+$/.test(clean)) {
+            if (clean.length > 5) {
+                return clean.replace(/^(\d{5})(\d{1,3}).*/, '$1-$2');
+            }
+            return clean.slice(0, 8);
+        }
+
+        // Caso contrário (internacional), limita em 12 caracteres alfanuméricos
+        return clean.slice(0, 12);
     }
 
     /**

@@ -62,6 +62,9 @@ model Evento {
   id           String        @id @default(uuid()) @db.Uuid
   nomeEvento   String        @unique @map("nome_evento")
   isGratuito   Boolean       @default(true) @map("is_gratuito")
+  localEvento  String?       @map("local_evento")
+  latitude     Float?        @map("latitude")
+  longitude    Float?        @map("longitude")
   privateKey   String?       @map("private_key")
   publicKey    String?       @map("public_key")
   credenciados Credenciado[]
@@ -92,9 +95,7 @@ model Credenciado {
   ccir            String?
   nomeEmpresa     String?         @map("nome_empresa")
   siteEmpresa     String?         @map("site_empresa")
-  setor           String?         @map("setor")
   aceiteLgpd      Boolean         @map("aceite_lgpd")
-  tipoCombustivel TipoCombustivel @map("tipo_combustivel")
 
   evento          Evento           @relation(fields: [eventoId], references: [id], onDelete: Restrict)
   endereco        Endereco?
@@ -116,10 +117,28 @@ model Endereco {
   bairro        String
   cidade        String
   estado        String
+  pais          String @default("Brasil")
+  latitude      Float?
+  longitude     Float?
 
   credenciado Credenciado @relation(fields: [credenciadoId], references: [id], onDelete: Cascade)
 
   @@map("endereco")
+}
+
+model EnderecoCache {
+  id         String   @id @default(uuid()) @db.Uuid
+  cep        String   @unique
+  pais       String   @default("Brasil")
+  rua        String
+  bairro     String
+  cidade     String
+  estado     String
+  latitude   Float?
+  longitude  Float?
+  atualizado DateTime @default(now()) @updatedAt
+
+  @@map("endereco_cache")
 }
 
 model Descarbonizacao {
@@ -127,6 +146,9 @@ model Descarbonizacao {
   credenciadoId       String          @unique @map("credenciado_id") @db.Uuid
   distanciaIdaVoltaKm Float           @map("distancia_ida_volta_km")
   tipoCombustivel     TipoCombustivel @map("tipo_combustivel")
+  latitudeOrigem      Float?          @map("latitude_origem")
+  longitudeOrigem     Float?          @map("longitude_origem")
+  pegadaCo2           Float?          @map("pegada_co2_kg")
 
   credenciado Credenciado @relation(fields: [credenciadoId], references: [id], onDelete: Cascade)
 

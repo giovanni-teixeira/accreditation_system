@@ -5,11 +5,14 @@ export declare class EnderecoRepository {
     constructor(prisma: PrismaService);
     create(data: Prisma.EnderecoCreateWithoutCredenciadoInput, credenciadoId: string): Promise<{
         id: string;
+        latitude: number | null;
+        longitude: number | null;
+        credenciadoId: string;
         cep: string;
         rua: string;
         bairro: string;
         cidade: string;
         estado: string;
-        credenciadoId: string;
+        pais: string;
     }>;
 }

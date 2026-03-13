@@ -17,6 +17,12 @@ class RegisterDto {
     login;
     senhaPura;
     perfilAcesso;
+    nomeCompleto;
+    cpf;
+    rg;
+    celular;
+    email;
+    setor;
 }
 exports.RegisterDto = RegisterDto;
 __decorate([
@@ -36,4 +42,40 @@ __decorate([
     (0, class_validator_1.IsEnum)(client_1.PerfilAcesso),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "perfilAcesso", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'João da Silva', required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "nomeCompleto", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '123.456.789-00', required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "cpf", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '12.345.678-9', required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "rg", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '(16) 99999-9999', required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "celular", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'joao@email.com', required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Portaria 1', required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "setor", void 0);
 //# sourceMappingURL=register.dto.js.map

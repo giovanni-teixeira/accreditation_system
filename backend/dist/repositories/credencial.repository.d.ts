@@ -15,20 +15,19 @@ export declare class CredencialRepository {
     }>;
     findByTicketId(ticketId: string): Promise<({
         credenciado: {
-            id: string;
             nomeCompleto: string;
             cpf: string;
             rg: string;
             celular: string;
             email: string;
-            aceiteLgpd: boolean;
-            tipoCombustivel: import(".prisma/client").$Enums.TipoCombustivel;
+            id: string;
+            eventoId: string;
             tipoCategoria: import(".prisma/client").$Enums.TipoCategoria;
             cnpj: string | null;
             ccir: string | null;
-            eventoId: string;
             nomeEmpresa: string | null;
             siteEmpresa: string | null;
+            aceiteLgpd: boolean;
         };
     } & {
         id: string;

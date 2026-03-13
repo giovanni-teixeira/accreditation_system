@@ -1,0 +1,1 @@
+{"version":3,"file":"routes.constants.js","sourceRoot":"","sources":["../../src/routes/routes.constants.ts"],"names":[],"mappings":";;;AAAa,QAAA,MAAM,GAAG;IACpB,IAAI,EAAE;QACJ,IAAI,EAAE,MAAM;QACZ,KAAK,EAAE,OAAO;QACd,QAAQ,EAAE,UAAU;KACrB;IACD,YAAY,EAAE;QACZ,IAAI,EAAE,cAAc;QACpB,KAAK,EAAE,EAAE;QACT,UAAU,EAAE,UAAU;KACvB;CACF,CAAC"}

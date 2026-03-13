@@ -10,9 +10,12 @@ export declare class CriarCredenciadoDto {
     bairro: string;
     cidade: string;
     estado: string;
+    pais: string;
     aceiteLgpd: boolean;
     tipoCombustivel: TipoCombustivel;
     tipoCategoria: TipoCategoria;
     cnpj?: string;
     ccir?: string;
+    nomeEmpresa?: string;
+    siteEmpresa?: string;
 }

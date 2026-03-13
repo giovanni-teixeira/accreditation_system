@@ -11,7 +11,11 @@ export const API_ROUTES = {
         CRIAR: () => `${ENV_CONFIG.API_BASE_URL}/api/credenciados`,
         BUSCAR_POR_CPF: (cpf: string) => `${ENV_CONFIG.API_BASE_URL}/api/credenciados/cpf/${cpf}`,
     },
+    ADDRESS: {
+        BUSCAR: (zipCode: string, country: string = 'Brasil') => `${ENV_CONFIG.API_BASE_URL}/api/address/${zipCode}?country=${country}`,
+    },
     EXTERNAL: {
         VIA_CEP: (zipCode: string) => `https://viacep.com.br/ws/${zipCode}/json/`,
+        BRASIL_API: (zipCode: string) => `https://brasilapi.com.br/api/cep/v1/${zipCode}`,
     }
 };

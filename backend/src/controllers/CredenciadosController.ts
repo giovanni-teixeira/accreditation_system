@@ -13,6 +13,8 @@ import { CredenciadoResponseDto } from '../dtos/response/credenciado-response.dt
 import { CredenciadoRepository } from '../repositories/credenciado.repository';
 import { EventoRepository } from '../repositories/evento.repository';
 import { QrCodeHelper } from '../utils/qrcode.util';
+import { AddressService } from '../services/address.service';
+import { CalculationHelper } from '../utils/calculation.helper';
 
 import { ROUTES } from '../routes/routes.constants';
 
@@ -22,6 +24,7 @@ export class CredenciadosController {
   constructor(
     private readonly credenciadoRepository: CredenciadoRepository,
     private readonly eventoRepository: EventoRepository,
+    private readonly addressService: AddressService,
   ) { }
 
   @Post(ROUTES.CREDENCIADOS.CRIAR)
@@ -41,24 +44,71 @@ export class CredenciadosController {
       dto.nomeCompleto,
     );
 
+    // 4. Buscar Localização (Geo) do Credenciado e do Evento
+    const addressData = await this.addressService.getAddress(dto.cep, 'Brasil');
+    
+    let latOrigem = addressData?.latitude || null;
+    let lonOrigem = addressData?.longitude || null;
+    let distanciaKm = 0;
+    let pegadaCo2 = 0;
+
+    // Forçamos o tipo para garantir que o TS veja os campos novos do Prisma
+    const eventoAny = evento as any;
+
+    if (latOrigem && lonOrigem && eventoAny.latitude && eventoAny.longitude) {
+      distanciaKm = CalculationHelper.calculateDistance(
+        latOrigem, lonOrigem, 
+        eventoAny.latitude, eventoAny.longitude
+      );
+      pegadaCo2 = CalculationHelper.calculateCo2Footprint(distanciaKm, dto.tipoCombustivel);
+    }
+
     const {
+      tipoCategoria,
+      tipoCombustivel,
       cep,
       rua,
       bairro,
       cidade,
       estado,
-      tipoCategoria,
+      pais,
       ...dadosParticipante
     } = dto;
 
     const res = await this.credenciadoRepository.create({
-      ...dadosParticipante,
-      evento: { connect: { id: evento.id } },
-      tipoCategoria: tipoCategoria,
-      tipoCombustivel:
-        dadosParticipante.tipoCombustivel || TipoCombustivel.GASOLINA,
+      nomeCompleto: dto.nomeCompleto,
+      cpf: dto.cpf,
+      rg: dto.rg,
+      celular: dto.celular,
+      email: dto.email,
+      cnpj: dto.cnpj,
+      ccir: dto.ccir,
+      nomeEmpresa: dto.nomeEmpresa,
+      siteEmpresa: dto.siteEmpresa,
       aceiteLgpd: true,
-      endereco: { create: { cep, rua, bairro, cidade, estado } },
+      tipoCategoria: tipoCategoria,
+      evento: { connect: { id: evento.id } },
+      endereco: { 
+        create: { 
+          cep: dto.cep, 
+          rua: dto.rua, 
+          bairro: dto.bairro, 
+          cidade: dto.cidade, 
+          estado: dto.estado,
+          latitude: latOrigem,
+          longitude: lonOrigem,
+          pais: 'Brasil'
+        } 
+      },
+      descarbonizacao: {
+        create: {
+          distanciaIdaVoltaKm: distanciaKm * 2,
+          tipoCombustivel: tipoCombustivel,
+          latitudeOrigem: latOrigem,
+          longitudeOrigem: lonOrigem,
+          pegadaCo2: pegadaCo2,
+        } as any
+      },
       credencial: {
         create: {
           ticketId: tokenDados.ticketId,
@@ -66,7 +116,7 @@ export class CredenciadosController {
           status: 'ACTIVE',
         },
       },
-    }, { credencial: true, endereco: true });
+    } as any, { credencial: true, endereco: true, descarbonizacao: true } as any);
 
     return new CredenciadoResponseDto(res);
   }

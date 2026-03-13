@@ -5,8 +5,10 @@ export declare class CredenciadoResponseDto {
     cpf: string;
     email: string;
     tipoCategoria: TipoCategoria;
-    tipoCombustivel: TipoCombustivel;
+    tipoCombustivel?: TipoCombustivel;
     endereco?: any;
     credencial?: any;
+    descarbonizacao?: any;
+    nomeEmpresa?: string;
     constructor(partial: any);
 }

@@ -103,11 +103,11 @@ export default function Scanner() {
       const parts = decodedText.split('.');
       if (parts.length !== 2) throw new Error('Token adulterado (formato inválido)');
 
-      const payloadBase64 = parts[0];
+      const payloadRaw = parts[0]; // Formato: eventoId|ticketId
       const signatureBase64 = parts[1];
 
       // Verificação Assinatura Ed25519 offline
-      const messageUint8 = util.decodeBase64(payloadBase64);
+      const messageUint8 = util.decodeUTF8(payloadRaw);
       const signatureUint8 = util.decodeBase64(signatureBase64);
       const publicKeyUint8 = util.decodeBase64(publicKey);
 
@@ -118,16 +118,15 @@ export default function Scanner() {
         return;
       }
 
-
       stopScanner();
 
-      const payloadString = util.encodeUTF8(messageUint8);
-      const payloadObj = JSON.parse(payloadString);
+      // No novo formato, o payload é "eventoId|ticketId"
+      const [eventoId, ticketId] = payloadRaw.split('|');
 
       setScanResult({
         status: 'SUCCESS',
         message: 'Acesso Liberado!',
-        detailed: `Nome: ${payloadObj.n}\nTicket: ${payloadObj.t}`
+        detailed: `Ticket: ${ticketId}\nEvento: ${eventoId}\n\n(Aviso: O nome agora deve ser consultado no banco de dados local via Ticket ID)`
       });
 
     } catch (err: any) {

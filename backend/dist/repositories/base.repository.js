@@ -8,8 +8,8 @@ class BaseRepository {
         this.prisma = prisma;
         this.model = model;
     }
-    async create(data) {
-        return this.model.create({ data });
+    async create(data, include) {
+        return this.model.create({ data, include });
     }
     async findAll(include) {
         return this.model.findMany({ include });
