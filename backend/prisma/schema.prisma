@@ -10,33 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// model Credenciado {
-//   id              String   @id @default(uuid())
-//   nomeCompleto    String
-//   cpf             String   @unique
-//   rg              String
-//   celular         String
-//   email           String
-//   municipio       String
-//   uf              String
-//   aceitouLgpd     Boolean  @default(false)
-//   tipo            String   // Pode ser "Visitante", "Produtor", "Expositor", "Imprensa"
-//   criadoEm        DateTime @default(now())
-//
-//   // Campos específicos de cada tipo
-//   // Expositores
-//   cnpj            String?
-//   nomeEmpresa     String?
-//   siteEmpresa     String?
-//
-//   // Produtores
-//   ccir            String?
-//   nomePropriedade String?
-//
-//   // Imprensa (cnpj e siteEmpresa já contemplados acima)
-//   nomeVeiculo     String?
-// }
-
 enum TipoCategoria {
   EXPOSITOR
   VISITANTE
@@ -83,19 +56,19 @@ model UsuarioOrganizacao {
 }
 
 model Credenciado {
-  id              String          @id @default(uuid()) @db.Uuid
-  eventoId        String          @map("evento_id") @db.Uuid
-  tipoCategoria   TipoCategoria   @map("tipo_categoria")
-  nomeCompleto    String          @map("nome_completo")
-  cpf             String          @unique
-  rg              String
-  celular         String
-  email           String
-  cnpj            String?
-  ccir            String?
-  nomeEmpresa     String?         @map("nome_empresa")
-  siteEmpresa     String?         @map("site_empresa")
-  aceiteLgpd      Boolean         @map("aceite_lgpd")
+  id            String        @id @default(uuid()) @db.Uuid
+  eventoId      String        @map("evento_id") @db.Uuid
+  tipoCategoria TipoCategoria @map("tipo_categoria")
+  nomeCompleto  String        @map("nome_completo")
+  cpf           String        @unique
+  rg            String
+  celular       String
+  email         String
+  cnpj          String?
+  ccir          String?
+  nomeEmpresa   String?       @map("nome_empresa")
+  siteEmpresa   String?       @map("site_empresa")
+  aceiteLgpd    Boolean       @map("aceite_lgpd")
 
   evento          Evento           @relation(fields: [eventoId], references: [id], onDelete: Restrict)
   endereco        Endereco?
@@ -108,6 +81,33 @@ model Credenciado {
   @@index([tipoCategoria])
   @@map("credenciado")
 }
+
+// model Credenciado {
+//   id              String   @id @default(uuid())
+//   nomeCompleto    String
+//   cpf             String   @unique
+//   rg              String
+//   celular         String
+//   email           String
+//   municipio       String
+//   uf              String
+//   aceitouLgpd     Boolean  @default(false)
+//   tipo            String   // Pode ser "Visitante", "Produtor", "Expositor", "Imprensa"
+//   criadoEm        DateTime @default(now())
+//
+//   // Campos específicos de cada tipo
+//   // Expositores
+//   cnpj            String?
+//   nomeEmpresa     String?
+//   siteEmpresa     String?
+//
+//   // Produtores
+//   ccir            String?
+//   nomePropriedade String?
+//
+//   // Imprensa (cnpj e siteEmpresa já contemplados acima)
+//   nomeVeiculo     String?
+// }
 
 model Endereco {
   id            String @id @default(uuid()) @db.Uuid

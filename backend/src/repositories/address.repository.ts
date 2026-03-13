@@ -6,7 +6,11 @@ import { BaseRepository } from './base.repository';
 import { IEndereco } from '../domain/entities/endereco.entity';
 
 @Injectable()
-export class AddressRepository extends BaseRepository<IEndereco, Prisma.EnderecoCacheCreateInput, Prisma.EnderecoCacheUpdateInput> {
+export class AddressRepository extends BaseRepository<
+  IEndereco,
+  Prisma.EnderecoCacheCreateInput,
+  Prisma.EnderecoCacheUpdateInput
+> {
   constructor(protected readonly prisma: PrismaService) {
     // Usamos o model enderecoCache para persistir o histórico de CEPs
     super(prisma, (prisma as any).enderecoCache);

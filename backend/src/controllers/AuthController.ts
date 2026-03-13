@@ -14,6 +14,7 @@ import * as bcrypt from 'bcrypt';
 import * as fs from 'fs';
 import * as path from 'path';
 import { QrCodeHelper } from '../utils/qrcode.util';
+import { BusinessException } from '../common/exceptions/business.exception';
 import {
   ApiTags,
   ApiOperation,
@@ -52,31 +53,36 @@ export class AuthController implements OnModuleInit {
   @ApiResponse({ status: 200, description: 'Logado com sucesso.' })
   @ApiResponse({ status: 401, description: 'Credenciais inválidas.' })
   async login(@Body() loginDto: LoginDto) {
-    const user = await this.usuarioRepository.findByLogin(loginDto.login);
-    if (!user || !(await bcrypt.compare(loginDto.senhaHash, user.senhaHash))) {
-      throw new UnauthorizedException('Credenciais inválidas');
-    }
-
-    const payload = {
-      sub: user.id,
-      login: user.login,
-      role: user.perfilAcesso,
-    };
-    const access_token = this.jwtService.sign(payload);
-
-    let publicKey = null;
-    if (user.perfilAcesso === 'LEITOR_CATRACA') {
-      const evento = await this.eventoRepository.findFirst();
-      if (evento && evento.publicKey) {
-        publicKey = evento.publicKey;
+    try {
+      const user = await this.usuarioRepository.findByLogin(loginDto.login);
+      if (!user || !(await bcrypt.compare(loginDto.senhaHash, user.senhaHash))) {
+        throw new BusinessException('Usuário ou senha inválidos. Por favor, verifique suas credenciais.', 401);
       }
-    }
 
-    return {
-      access_token,
-      publicKey,
-      user: new UsuarioResponseDto(user),
-    };
+      const payload = {
+        sub: user.id,
+        login: user.login,
+        role: user.perfilAcesso,
+      };
+      const access_token = this.jwtService.sign(payload);
+
+      let publicKey = null;
+      if (user.perfilAcesso === 'LEITOR_CATRACA') {
+        const evento = await this.eventoRepository.findFirst();
+        if (evento && evento.publicKey) {
+          publicKey = evento.publicKey;
+        }
+      }
+
+      return {
+        access_token,
+        publicKey,
+        user: new UsuarioResponseDto(user),
+      };
+    } catch (error) {
+      if (error instanceof BusinessException) throw error;
+      throw new BusinessException(`Falha na autenticação: ${error.message}`);
+    }
   }
 
   @Post(ROUTES.AUTH.REGISTER)
@@ -87,16 +93,21 @@ export class AuthController implements OnModuleInit {
   @ApiResponse({ status: 201, description: 'Usuário registrado com sucesso.' })
   @ApiResponse({ status: 403, description: 'Sem permissão de acesso.' })
   async register(@Body() registerDto: RegisterDto) {
-    const saltRounds = 10;
-    const hashData = await bcrypt.hash(registerDto.senhaPura, saltRounds);
+    try {
+      const saltRounds = 10;
+      const hashData = await bcrypt.hash(registerDto.senhaPura, saltRounds);
 
-    const novoUsuario = await this.usuarioRepository.create({
-      login: registerDto.login,
-      senhaHash: hashData,
-      perfilAcesso: registerDto.perfilAcesso,
-    });
+      const novoUsuario = await this.usuarioRepository.create({
+        login: registerDto.login,
+        senhaHash: hashData,
+        perfilAcesso: registerDto.perfilAcesso,
+      });
 
-    return new UsuarioResponseDto(novoUsuario);
+      return new UsuarioResponseDto(novoUsuario);
+    } catch (error) {
+      if (error instanceof BusinessException) throw error;
+      throw new BusinessException(`Erro ao registrar usuário: ${error.message}`);
+    }
   }
 
   async onModuleInit() {

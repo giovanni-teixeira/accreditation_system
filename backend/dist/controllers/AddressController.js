@@ -16,17 +16,25 @@ exports.AddressController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const address_service_1 = require("../services/address.service");
+const business_exception_1 = require("../common/exceptions/business.exception");
 let AddressController = class AddressController {
     addressService;
     constructor(addressService) {
         this.addressService = addressService;
     }
     async getAddress(zipCode, country = 'Brasil') {
-        const address = await this.addressService.getAddress(zipCode, country);
-        if (!address) {
-            throw new common_1.NotFoundException('Endereço não encontrado nas bases disponíveis.');
+        try {
+            const address = await this.addressService.getAddress(zipCode, country);
+            if (!address) {
+                throw new business_exception_1.BusinessException('Endereço não encontrado nas bases disponíveis.', 404);
+            }
+            return address;
         }
-        return address;
+        catch (error) {
+            if (error instanceof business_exception_1.BusinessException)
+                throw error;
+            throw new business_exception_1.BusinessException(`Erro ao buscar endereço: ${error.message}`);
+        }
     }
 };
 exports.AddressController = AddressController;

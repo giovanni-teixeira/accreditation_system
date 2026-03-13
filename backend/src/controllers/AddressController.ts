@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { AddressService } from '../services/address.service';
+import { BusinessException } from '../common/exceptions/business.exception';
 
 @ApiTags('Endereços')
 @Controller('address')
@@ -28,14 +29,20 @@ export class AddressController {
     @Param('zipCode') zipCode: string,
     @Query('country') country: string = 'Brasil',
   ) {
-    const address = await this.addressService.getAddress(zipCode, country);
+    try {
+      const address = await this.addressService.getAddress(zipCode, country);
 
-    if (!address) {
-      throw new NotFoundException(
-        'Endereço não encontrado nas bases disponíveis.',
-      );
+      if (!address) {
+        throw new BusinessException(
+          'Endereço não encontrado nas bases disponíveis.',
+          404,
+        );
+      }
+
+      return address;
+    } catch (error) {
+      if (error instanceof BusinessException) throw error;
+      throw new BusinessException(`Erro ao buscar endereço: ${error.message}`);
     }
-
-    return address;
   }
 }

@@ -53,6 +53,7 @@ const bcrypt = __importStar(require("bcrypt"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const qrcode_util_1 = require("../utils/qrcode.util");
+const business_exception_1 = require("../common/exceptions/business.exception");
 const swagger_1 = require("@nestjs/swagger");
 const login_dto_1 = require("../dtos/request/login.dto");
 const register_dto_1 = require("../dtos/request/register.dto");
@@ -78,38 +79,52 @@ let AuthController = class AuthController {
         this.configService = configService;
     }
     async login(loginDto) {
-        const user = await this.usuarioRepository.findByLogin(loginDto.login);
-        if (!user || !(await bcrypt.compare(loginDto.senhaHash, user.senhaHash))) {
-            throw new common_1.UnauthorizedException('Credenciais inválidas');
-        }
-        const payload = {
-            sub: user.id,
-            login: user.login,
-            role: user.perfilAcesso,
-        };
-        const access_token = this.jwtService.sign(payload);
-        let publicKey = null;
-        if (user.perfilAcesso === 'LEITOR_CATRACA') {
-            const evento = await this.eventoRepository.findFirst();
-            if (evento && evento.publicKey) {
-                publicKey = evento.publicKey;
+        try {
+            const user = await this.usuarioRepository.findByLogin(loginDto.login);
+            if (!user || !(await bcrypt.compare(loginDto.senhaHash, user.senhaHash))) {
+                throw new business_exception_1.BusinessException('Usuário ou senha inválidos. Por favor, verifique suas credenciais.', 401);
             }
+            const payload = {
+                sub: user.id,
+                login: user.login,
+                role: user.perfilAcesso,
+            };
+            const access_token = this.jwtService.sign(payload);
+            let publicKey = null;
+            if (user.perfilAcesso === 'LEITOR_CATRACA') {
+                const evento = await this.eventoRepository.findFirst();
+                if (evento && evento.publicKey) {
+                    publicKey = evento.publicKey;
+                }
+            }
+            return {
+                access_token,
+                publicKey,
+                user: new usuario_response_dto_1.UsuarioResponseDto(user),
+            };
         }
-        return {
-            access_token,
-            publicKey,
-            user: new usuario_response_dto_1.UsuarioResponseDto(user),
-        };
+        catch (error) {
+            if (error instanceof business_exception_1.BusinessException)
+                throw error;
+            throw new business_exception_1.BusinessException(`Falha na autenticação: ${error.message}`);
+        }
     }
     async register(registerDto) {
-        const saltRounds = 10;
-        const hashData = await bcrypt.hash(registerDto.senhaPura, saltRounds);
-        const novoUsuario = await this.usuarioRepository.create({
-            login: registerDto.login,
-            senhaHash: hashData,
-            perfilAcesso: registerDto.perfilAcesso,
-        });
-        return new usuario_response_dto_1.UsuarioResponseDto(novoUsuario);
+        try {
+            const saltRounds = 10;
+            const hashData = await bcrypt.hash(registerDto.senhaPura, saltRounds);
+            const novoUsuario = await this.usuarioRepository.create({
+                login: registerDto.login,
+                senhaHash: hashData,
+                perfilAcesso: registerDto.perfilAcesso,
+            });
+            return new usuario_response_dto_1.UsuarioResponseDto(novoUsuario);
+        }
+        catch (error) {
+            if (error instanceof business_exception_1.BusinessException)
+                throw error;
+            throw new business_exception_1.BusinessException(`Erro ao registrar usuário: ${error.message}`);
+        }
     }
     async onModuleInit() {
         const eventoSeedPath = path.join(process.cwd(), 'prisma', 'evento.seed.json');
