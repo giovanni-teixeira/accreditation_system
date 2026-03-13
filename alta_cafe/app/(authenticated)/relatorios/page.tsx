@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { 
-  BarChart3, 
-  Download, 
-  FileText, 
-  Users, 
-  MapPin, 
+import {
+  BarChart3,
+  Download,
+  FileText,
+  Users,
+  MapPin,
   Percent,
   Calendar,
   TrendingUp,
@@ -35,7 +35,7 @@ import { dashboardKPIs, credenciados, cidadesData, diarioData, categoriasLabels 
 // Dados para gráfico de pizza
 const categoriaData = [
   { name: 'Expositores', value: dashboardKPIs.expositores, color: '#8B5CF6' },
-  { name: 'Cafeicultores', value: dashboardKPIs.cafeicultores, color: '#F59E0B' },
+  { name: 'Produtores', value: dashboardKPIs.produtores, color: '#F59E0B' },
   { name: 'Visitantes', value: dashboardKPIs.visitantes, color: '#0EA5E9' },
   { name: 'Imprensa', value: dashboardKPIs.imprensa, color: '#EC4899' },
 ]
@@ -54,7 +54,7 @@ export default function RelatoriosPage() {
   const estatisticas = useMemo(() => {
     const porCategoria = {
       EXPOSITOR: dadosFiltrados.filter(c => c.tipoCategoria === 'EXPOSITOR').length,
-      CAFEICULTOR: dadosFiltrados.filter(c => c.tipoCategoria === 'CAFEICULTOR').length,
+      PRODUTOR: dadosFiltrados.filter(c => c.tipoCategoria === 'PRODUTOR').length,
       VISITANTE: dadosFiltrados.filter(c => c.tipoCategoria === 'VISITANTE').length,
       IMPRENSA: dadosFiltrados.filter(c => c.tipoCategoria === 'IMPRENSA').length,
     }
@@ -100,7 +100,7 @@ export default function RelatoriosPage() {
     link.href = URL.createObjectURL(blob)
     link.download = `credenciados_alta_cafe_2026_${new Date().toISOString().split('T')[0]}.csv`
     link.click()
-    
+
     toast.success('Arquivo CSV exportado com sucesso!')
   }
 
@@ -122,7 +122,7 @@ export default function RelatoriosPage() {
     link.href = URL.createObjectURL(blob)
     link.download = `relatorio_cidades_alta_cafe_2026.csv`
     link.click()
-    
+
     toast.success('Relatório de cidades exportado!')
   }
 
@@ -145,7 +145,7 @@ export default function RelatoriosPage() {
     link.href = URL.createObjectURL(blob)
     link.download = `relatorio_categorias_alta_cafe_2026.csv`
     link.click()
-    
+
     toast.success('Relatório de categorias exportado!')
   }
 
@@ -192,7 +192,7 @@ export default function RelatoriosPage() {
           <SelectContent>
             <SelectItem value="todas">Todas categorias</SelectItem>
             <SelectItem value="EXPOSITOR">Expositores</SelectItem>
-            <SelectItem value="CAFEICULTOR">Cafeicultores</SelectItem>
+            <SelectItem value="PRODUTOR">Produtores</SelectItem>
             <SelectItem value="VISITANTE">Visitantes</SelectItem>
             <SelectItem value="IMPRENSA">Imprensa</SelectItem>
           </SelectContent>
@@ -389,8 +389,8 @@ export default function RelatoriosPage() {
                   <TableRow key={cat.name}>
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
-                        <div 
-                          className="h-3 w-3 rounded-full" 
+                        <div
+                          className="h-3 w-3 rounded-full"
                           style={{ backgroundColor: cat.color }}
                         />
                         {cat.name}

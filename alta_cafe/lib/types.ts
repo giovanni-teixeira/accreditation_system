@@ -1,5 +1,5 @@
 // Enums
-export type CategoriaCredenciado = 'EXPOSITOR' | 'CAFEICULTOR' | 'VISITANTE' | 'IMPRENSA'
+export type CategoriaCredenciado = 'EXPOSITOR' | 'PRODUTOR' | 'VISITANTE' | 'IMPRENSA'
 
 // Removido status - credenciados são apenas confirmados ou não existem
 export type PerfilAcesso = 'ADMIN' | 'COMISSAO_ORGANIZADORA' | 'COLABORADOR_TERCEIRIZADO'
@@ -28,7 +28,7 @@ export interface Credenciado {
   municipio: string
   uf: string
   cnpj?: string // Para expositor/imprensa
-  ccir?: string // Para cafeicultor
+  ccir?: string // Para produtor
   empresa?: string
   cargo?: string
   aceiteLgpd: boolean
@@ -65,7 +65,7 @@ export interface HistoricoCredenciado {
 export interface DashboardKPIs {
   totalCredenciados: number
   expositores: number
-  cafeicultores: number
+  produtores: number
   visitantes: number
   imprensa: number
 }

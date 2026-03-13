@@ -68,26 +68,26 @@ export class Expositor extends Credenciado {
     }
 }
 
-export interface ICafeicultorArgs extends ICredenciadoArgs {
+export interface IProdutorArgs extends ICredenciadoArgs {
     ccir: string;
     nomePropriedade: string;
 }
 
-export class Cafeicultor extends Credenciado {
+export class Produtor extends Credenciado {
     ccir: string;
     nomePropriedade: string;
 
-    constructor(data: ICafeicultorArgs) {
+    constructor(data: IProdutorArgs) {
         super(data);
         this.ccir = data.ccir;
         this.nomePropriedade = data.nomePropriedade;
-        this.tipo = 'Cafeicultor';
+        this.tipo = 'Produtor';
     }
 
     validar() {
         super.validar();
         if (!this.ccir || !this.nomePropriedade) {
-            throw new Error("Cafeicultor precisa de CCIR e Nome da Propriedade.");
+            throw new Error("Produtor precisa de CCIR e Nome da Propriedade.");
         }
     }
 }

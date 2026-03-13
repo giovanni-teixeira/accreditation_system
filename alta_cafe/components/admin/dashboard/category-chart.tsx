@@ -5,7 +5,7 @@ import { dashboardKPIs } from '@/lib/mock-data'
 
 const data = [
   { name: 'Expositores', value: dashboardKPIs.expositores, color: '#8B5CF6' },
-  { name: 'Cafeicultores', value: dashboardKPIs.cafeicultores, color: '#F59E0B' },
+  { name: 'Produtores', value: dashboardKPIs.produtores, color: '#F59E0B' },
   { name: 'Visitantes', value: dashboardKPIs.visitantes, color: '#0EA5E9' },
   { name: 'Imprensa', value: dashboardKPIs.imprensa, color: '#EC4899' },
 ]

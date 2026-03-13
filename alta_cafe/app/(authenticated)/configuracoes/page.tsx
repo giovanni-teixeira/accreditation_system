@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { 
-  Calendar, 
-  Users, 
+import {
+  Calendar,
+  Users,
   Sliders,
   Save,
   Plus,
@@ -64,19 +64,19 @@ const perfilLabels: Record<PerfilAcesso, string> = {
 
 export default function ConfiguracoesPage() {
   const [isSaving, setIsSaving] = useState(false)
-  
+
   // Dados do Evento
   const [nomeEvento, setNomeEvento] = useState(eventoData.nomeEvento)
   const [localEvento, setLocalEvento] = useState(eventoData.local)
   const [dataInicio, setDataInicio] = useState(eventoData.dataInicio)
   const [dataFim, setDataFim] = useState(eventoData.dataFim)
-  const [descricao, setDescricao] = useState('A maior feira de café do Brasil, reunindo cafeicultores, expositores e profissionais do setor.')
+  const [descricao, setDescricao] = useState('A maior feira de café do Brasil, reunindo produtores, expositores e profissionais do setor.')
 
   // Configurações de Credenciamento
   const [autoCredenciamento, setAutoCredenciamento] = useState(true)
   const [enviarEmail, setEnviarEmail] = useState(true)
   const [limiteExpositores, setLimiteExpositores] = useState('200')
-  const [limiteCafeicultores, setLimiteCafeicultores] = useState('500')
+  const [limiteProdutores, setLimiteProdutores] = useState('500')
   const [limiteVisitantes, setLimiteVisitantes] = useState('1000')
   const [limiteImprensa, setLimiteImprensa] = useState('100')
 
@@ -105,8 +105,8 @@ export default function ConfiguracoesPage() {
 
     if (editingUser) {
       // Editar usuário existente
-      setUsuarios(prev => prev.map(u => 
-        u.id === editingUser.id 
+      setUsuarios(prev => prev.map(u =>
+        u.id === editingUser.id
           ? { ...u, nome: newUserNome, login: newUserLogin, senha: newUserSenha, email: newUserEmail, perfilAcesso: newUserPerfil }
           : u
       ))
@@ -154,7 +154,7 @@ export default function ConfiguracoesPage() {
       toast.error('Não é possível desativar o administrador principal')
       return
     }
-    setUsuarios(prev => prev.map(u => 
+    setUsuarios(prev => prev.map(u =>
       u.id === userId ? { ...u, ativo: !u.ativo } : u
     ))
     toast.success('Status do usuário atualizado!')
@@ -385,8 +385,8 @@ export default function ConfiguracoesPage() {
                             {usuario.perfilAcesso === 'COMISSAO_ORGANIZADORA' && <UserCog className="mr-1 h-3 w-3" />}
                             <span className="hidden sm:inline">{perfilLabels[usuario.perfilAcesso]}</span>
                             <span className="sm:hidden">
-                              {usuario.perfilAcesso === 'ADMIN' ? 'Admin' : 
-                               usuario.perfilAcesso === 'COMISSAO_ORGANIZADORA' ? 'Comissão' : 'Colab.'}
+                              {usuario.perfilAcesso === 'ADMIN' ? 'Admin' :
+                                usuario.perfilAcesso === 'COMISSAO_ORGANIZADORA' ? 'Comissão' : 'Colab.'}
                             </span>
                           </Badge>
                         </TableCell>
@@ -410,9 +410,9 @@ export default function ConfiguracoesPage() {
                             <Button variant="ghost" size="icon" onClick={() => handleEditUser(usuario)}>
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
+                            <Button
+                              variant="ghost"
+                              size="icon"
                               className="text-destructive"
                               onClick={() => handleDeleteUser(usuario.id)}
                               disabled={usuario.id === 'usr-001'}
@@ -479,32 +479,32 @@ export default function ConfiguracoesPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label>Expositores</Label>
-                  <Input 
-                    type="number" 
+                  <Input
+                    type="number"
                     value={limiteExpositores}
                     onChange={(e) => setLimiteExpositores(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Cafeicultores</Label>
-                  <Input 
-                    type="number" 
-                    value={limiteCafeicultores}
-                    onChange={(e) => setLimiteCafeicultores(e.target.value)}
+                  <Label>Produtores</Label>
+                  <Input
+                    type="number"
+                    value={limiteProdutores}
+                    onChange={(e) => setLimiteProdutores(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Visitantes</Label>
-                  <Input 
-                    type="number" 
+                  <Input
+                    type="number"
                     value={limiteVisitantes}
                     onChange={(e) => setLimiteVisitantes(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Imprensa</Label>
-                  <Input 
-                    type="number" 
+                  <Input
+                    type="number"
                     value={limiteImprensa}
                     onChange={(e) => setLimiteImprensa(e.target.value)}
                   />

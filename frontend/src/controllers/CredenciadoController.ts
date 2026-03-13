@@ -1,8 +1,9 @@
 'use server';
 
 // src/controllers/CredenciadoController.ts
-import { Credenciado, Expositor, Cafeicultor, Visitante, Imprensa } from '@/models/Credenciado';
+import { Credenciado, Expositor, Produtor, Visitante, Imprensa } from '@/models/Credenciado';
 import { API_ROUTES } from '@/config/api';
+import { CredenciadoService } from '@/services/credenciado.service';
 
 export interface CadastroResponse {
     sucesso: boolean;
@@ -20,8 +21,8 @@ export async function cadastrarUsuario(formData: any): Promise<CadastroResponse>
             case 'expositor':
                 novoUsuario = new Expositor(dados as any);
                 break;
-            case 'cafeicultor':
-                novoUsuario = new Cafeicultor(dados as any);
+            case 'produtor':
+                novoUsuario = new Produtor(dados as any);
                 break;
             case 'visitante':
                 novoUsuario = new Visitante(dados as any);
@@ -39,31 +40,13 @@ export async function cadastrarUsuario(formData: any): Promise<CadastroResponse>
         novoUsuario.validar();
 
 
-        const rotasPossiveis = ['visitante', 'cafeicultor', 'imprensa', 'expositor'];
+        const rotasPossiveis = ['visitante', 'produtor', 'imprensa', 'expositor'];
         if (!rotasPossiveis.includes(role)) {
             throw new Error('Perfil inválido no sistema.');
         }
 
-        // Requisição centralizada para o backend
-        const res = await fetch(API_ROUTES.CREDENCIADOS.CRIAR(role), {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dados)
-        });
-
-        if (!res.ok) {
-
-            const erroRes = await res.json().catch(() => ({}));
-
-            let errorMessage = erroRes.message || 'Erro ao comunicar com o servidor de credenciamento.';
-            if (Array.isArray(errorMessage)) errorMessage = errorMessage.join(', ');
-
-            throw new Error(errorMessage);
-        }
-
-        const usuarioCriado = await res.json();
+        // Requisição delegada ao Serviço de Credenciados
+        const usuarioCriado = await CredenciadoService.cadastrar(role, dados);
 
         return {
             sucesso: true,
@@ -76,6 +59,25 @@ export async function cadastrarUsuario(formData: any): Promise<CadastroResponse>
         return {
             sucesso: false,
             mensagem: error.message || "Erro ao processar o cadastro."
+        };
+    }
+}
+
+export async function buscarPorCpf(cpf: string): Promise<CadastroResponse> {
+    try {
+        const cleanCpf = cpf.replace(/\D/g, '');
+        const data = await CredenciadoService.buscarPorCpf(cleanCpf);
+
+        return {
+            sucesso: true,
+            mensagem: `Credencial encontrada!`,
+            dadosRecebidos: data
+        };
+    } catch (error: any) {
+        console.error("Erro na busca por CPF:", error);
+        return {
+            sucesso: false,
+            mensagem: error.message || "CPF não encontrado na base de dados."
         };
     }
 }

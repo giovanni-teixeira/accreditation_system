@@ -1,4 +1,4 @@
-FROM node:20.11.1-bookworm-slim
+FROM node:22-bookworm-slim
 
 # Instala bibliotecas de sistema necessárias pro Prisma ORM lidar com C++ Engines
 RUN apt-get update -y && apt-get install -y openssl

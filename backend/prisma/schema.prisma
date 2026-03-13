@@ -20,7 +20,7 @@ datasource db {
 //   municipio       String
 //   uf              String
 //   aceitouLgpd     Boolean  @default(false)
-//   tipo            String   // Pode ser "Visitante", "Cafeicultor", "Expositor", "Imprensa"
+//   tipo            String   // Pode ser "Visitante", "Produtor", "Expositor", "Imprensa"
 //   criadoEm        DateTime @default(now())
 //
 //   // Campos específicos de cada tipo
@@ -29,7 +29,7 @@ datasource db {
 //   nomeEmpresa     String?
 //   siteEmpresa     String?
 //
-//   // Cafeicultores
+//   // Produtores
 //   ccir            String?
 //   nomePropriedade String?
 //
@@ -40,7 +40,7 @@ datasource db {
 enum TipoCategoria {
   EXPOSITOR
   VISITANTE
-  CAFEICULTOR
+  PRODUTOR
   IMPRENSA
   ORGANIZACAO
   TERCEIRIZADO
@@ -75,21 +75,31 @@ model UsuarioOrganizacao {
   senhaHash    String       @map("senha_hash")
   perfilAcesso PerfilAcesso @map("perfil_acesso")
 
+  // Campos para Credencial Organizacional
+  nomeCompleto String? @map("nome_completo")
+  cpf          String? @unique
+  rg           String?
+  celular      String?
+  email        String?
+  setor        String?
+
   @@map("usuario_organizacao")
 }
 
 model Credenciado {
-  id            String        @id @default(uuid()) @db.Uuid
-  eventoId      String        @map("evento_id") @db.Uuid
-  tipoCategoria TipoCategoria @map("tipo_categoria")
-  nomeCompleto  String        @map("nome_completo")
-  cpf           String        @unique
-  rg            String
-  celular       String
-  email         String
-  cnpj          String?
-  ccir          String?
-  aceiteLgpd    Boolean         @map("aceite_lgpd")
+  id              String          @id @default(uuid()) @db.Uuid
+  eventoId        String          @map("evento_id") @db.Uuid
+  tipoCategoria   TipoCategoria   @map("tipo_categoria")
+  nomeCompleto    String          @map("nome_completo")
+  cpf             String          @unique
+  rg              String
+  celular         String
+  email           String
+  cnpj            String?
+  ccir            String?
+  nomeEmpresa     String?         @map("nome_empresa")
+  siteEmpresa     String?         @map("site_empresa")
+  aceiteLgpd      Boolean         @map("aceite_lgpd")
   tipoCombustivel TipoCombustivel @map("tipo_combustivel")
 
   evento          Evento           @relation(fields: [eventoId], references: [id], onDelete: Restrict)
@@ -105,15 +115,15 @@ model Credenciado {
 }
 
 model Endereco {
-  id            String      @id @default(uuid()) @db.Uuid
-  credenciadoId String      @unique @map("credenciado_id") @db.Uuid
+  id            String @id @default(uuid()) @db.Uuid
+  credenciadoId String @unique @map("credenciado_id") @db.Uuid
   cep           String
   rua           String
   bairro        String
   cidade        String
   estado        String
 
-  credenciado   Credenciado @relation(fields: [credenciadoId], references: [id], onDelete: Cascade)
+  credenciado Credenciado @relation(fields: [credenciadoId], references: [id], onDelete: Cascade)
 
   @@map("endereco")
 }
@@ -130,14 +140,14 @@ model Descarbonizacao {
 }
 
 model Credencial {
-  id                 String  @id @default(uuid()) @db.Uuid
-  credenciadoId      String  @unique @map("credenciado_id") @db.Uuid
-  ticketId           String  @unique @default(uuid()) @map("ticket_id") @db.Uuid
-  qrToken            String  @map("qr_token") @db.Text
-  downloads          Int     @default(0)
-  printCount         Int     @default(0) @map("print_count")
-  status             String  @default("ACTIVE")
-  createdAt          DateTime @default(now()) @map("created_at")
+  id            String   @id @default(uuid()) @db.Uuid
+  credenciadoId String   @unique @map("credenciado_id") @db.Uuid
+  ticketId      String   @unique @default(uuid()) @map("ticket_id") @db.Uuid
+  qrToken       String   @map("qr_token") @db.Text
+  downloads     Int      @default(0)
+  printCount    Int      @default(0) @map("print_count")
+  status        String   @default("ACTIVE")
+  createdAt     DateTime @default(now()) @map("created_at")
 
   credenciado Credenciado @relation(fields: [credenciadoId], references: [id], onDelete: Cascade)
   scans       QrScan[]
@@ -147,13 +157,13 @@ model Credencial {
 }
 
 model QrScan {
-  id           String   @id @default(uuid()) @db.Uuid
-  ticketId     String   @map("ticket_id") @db.Uuid
-  scannerId    String   @map("scanner_id")
-  scanType     String   @map("scan_type")
-  createdAt    DateTime @default(now()) @map("created_at")
+  id        String   @id @default(uuid()) @db.Uuid
+  ticketId  String   @map("ticket_id") @db.Uuid
+  scannerId String   @map("scanner_id")
+  scanType  String   @map("scan_type")
+  createdAt DateTime @default(now()) @map("created_at")
 
-  credencial   Credencial @relation(fields: [ticketId], references: [ticketId], onDelete: Cascade)
+  credencial Credencial @relation(fields: [ticketId], references: [ticketId], onDelete: Cascade)
 
   @@index([ticketId])
   @@map("qrscans")

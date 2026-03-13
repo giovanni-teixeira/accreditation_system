@@ -1,0 +1,98 @@
+.searchContainer {
+    width: 100%;
+    max-width: 380px;
+    margin: 1.5rem auto 0;
+    position: relative;
+    border-bottom: 3px solid var(--coffee-brown);
+    transition: all 0.3s ease;
+}
+
+.searchContainer:focus-within {
+    border-bottom-color: var(--primary-green);
+}
+
+.inputWrapper {
+    position: relative;
+    height: 40px;
+    display: flex;
+    align-items: flex-end;
+}
+
+.label {
+    position: absolute;
+    left: 0;
+    bottom: 8px;
+    color: var(--coffee-brown);
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 8px 0;
+    font-size: 1.2rem;
+    color: var(--dark-brown);
+    outline: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.searchContainer.active .input,
+.input:focus {
+    opacity: 1;
+}
+
+.searchContainer.active .label,
+.input:focus+.label,
+.input:not(:placeholder-shown)+.label {
+    bottom: 35px;
+    font-size: 0.85rem;
+    color: var(--primary-green);
+    opacity: 1;
+}
+
+.searchIcon {
+    position: absolute;
+    right: 0;
+    bottom: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--coffee-brown);
+    transition: color 0.2s ease, transform 0.2s ease;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.searchIcon:hover {
+    color: var(--primary-green);
+    transform: scale(1.2);
+}
+
+.searchIcon:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.loadingSpinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(78, 52, 46, 0.1);
+    border-top-color: var(--primary-green);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

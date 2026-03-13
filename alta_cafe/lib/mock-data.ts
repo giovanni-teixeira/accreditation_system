@@ -1,9 +1,9 @@
-import type { 
-  Evento, 
-  Credenciado, 
-  UsuarioAdmin, 
+import type {
+  Evento,
+  Credenciado,
+  UsuarioAdmin,
   HistoricoCredenciado,
-  DashboardKPIs 
+  DashboardKPIs
 } from './types'
 
 // Evento único - Alta Café 2026
@@ -56,7 +56,7 @@ export const credenciados: Credenciado[] = [
   {
     id: 'cred-002',
     eventoId: 'evt-001',
-    tipoCategoria: 'CAFEICULTOR',
+    tipoCategoria: 'PRODUTOR',
     nomeCompleto: 'Ana Carolina Ferreira',
     cpf: '987.654.321-00',
     rg: 'MG-98.765.432',
@@ -137,7 +137,7 @@ export const credenciados: Credenciado[] = [
   {
     id: 'cred-006',
     eventoId: 'evt-001',
-    tipoCategoria: 'CAFEICULTOR',
+    tipoCategoria: 'PRODUTOR',
     nomeCompleto: 'Mariana Oliveira Prado',
     cpf: '789.123.456-00',
     celular: '(35) 94444-2345',
@@ -195,7 +195,7 @@ export const credenciados: Credenciado[] = [
   {
     id: 'cred-009',
     eventoId: 'evt-001',
-    tipoCategoria: 'CAFEICULTOR',
+    tipoCategoria: 'PRODUTOR',
     nomeCompleto: 'Antônio José Ribeiro',
     cpf: '258.147.369-00',
     celular: '(34) 91111-4567',
@@ -256,7 +256,7 @@ export const historicoCredenciado: HistoricoCredenciado[] = [
 export const dashboardKPIs: DashboardKPIs = {
   totalCredenciados: 847,
   expositores: 156,
-  cafeicultores: 312,
+  produtores: 312,
   visitantes: 324,
   imprensa: 55,
 }
@@ -271,7 +271,7 @@ export const ufs = [
 // Labels das categorias
 export const categoriasLabels: Record<string, string> = {
   EXPOSITOR: 'Expositor',
-  CAFEICULTOR: 'Cafeicultor',
+  PRODUTOR: 'Produtor',
   VISITANTE: 'Visitante',
   IMPRENSA: 'Imprensa',
 }
@@ -279,7 +279,7 @@ export const categoriasLabels: Record<string, string> = {
 // Cores das categorias
 export const categoriaColors: Record<string, { bg: string; text: string }> = {
   EXPOSITOR: { bg: 'bg-purple-100', text: 'text-purple-800' },
-  CAFEICULTOR: { bg: 'bg-amber-100', text: 'text-amber-800' },
+  PRODUTOR: { bg: 'bg-amber-100', text: 'text-amber-800' },
   VISITANTE: { bg: 'bg-sky-100', text: 'text-sky-800' },
   IMPRENSA: { bg: 'bg-rose-100', text: 'text-rose-800' },
 }
@@ -332,7 +332,7 @@ export function calcularEmissaoTotal(): {
     AVIAO: { quantidade: 0, emissaoKg: 0 },
     MOTO: { quantidade: 0, emissaoKg: 0 },
   }
-  
+
   const porCredenciado: Array<{ nome: string; cidade: string; distancia: number; transporte: string; emissaoKg: number }> = []
   let totalKgCO2 = 0
 

@@ -104,8 +104,8 @@ export default function NovoCredenciamentoPage() {
       toast.error('CNPJ é obrigatório para esta categoria')
       return
     }
-    if (categoria === 'CAFEICULTOR' && !ccir.trim()) {
-      toast.error('CCIR é obrigatório para cafeicultores')
+    if (categoria === 'PRODUTOR' && !ccir.trim()) {
+      toast.error('CCIR é obrigatório para produtores')
       return
     }
 
@@ -324,7 +324,7 @@ export default function NovoCredenciamentoPage() {
               <CardTitle>Dados Profissionais</CardTitle>
               <CardDescription>
                 {categoria === 'EXPOSITOR' && 'Informações da empresa expositora'}
-                {categoria === 'CAFEICULTOR' && 'Informações da propriedade rural'}
+                {categoria === 'PRODUTOR' && 'Informações da propriedade rural'}
                 {categoria === 'IMPRENSA' && 'Informações do veículo de comunicação'}
                 {categoria === 'VISITANTE' && 'Informações adicionais (opcional)'}
               </CardDescription>
@@ -333,14 +333,14 @@ export default function NovoCredenciamentoPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="empresa">
-                    {categoria === 'CAFEICULTOR' ? 'Nome da Propriedade' : 'Empresa / Instituição'}
+                    {categoria === 'PRODUTOR' ? 'Nome da Propriedade' : 'Empresa / Instituição'}
                     {(categoria === 'EXPOSITOR' || categoria === 'IMPRENSA') && ' *'}
                   </Label>
                   <Input
                     id="empresa"
                     value={empresa}
                     onChange={(e) => setEmpresa(e.target.value)}
-                    placeholder={categoria === 'CAFEICULTOR' ? 'Nome da fazenda' : 'Nome da empresa'}
+                    placeholder={categoria === 'PRODUTOR' ? 'Nome da fazenda' : 'Nome da empresa'}
                   />
                 </div>
                 <div className="space-y-2">
@@ -363,7 +363,7 @@ export default function NovoCredenciamentoPage() {
                     />
                   </div>
                 )}
-                {categoria === 'CAFEICULTOR' && (
+                {categoria === 'PRODUTOR' && (
                   <div className="space-y-2">
                     <Label htmlFor="ccir">CCIR *</Label>
                     <Input

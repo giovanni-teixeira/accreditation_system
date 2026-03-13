@@ -1,8 +1,8 @@
-import { 
-  Users, 
-  Building2, 
-  Leaf, 
-  UserCheck, 
+import {
+  Users,
+  Building2,
+  Leaf,
+  UserCheck,
   Newspaper,
 } from 'lucide-react'
 import { dashboardKPIs } from '@/lib/mock-data'
@@ -38,8 +38,8 @@ export default function DashboardPage() {
           variant="default"
         />
         <KPICard
-          title="Cafeicultores"
-          value={dashboardKPIs.cafeicultores}
+          title="Produtores"
+          value={dashboardKPIs.produtores}
           icon={Leaf}
           variant="default"
         />
