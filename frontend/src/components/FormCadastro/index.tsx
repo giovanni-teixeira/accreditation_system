@@ -480,8 +480,8 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                                         value={formData.cnpj} 
                                                         onChange={handleInputChange} 
                                                         onBlur={handleBlur}
-                                                        placeholder={(formData.pais === 'Brasil' && (role === 'expositor' || role === 'imprensa')) ? "00.000.000/0000-00" : "Opcional"}
-                                                        required={formData.pais === 'Brasil' && (role === 'expositor' || role === 'imprensa')} 
+                                                        placeholder={formData.pais === 'Brasil' ? "00.000.000/0000-00" : "Opcional"}
+                                                        required={formData.pais === 'Brasil'} 
                                                     />
                                                     {errors.cnpj && <span className={styles.validationError}>{errors.cnpj}</span>}
                                                 </div>
@@ -520,8 +520,8 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                                         value={formData.cnpj} 
                                                         onChange={handleInputChange} 
                                                         onBlur={handleBlur}
-                                                        placeholder={(formData.pais === 'Brasil' && (role === 'expositor' || role === 'imprensa')) ? "00.000.000/0000-00" : "Opcional"}
-                                                        required={formData.pais === 'Brasil' && (role === 'expositor' || role === 'imprensa')} 
+                                                        placeholder={formData.pais === 'Brasil' ? "00.000.000/0000-00" : "Opcional"}
+                                                        required={formData.pais === 'Brasil'} 
                                                     />
                                                     {errors.cnpj && <span className={styles.validationError}>{errors.cnpj}</span>}
                                                 </div>
