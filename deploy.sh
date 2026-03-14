@@ -12,13 +12,24 @@ git fetch origin
 git reset --hard origin/dev
 git pull origin dev
 
-# 1.5 Gerenciamento do Arquivo de Ambiente (.env) seguro
-echo "🔐 1.5 Copiando Variáveis de Ambiente (.env) seguras do servidor..."
+# 1.5 Gerenciamento do Arquivo de Ambiente (.env) e Certificados SSL
+echo "🔐 1.5 Preparando variáveis de ambiente e certificados..."
 if [ -f "$HOME/alta-cafe-config/.env" ]; then
   cp "$HOME/alta-cafe-config/.env" "backend/.env"
-  echo "✅ Arquivo backend/.env atualizado com sucesso a partir de $HOME/alta-cafe-config/.env."
-else
-  echo "⚠️ AVISO: Arquivo $HOME/alta-cafe-config/.env não encontrado no servidor! A aplicação pode falhar ao conectar no banco."
+  echo "✅ Arquivo backend/.env atualizado."
+fi
+
+# Criar pasta de certificados se não existir
+mkdir -p nginx/certs
+
+# Se os certificados SSL não existirem, cria dummies para o Nginx não crashar
+if [ ! -f "nginx/certs/fullchain.pem" ] || [ ! -f "nginx/certs/privkey.pem" ]; then
+  echo "⚠️ Certificados SSL reais não encontrados. Criando certificados temporários para evitar crash do Nginx..."
+  openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout nginx/certs/privkey.pem \
+    -out nginx/certs/fullchain.pem \
+    -subj "/C=BR/ST=SP/L=Franca/O=AltaCafe/CN=localhost"
+  echo "✅ Certificados temporários criados em nginx/certs/."
 fi
 
 
