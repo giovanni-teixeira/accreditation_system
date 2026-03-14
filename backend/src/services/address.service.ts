@@ -27,7 +27,11 @@ export class AddressService {
     cep: string,
     country: string = 'Brasil',
   ): Promise<StandardAddress | null> {
-    const cleanCep = cep.replace(/\D/g, '').toUpperCase();
+    const isBrasil = country.toLowerCase() === 'brasil' || country.toUpperCase() === 'BR';
+    const cleanCep = isBrasil 
+        ? cep.replace(/\D/g, '') 
+        : cep.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    
     // Chave de cache composta para evitar colisão entre países (ex: BR:01001000)
     const cacheKey = `${country.substring(0, 2).toUpperCase()}:${cleanCep}`;
 

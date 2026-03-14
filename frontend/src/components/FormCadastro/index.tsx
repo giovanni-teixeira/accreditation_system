@@ -103,7 +103,8 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
     }, []);
 
     const fetchAddress = async (cepText: string) => {
-        const zipCode = cepText.replace(/\D/g, '');
+        const isBrasil = formData.pais === 'Brasil';
+        const zipCode = isBrasil ? cepText.replace(/\D/g, '') : cepText.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
 
         if (formData.pais === 'Brasil' && zipCode.length !== 8) return;
         if (formData.pais !== 'Brasil' && zipCode.length < 3) return;
@@ -154,7 +155,9 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
         let finalValue = value;
 
         if (name === 'cep') {
-            finalValue = formData.pais === 'Brasil' ? MaskUtils.cep(value) : value.toUpperCase();
+            finalValue = formData.pais === 'Brasil' 
+                ? MaskUtils.cep(value) 
+                : value.replace(/[^a-zA-Z0-9\s-]/g, '').toUpperCase();
         } else if (name === 'cpf') finalValue = MaskUtils.cpf(value);
         else if (name === 'celular') finalValue = MaskUtils.celular(value);
         else if (name === 'rg') finalValue = MaskUtils.rg(value);
