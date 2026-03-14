@@ -120,7 +120,15 @@ const SuccessModal = ({ isOpen, onClose, userData }: SuccessModalProps) => {
                 </div>
 
                 {/* 1:1 REPLICA FROM index.html HIDDEN FOR EXPORT */}
-                <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', overflow: 'hidden' }}>
+                <div style={{ 
+                    position: 'absolute', 
+                    left: '-9999px', 
+                    top: '-9999px', 
+                    overflow: 'hidden',
+                    width: '210mm',
+                    height: '296mm',
+                    background: 'white'
+                }}>
                     <CredentialPDF
                         ref={templateRef}
                         userData={{ ...userData, qrBase64 }}
