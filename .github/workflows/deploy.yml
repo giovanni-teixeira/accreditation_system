@@ -25,11 +25,13 @@ jobs:
             if [ ! -d "$HOME/HAKATON" ]; then
               echo "Pasta do projeto não encontrada. Realizando o Clone Mágico Inicial..."
               cd $HOME
-              git clone -b dev https://github.com/MaurilioSemeao/hakaton-alta-cafe.git HAKATON
+              git clone -b dev https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/MaurilioSemeao/hakaton-alta-cafe.git HAKATON
             fi
             cd $HOME/HAKATON
+            # Atualiza a URL do remote para garantir que o token seja usado no pull/fetch
+            git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/MaurilioSemeao/hakaton-alta-cafe.git
             git fetch origin
             git checkout dev
-            git pull origin dev
+            git reset --hard origin/dev
             chmod +x deploy.sh
             ./deploy.sh
