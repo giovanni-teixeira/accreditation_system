@@ -120,13 +120,13 @@ export default function Scanner() {
 
       stopScanner();
 
-      // No novo formato, o payload é "eventoId|ticketId"
-      const [eventoId, ticketId] = payloadRaw.split('|');
+      // No novo formato, o payload é "eventoId|ticketId|nome"
+      const [eventoId, ticketId, nome] = payloadRaw.split('|');
 
       setScanResult({
         status: 'SUCCESS',
         message: 'Acesso Liberado!',
-        detailed: `Ticket: ${ticketId}\nEvento: ${eventoId}\n\n(Aviso: O nome agora deve ser consultado no banco de dados local via Ticket ID)`
+        detailed: `Nome: ${nome || 'Não informado'}\nTicket: ${ticketId}\nEvento: ${eventoId}`
       });
 
     } catch (err: any) {

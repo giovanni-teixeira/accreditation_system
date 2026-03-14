@@ -32,7 +32,7 @@ enum TipoCombustivel {
 }
 
 model Evento {
-  id           String        @id @default(uuid()) @db.Uuid
+  id           String        @id @db.VarChar(6)
   nomeEvento   String        @unique @map("nome_evento")
   isGratuito   Boolean       @default(true) @map("is_gratuito")
   localEvento  String?       @map("local_evento")
@@ -57,7 +57,7 @@ model UsuarioOrganizacao {
 
 model Credenciado {
   id            String        @id @default(uuid()) @db.Uuid
-  eventoId      String        @map("evento_id") @db.Uuid
+  eventoId      String        @map("evento_id") @db.VarChar(6)
   tipoCategoria TipoCategoria @map("tipo_categoria")
   nomeCompleto  String        @map("nome_completo")
   cpf           String        @unique

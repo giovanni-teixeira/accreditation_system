@@ -12,9 +12,10 @@ export const QrCodeHelper = {
   signPayload(
     eventoId: string,
     ticketId: string,
+    nome: string,
     privateKeyBase64: string,
   ): string {
-    const messageStr = `${eventoId}|${ticketId}`;
+    const messageStr = `${eventoId}|${ticketId}|${nome.substring(0, 25).toUpperCase()}`;
     const message = util.decodeUTF8(messageStr);
     const privateKey = util.decodeBase64(privateKeyBase64);
 
@@ -26,11 +27,11 @@ export const QrCodeHelper = {
   generateSignedToken(
     eventoId: string,
     privateKeyBase64: string,
-    _nome: string,
+    nome: string,
   ): QrCodeResult {
-    // 5 bytes = 10 caracteres hexadecimais
-    const ticketId = crypto.randomBytes(5).toString('hex').toUpperCase();
-    const qrToken = this.signPayload(eventoId, ticketId, privateKeyBase64);
+    // 3 bytes = 6 caracteres hexadecimais
+    const ticketId = crypto.randomBytes(3).toString('hex').toUpperCase();
+    const qrToken = this.signPayload(eventoId, ticketId, nome, privateKeyBase64);
 
     return { ticketId, qrToken };
   },
