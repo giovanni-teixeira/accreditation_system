@@ -14,9 +14,12 @@ git pull origin dev
 
 # 1.5 Gerenciamento do Arquivo de Ambiente (.env) e Nginx baseada no feedback do usuário.
 echo "🔐 1.5 Preparando configurações de ambiente..."
-if [ -f "$HOME/alta-cafe-config/.env" ]; then
+if [ -f "./.env" ]; then
+  cp "./.env" "backend/.env"
+  echo "✅ Arquivo backend/.env atualizado a partir da raiz."
+elif [ -f "$HOME/alta-cafe-config/.env" ]; then
   cp "$HOME/alta-cafe-config/.env" "backend/.env"
-  echo "✅ Arquivo backend/.env atualizado."
+  echo "✅ Arquivo backend/.env atualizado a partir do config global."
 fi
 
 # Configura o Nginx para Desenvolvimento (Sem SSL) baseada no feedback do usuário.
