@@ -96,9 +96,9 @@ export class MaskUtils {
     }
 
     /**
-     * Remove todos os caracteres não numéricos
+     * Remove caracteres especiais, mantendo apenas letras e números (Alfanumérico)
      */
     static unmask(value: string): string {
-        return value.replace(/\D/g, '');
+        return value.replace(/[^a-zA-Z0-9]/g, '');
     }
 }

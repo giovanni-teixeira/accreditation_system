@@ -162,11 +162,15 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
             finalValue = formData.pais === 'Brasil' 
                 ? MaskUtils.cep(value) 
                 : value.replace(/[^a-zA-Z0-9\s-]/g, '').toUpperCase();
-        } else if (name === 'cpf') finalValue = MaskUtils.cpf(value);
-        else if (name === 'celular') finalValue = MaskUtils.celular(value);
-        else if (name === 'rg') finalValue = MaskUtils.rg(value);
-        else if (name === 'cnpj') finalValue = MaskUtils.cnpj(value);
-        else if (name === 'ccir') finalValue = MaskUtils.ccir(value);
+        } else if (name === 'cpf') {
+            finalValue = formData.pais === 'Brasil' ? MaskUtils.cpf(value) : value.toUpperCase();
+        } else if (name === 'celular') {
+            finalValue = formData.pais === 'Brasil' ? MaskUtils.celular(value) : value;
+        } else if (name === 'rg') {
+            finalValue = value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+        } else if (name === 'cnpj') {
+            finalValue = formData.pais === 'Brasil' ? MaskUtils.cnpj(value) : value.toUpperCase();
+        } else if (name === 'ccir') finalValue = MaskUtils.ccir(value);
 
         setFormData(prev => ({
             ...prev,
@@ -427,7 +431,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                         {role === 'expositor' && (
                                             <>
                                                 <div className={styles.inputGroup}>
-                                                    <label>CNPJ</label>
+                                                    <label>{formData.pais === 'Brasil' ? 'CNPJ' : 'Tax ID / Business Registration'}</label>
                                                     <input 
                                                         ref={cnpjInputRef} 
                                                         type="text" 
