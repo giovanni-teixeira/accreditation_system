@@ -29,7 +29,7 @@ async function bootstrap() {
     .setVersion('1.1.0')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, documentFactory);
+  SwaggerModule.setup('docs', app, documentFactory);
 
   // Rodar na porta 3001
   const port = process.env.PORT ?? 3001;
