@@ -55,19 +55,21 @@
     font-size: 13pt;
     text-align: center;
     line-height: 1.2;
+    margin-top: 4mm; /* Espaço entre nome do usuário e cidade/empresa */
 }
 
 .qrContainer {
     display: flex;
     justify-content: center;
+    margin-top: 6mm; /* Desce o QR Code um pouco */
     margin-bottom: 5mm;
 }
 
 .qrCode {
-    width: 38mm;
-    height: 38mm;
+    width: 44mm; /* Aumentado de 38mm para 44mm */
+    height: 44mm;
     border: 0.2mm solid #000;
-    padding: 1mm;
+    padding: 1.2mm;
     background: white;
     box-sizing: border-box;
     display: block;
