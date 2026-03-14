@@ -107,7 +107,6 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [formData.pais]);
-formData.pais]);
 
     const fetchAddress = async (cepText: string) => {
         const isBrasil = formData.pais === 'Brasil';

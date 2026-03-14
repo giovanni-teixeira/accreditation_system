@@ -33,7 +33,7 @@
 }
 
 .logoEvento {
-    max-height: 102px; /* Aumentado conforme solicitado */
+    max-height: 30mm; /* Convertido de 102px para mm para consistência */
     width: auto;
     display: block;
 }
@@ -55,25 +55,27 @@
     font-size: 13pt;
     text-align: center;
     line-height: 1.2;
-    margin-top: 4mm; /* Espaço entre nome do usuário e cidade/empresa */
+    margin-top: 6mm; /* Aumentado espaçamento entre nome e empresa */
 }
 
 .qrContainer {
     display: flex;
     justify-content: center;
-    margin-top: 6mm; /* Desce o QR Code um pouco */
+    align-items: center; /* Garante centralização vertical se houver espaço */
+    margin-top: 8mm; /* Desce o QR Code ainda mais */
     margin-bottom: 5mm;
 }
 
 .qrCode {
-    width: 44mm; /* Aumentado de 38mm para 44mm */
-    height: 44mm;
-    border: 0.2mm solid #000;
-    padding: 1.2mm;
+    width: 48mm; /* Aumentado conforme solicitado */
+    height: 48mm;
+    border: 0.1mm solid #000;
+    padding: 2mm; /* Exatamente como solicitado pelo usuário (aproximado em mm) */
     background: white;
     box-sizing: border-box;
     display: block;
     max-width: 100%;
+    object-fit: contain; /* Garante que a imagem centralize e não estique */
 }
 
 .faixaTipo {
