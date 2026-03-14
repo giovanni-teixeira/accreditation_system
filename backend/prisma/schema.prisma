@@ -82,33 +82,6 @@ model Credenciado {
   @@map("credenciado")
 }
 
-// model Credenciado {
-//   id              String   @id @default(uuid())
-//   nomeCompleto    String
-//   cpf             String   @unique
-//   rg              String
-//   celular         String
-//   email           String
-//   municipio       String
-//   uf              String
-//   aceitouLgpd     Boolean  @default(false)
-//   tipo            String   // Pode ser "Visitante", "Produtor", "Expositor", "Imprensa"
-//   criadoEm        DateTime @default(now())
-//
-//   // Campos específicos de cada tipo
-//   // Expositores
-//   cnpj            String?
-//   nomeEmpresa     String?
-//   siteEmpresa     String?
-//
-//   // Produtores
-//   ccir            String?
-//   nomePropriedade String?
-//
-//   // Imprensa (cnpj e siteEmpresa já contemplados acima)
-//   nomeVeiculo     String?
-// }
-
 model Endereco {
   id            String @id @default(uuid()) @db.Uuid
   credenciadoId String @unique @map("credenciado_id") @db.Uuid

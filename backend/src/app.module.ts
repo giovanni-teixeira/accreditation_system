@@ -12,6 +12,8 @@ import { CommonRepository } from './repositories/common.repository';
 import { AddressRepository } from './repositories/address.repository';
 import { AddressService } from './services/address.service';
 import { AddressController } from './controllers/AddressController';
+import { DataService } from './services/data.service';
+import { DataController } from './controllers/DataController';
 import { JwtStrategy } from './controllers/guards/jwt.strategy';
 
 @Module({
@@ -23,7 +25,7 @@ import { JwtStrategy } from './controllers/guards/jwt.strategy';
       signOptions: { expiresIn: '24h' },
     }),
   ],
-  controllers: [AuthController, CredenciadosController, AddressController],
+  controllers: [AuthController, CredenciadosController, AddressController, DataController],
   providers: [
     PrismaService,
     UsuarioRepository,
@@ -32,6 +34,7 @@ import { JwtStrategy } from './controllers/guards/jwt.strategy';
     CommonRepository,
     AddressRepository,
     AddressService,
+    DataService,
     JwtStrategy,
   ],
 })
