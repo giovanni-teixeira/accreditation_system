@@ -38,3 +38,6 @@ scanner/.env
 # Mac / Windows Cache
 .DS_Store
 Thumbs.db
+
+# Documentação Local
+api_routes_guide.md
