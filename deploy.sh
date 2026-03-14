@@ -12,7 +12,7 @@ git fetch origin
 git reset --hard origin/dev
 git pull origin dev
 
-# 1.5 Gerenciamento do Arquivo de Ambiente (.env) e Certificados SSL
+# 1.5 Gerenciamento do Arquivo de Ambiente (.env) e SSL
 echo "🔐 1.5 Preparando variáveis de ambiente e certificados..."
 if [ -f "$HOME/alta-cafe-config/.env" ]; then
   cp "$HOME/alta-cafe-config/.env" "backend/.env"
@@ -22,14 +22,25 @@ fi
 # Criar pasta de certificados se não existir
 mkdir -p nginx/certs
 
-# Se os certificados SSL não existirem, cria dummies para o Nginx não crashar
-if [ ! -f "nginx/certs/fullchain.pem" ] || [ ! -f "nginx/certs/privkey.pem" ]; then
-  echo "⚠️ Certificados SSL reais não encontrados. Criando certificados temporários para evitar crash do Nginx..."
+# Lógica Inteligente de Certificados SSL baseada no feedback do usuário.
+REAL_CERT="/etc/letsencrypt/live/credenciamento.altacafe.com.br/fullchain.pem"
+REAL_KEY="/etc/letsencrypt/live/credenciamento.altacafe.com.br/privkey.pem"
+
+if [ -f "$REAL_CERT" ] && [ -f "$REAL_KEY" ]; then
+  echo "✨ Certificados reais encontrados! Copiando para o diretório do Nginx..."
+  # Usamos -L para seguir os links simbólicos do Let's Encrypt baseada no feedback do usuário.
+  cp -L "$REAL_CERT" nginx/certs/fullchain.pem
+  cp -L "$REAL_KEY" nginx/certs/privkey.pem
+  echo "✅ Certificados oficiais prontos."
+elif [ ! -f "nginx/certs/fullchain.pem" ] || [ ! -f "nginx/certs/privkey.pem" ]; then
+  echo "⚠️ Certificados reais NÃO encontrados em $REAL_CERT. Criando certificados temporários..."
   openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -keyout nginx/certs/privkey.pem \
     -out nginx/certs/fullchain.pem \
     -subj "/C=BR/ST=SP/L=Franca/O=AltaCafe/CN=localhost"
   echo "✅ Certificados temporários criados em nginx/certs/."
+else
+  echo "ℹ️ Usando certificados já existentes em nginx/certs/."
 fi
 
 
