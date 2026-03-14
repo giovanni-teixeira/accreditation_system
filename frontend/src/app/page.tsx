@@ -43,7 +43,7 @@ export default function Home() {
             <h2 className={styles.formTitle}>Credenciamento de Participante</h2>
             <p className={styles.formSubtitle}>Preencha seus dados para garantir acesso ao evento.</p>
 
-            <FormCadastro onResult={handleResult} />
+            <FormCadastro onResult={handleResult} isBlocked={isSuccessOpen || isErrorOpen} />
           </div>
         </section>
       </div>
