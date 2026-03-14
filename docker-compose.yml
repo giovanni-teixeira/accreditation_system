@@ -5,13 +5,12 @@ services:
     container_name: postgres_db
     restart: always
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 4lt4C4f3!2026
+      POSTGRES_DB: alta_cafe
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-
       - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d alta_cafe"]
@@ -25,8 +24,7 @@ services:
     restart: always
     env_file: .env
     environment:
-
-      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_URL: postgresql://postgres:4lt4C4f3!2026@postgres:5432/alta_cafe?schema=public
     depends_on:
       postgres:
         condition: service_healthy

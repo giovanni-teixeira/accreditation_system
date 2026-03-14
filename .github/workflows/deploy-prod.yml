@@ -19,7 +19,6 @@ jobs:
           host: ${{ secrets.SERVER_HOST_PROD }}
           username: ${{ secrets.SERVER_USER_PROD }}
           password: ${{ secrets.SERVER_PASSWORD_PROD }}
-          envs: POSTGRES_USER,POSTGRES_PASSWORD,POSTGRES_DB,JWT_SECRET,DATABASE_URL,ADMIN_LOGIN,ADMIN_PASSWORD,ADMIN_NAME,ADMIN_EMAIL,SCANNER_LOGIN,SCANNER_PASSWORD,SCANNER_NAME
           script: |
             if [ ! -d "$HOME/alta-cafe-prod" ]; then
               echo "Pasta de produção não encontrada. Realizando Clone Inicial..."
@@ -31,33 +30,5 @@ jobs:
             git checkout main
             git reset --hard origin/main
             git pull origin main
-
-            # Gerar .env a partir das Secrets do GitHub (PROD)
-            echo "POSTGRES_USER=$POSTGRES_USER" > .env
-            echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env
-            echo "POSTGRES_DB=$POSTGRES_DB" >> .env
-            echo "DATABASE_URL=\"$DATABASE_URL\"" >> .env
-            echo "JWT_SECRET=\"$JWT_SECRET\"" >> .env
-            echo "ADMIN_LOGIN=\"$ADMIN_LOGIN\"" >> .env
-            echo "ADMIN_PASSWORD=\"$ADMIN_PASSWORD\"" >> .env
-            echo "ADMIN_NAME=\"$ADMIN_NAME\"" >> .env
-            echo "ADMIN_EMAIL=\"$ADMIN_EMAIL\"" >> .env
-            echo "SCANNER_LOGIN=\"$SCANNER_LOGIN\"" >> .env
-            echo "SCANNER_PASSWORD=\"$SCANNER_PASSWORD\"" >> .env
-            echo "SCANNER_NAME=\"$SCANNER_NAME\"" >> .env
-
             chmod +x deploy-prod.sh
             ./deploy-prod.sh
-        env:
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER_PROD }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD_PROD }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB_PROD }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET_PROD }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
-          ADMIN_LOGIN: ${{ secrets.ADMIN_LOGIN_PROD }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD_PROD }}
-          ADMIN_NAME: ${{ secrets.ADMIN_NAME_PROD }}
-          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL_PROD }}
-          SCANNER_LOGIN: ${{ secrets.SCANNER_LOGIN_PROD }}
-          SCANNER_PASSWORD: ${{ secrets.SCANNER_PASSWORD_PROD }}
-          SCANNER_NAME: ${{ secrets.SCANNER_NAME_PROD }}
