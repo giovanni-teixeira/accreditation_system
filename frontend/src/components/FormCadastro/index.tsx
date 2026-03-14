@@ -268,10 +268,21 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                 onResult({ sucesso: false, mensagem: 'O CPF informado é inválido. Por favor, verifique.' });
                 return;
             }
-            if ((role === 'expositor' || role === 'imprensa') && !Validador.validarCNPJ(formData.cnpj)) {
-                setErrors(prev => ({ ...prev, cnpj: 'Documento inválido' }));
-                onResult({ sucesso: false, mensagem: 'O CNPJ informado é inválido. Por favor, verifique.' });
-                return;
+            
+            // CNPJ obrigatório apenas para Expositores Brasileiros baseada no feedback do usuário.
+            if (role === 'expositor') {
+                if (!formData.cnpj || !Validador.validarCNPJ(formData.cnpj)) {
+                    setErrors(prev => ({ ...prev, cnpj: 'Documento obrigatório/inválido' }));
+                    onResult({ sucesso: false, mensagem: 'O CNPJ é obrigatório para expositores brasileiros.' });
+                    return;
+                }
+            } else if (role === 'imprensa' && formData.cnpj) {
+                // Se preencheu CNPJ como imprensa, valida
+                if (!Validador.validarCNPJ(formData.cnpj)) {
+                    setErrors(prev => ({ ...prev, cnpj: 'Documento inválido' }));
+                    onResult({ sucesso: false, mensagem: 'O CNPJ informado é inválido.' });
+                    return;
+                }
             }
         }
 
@@ -342,7 +353,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                             <div className={styles.inputGrid}>
                                 <div className={styles.inputGroupFull}>
                                     <label>Nome Completo</label>
-                                    <input ref={nomeInputRef} type="text" name="nomeCompleto" value={formData.nomeCompleto} onChange={handleInputChange} required />
+                                    <input ref={nomeInputRef} type="text" name="nomeCompleto" value={formData.nomeCompleto} onChange={handleInputChange} placeholder="Digite seu nome completo" required />
                                 </div>
 
                                 <div className={styles.inputGroup}>
@@ -388,24 +399,25 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                         value={formData.cpf} 
                                         onChange={handleInputChange} 
                                         onBlur={handleBlur}
+                                        placeholder={formData.pais === 'Brasil' ? "000.000.000-00" : "Passaporte ou ID"}
                                         required 
                                     />
                                     {errors.cpf && <span className={styles.validationError}>{errors.cpf}</span>}
                                 </div>
 
                                 <div className={styles.inputGroup}>
-                                    <label>RG (Opcional)</label>
-                                    <input type="text" name="rg" value={formData.rg} onChange={handleInputChange} />
+                                    <label>RG</label>
+                                    <input type="text" name="rg" value={formData.rg} onChange={handleInputChange} placeholder="Opcional" />
                                 </div>
 
                                 <div className={styles.inputGroup}>
                                     <label>Celular (WhatsApp)</label>
-                                    <input type="tel" name="celular" value={formData.celular} onChange={handleInputChange} required />
+                                    <input type="tel" name="celular" value={formData.celular} onChange={handleInputChange} placeholder={formData.pais === 'Brasil' ? "(00) 00000-0000" : "DDD + Número"} required />
                                 </div>
 
                                 <div className={styles.inputGroup}>
                                     <label>E-mail</label>
-                                    <input type="email" name="email" value={formData.email} onChange={handleInputChange} required />
+                                    <input type="email" name="email" value={formData.email} onChange={handleInputChange} placeholder="exemplo@email.com" required />
                                 </div>
                             </div>
 
@@ -421,28 +433,29 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                         onBlur={handleCepBlur}
                                         onKeyDown={handleCepKeyDown}
                                         maxLength={ formData.pais === 'Brasil' ? 9 : 15} 
+                                        placeholder={formData.pais === 'Brasil' ? "00000-000" : "Postal Code"}
                                         required 
                                     />
                                 </div>
 
                                 <div className={styles.inputGroupFull}>
                                     <label>Rua / Logradouro</label>
-                                    <input type="text" name="rua" value={formData.rua} onChange={handleInputChange} disabled={cepLocked.rua || formDisabled} required />
+                                    <input type="text" name="rua" value={formData.rua} onChange={handleInputChange} disabled={cepLocked.rua || formDisabled} placeholder="Nome da rua e número" required />
                                 </div>
 
                                 <div className={styles.inputGroup}>
                                     <label>Bairro</label>
-                                    <input type="text" name="bairro" value={formData.bairro} onChange={handleInputChange} disabled={cepLocked.bairro || formDisabled} required />
+                                    <input type="text" name="bairro" value={formData.bairro} onChange={handleInputChange} disabled={cepLocked.bairro || formDisabled} placeholder="Seu bairro" required />
                                 </div>
 
                                 <div className={styles.inputGroup}>
                                     <label>Cidade</label>
-                                    <input type="text" name="cidade" value={formData.cidade} onChange={handleInputChange} disabled={cepLocked.cidade || formDisabled} required />
+                                    <input type="text" name="cidade" value={formData.cidade} onChange={handleInputChange} disabled={cepLocked.cidade || formDisabled} placeholder="Sua cidade" required />
                                 </div>
 
                                 <div className={styles.inputGroup}>
                                     <label>Estado (UF)</label>
-                                    <input type="text" name="estado" value={formData.estado} onChange={handleInputChange} maxLength={10} disabled={cepLocked.estado || formDisabled} required />
+                                    <input type="text" name="estado" value={formData.estado} onChange={handleInputChange} maxLength={10} disabled={cepLocked.estado || formDisabled} placeholder="UF" required />
                                 </div>
 
                                 <div className={styles.inputGroup}>
@@ -474,17 +487,18 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                                         value={formData.cnpj} 
                                                         onChange={handleInputChange} 
                                                         onBlur={handleBlur}
-                                                        required 
+                                                        placeholder={(formData.pais === 'Brasil' && role === 'expositor') ? "00.000.000/0000-00" : "Opcional"}
+                                                        required={formData.pais === 'Brasil' && role === 'expositor'} 
                                                     />
                                                     {errors.cnpj && <span className={styles.validationError}>{errors.cnpj}</span>}
                                                 </div>
                                                 <div className={styles.inputGroup}>
                                                     <label>Nome da Empresa</label>
-                                                    <input type="text" name="nomeEmpresa" value={formData.nomeEmpresa} onChange={handleInputChange} required />
+                                                    <input type="text" name="nomeEmpresa" value={formData.nomeEmpresa} onChange={handleInputChange} placeholder="Nome fantasia ou razão social" required />
                                                 </div>
                                                 <div className={styles.inputGroupFull}>
                                                     <label>Site da Empresa</label>
-                                                    <input type="url" name="siteEmpresa" value={formData.siteEmpresa} onChange={handleInputChange} />
+                                                    <input type="url" name="siteEmpresa" value={formData.siteEmpresa} onChange={handleInputChange} placeholder="https://www.seusite.com.br" />
                                                 </div>
                                             </>
                                         )}
@@ -493,11 +507,11 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                             <>
                                                 <div className={styles.inputGroup}>
                                                     <label>CCIR</label>
-                                                    <input ref={ccirInputRef} type="text" name="ccir" value={formData.ccir} onChange={handleInputChange} required />
+                                                    <input ref={ccirInputRef} type="text" name="ccir" value={formData.ccir} onChange={handleInputChange} placeholder="Certificado de Cadastro de Imóvel Rural" required />
                                                 </div>
                                                 <div className={styles.inputGroupFull}>
                                                     <label>Nome da Propriedade</label>
-                                                    <input type="text" name="nomePropriedade" value={formData.nomePropriedade} onChange={handleInputChange} required />
+                                                    <input type="text" name="nomePropriedade" value={formData.nomePropriedade} onChange={handleInputChange} placeholder="Nome da sua fazenda ou sítio" required />
                                                 </div>
                                             </>
                                         )}
@@ -513,17 +527,17 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                                         value={formData.cnpj} 
                                                         onChange={handleInputChange} 
                                                         onBlur={handleBlur}
-                                                        required 
+                                                        placeholder="Opcional"
                                                     />
                                                     {errors.cnpj && <span className={styles.validationError}>{errors.cnpj}</span>}
                                                 </div>
                                                 <div className={styles.inputGroup}>
                                                     <label>Nome do Veículo</label>
-                                                    <input type="text" name="nomeVeiculo" value={formData.nomeVeiculo} onChange={handleInputChange} required />
+                                                    <input type="text" name="nomeVeiculo" value={formData.nomeVeiculo} onChange={handleInputChange} placeholder="Ex: Jornal Local, Rádio..." required />
                                                 </div>
                                                 <div className={styles.inputGroupFull}>
                                                     <label>Site da Empresa / Veículo</label>
-                                                    <input type="url" name="siteEmpresa" value={formData.siteEmpresa} onChange={handleInputChange} />
+                                                    <input type="url" name="siteEmpresa" value={formData.siteEmpresa} onChange={handleInputChange} placeholder="https://www.meuveiculo.com.br" />
                                                 </div>
                                             </>
                                         )}
