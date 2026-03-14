@@ -123,6 +123,14 @@
     }
 }
 
+.validationError {
+    color: var(--error);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    display: block;
+    animation: fadeIn 0.2s ease-out;
+}
+
 /* Input Fields Grid */
 .inputGrid {
     display: grid;

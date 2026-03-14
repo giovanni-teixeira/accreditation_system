@@ -33,7 +33,7 @@
 }
 
 .logoEvento {
-    max-height: 82px; /* Aumentado conforme solicitado */
+    max-height: 102px; /* Aumentado conforme solicitado */
     width: auto;
     display: block;
 }
@@ -64,8 +64,8 @@
 }
 
 .qrCode {
-    width: 165px; /* Maior conforme solicitado */
-    height: 165px;
+    width: 135px; /* Maior conforme solicitado */
+    height: 135px;
     border: 1px solid #000;
     padding: 3px;
     background: white;

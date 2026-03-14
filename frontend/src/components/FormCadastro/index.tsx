@@ -5,7 +5,7 @@ import styles from './style.module.css';
 import { cadastrarUsuario, CadastroResponse } from '@/controllers/CredenciadoController';
 import { API_ROUTES } from '@/config/api';
 import { MaskUtils } from '@/utils/mask.utils';
-import { validarCPF, validarCNPJ } from '@/utils/validation.utils';
+import { Validador } from '@/utils/validation.utils';
 import { COUNTRIES } from '@/constants/countries';
 
 const ROLES = [
@@ -51,6 +51,9 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
     const [countrySearch, setCountrySearch] = useState('Brasil');
     const [showCountries, setShowCountries] = useState(false);
     const countryContainerRef = useRef<HTMLDivElement>(null);
+
+    // Controle de Erros de Validação baseada no feedback do usuário.
+    const [errors, setErrors] = useState<{ cpf?: string; cnpj?: string }>({});
 
     // Bloqueia se estiver pendente (enviando) ou se o pai solicitar (modal aberto)
     const formDisabled = isPending || isBlocked;
@@ -175,6 +178,26 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
         } else if (name === 'cep') {
             setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
         }
+
+        // Limpa erro ao digitar baseada no feedback do usuário.
+        if (name === 'cpf' || name === 'cnpj') {
+            setErrors(prev => ({ ...prev, [name]: undefined }));
+        }
+    };
+
+    const handleBlur = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        if (formData.pais !== 'Brasil') return;
+
+        if (name === 'cpf') {
+            if (value && !Validador.validarCPF(value)) {
+                setErrors(prev => ({ ...prev, cpf: 'Documento inválido' }));
+            }
+        } else if (name === 'cnpj') {
+            if (value && !Validador.validarCNPJ(value)) {
+                setErrors(prev => ({ ...prev, cnpj: 'Documento inválido' }));
+            }
+        }
     };
 
     const handleCountrySelect = (countryName: string) => {
@@ -199,13 +222,15 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
             return;
         }
 
-        // Validação de Documentos Brasileiros
+        // Validação de Documentos Brasileiros baseada no feedback do usuário.
         if (formData.pais === 'Brasil') {
-            if (!validarCPF(formData.cpf)) {
+            if (!Validador.validarCPF(formData.cpf)) {
+                setErrors(prev => ({ ...prev, cpf: 'Documento inválido' }));
                 onResult({ sucesso: false, mensagem: 'O CPF informado é inválido. Por favor, verifique.' });
                 return;
             }
-            if ((role === 'expositor' || role === 'imprensa') && !validarCNPJ(formData.cnpj)) {
+            if ((role === 'expositor' || role === 'imprensa') && !Validador.validarCNPJ(formData.cnpj)) {
+                setErrors(prev => ({ ...prev, cnpj: 'Documento inválido' }));
                 onResult({ sucesso: false, mensagem: 'O CNPJ informado é inválido. Por favor, verifique.' });
                 return;
             }
@@ -318,7 +343,15 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
 
                                 <div className={styles.inputGroup}>
                                     <label>{formData.pais === 'Brasil' ? 'CPF' : 'Documento de Identificação'}</label>
-                                    <input type="text" name="cpf" value={formData.cpf} onChange={handleInputChange} required />
+                                    <input 
+                                        type="text" 
+                                        name="cpf" 
+                                        value={formData.cpf} 
+                                        onChange={handleInputChange} 
+                                        onBlur={handleBlur}
+                                        required 
+                                    />
+                                    {errors.cpf && <span className={styles.validationError}>{errors.cpf}</span>}
                                 </div>
 
                                 <div className={styles.inputGroup}>
@@ -395,7 +428,16 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                             <>
                                                 <div className={styles.inputGroup}>
                                                     <label>CNPJ</label>
-                                                    <input ref={cnpjInputRef} type="text" name="cnpj" value={formData.cnpj} onChange={handleInputChange} required />
+                                                    <input 
+                                                        ref={cnpjInputRef} 
+                                                        type="text" 
+                                                        name="cnpj" 
+                                                        value={formData.cnpj} 
+                                                        onChange={handleInputChange} 
+                                                        onBlur={handleBlur}
+                                                        required 
+                                                    />
+                                                    {errors.cnpj && <span className={styles.validationError}>{errors.cnpj}</span>}
                                                 </div>
                                                 <div className={styles.inputGroup}>
                                                     <label>Nome da Empresa</label>
@@ -425,7 +467,16 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                             <>
                                                 <div className={styles.inputGroup}>
                                                     <label>CNPJ</label>
-                                                    <input ref={cnpjInputRef} type="text" name="cnpj" value={formData.cnpj} onChange={handleInputChange} required />
+                                                    <input 
+                                                        ref={cnpjInputRef} 
+                                                        type="text" 
+                                                        name="cnpj" 
+                                                        value={formData.cnpj} 
+                                                        onChange={handleInputChange} 
+                                                        onBlur={handleBlur}
+                                                        required 
+                                                    />
+                                                    {errors.cnpj && <span className={styles.validationError}>{errors.cnpj}</span>}
                                                 </div>
                                                 <div className={styles.inputGroup}>
                                                     <label>Nome do Veículo</label>
