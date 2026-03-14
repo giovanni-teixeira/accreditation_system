@@ -35,7 +35,7 @@ docker compose up -d --build
 
 # 3.5 Sincronizando Banco de Dados (Migrações)
 echo "🗄️ 3.5 Estruturando e Sincronizando o Banco de Dados com Prisma..."
-docker exec backend_api npx prisma migrate deploy
+docker exec backend_api npx prisma db push
 
 # 4. Limpeza de Imagens Órfãs
 echo "🧹 4. Limpando cache do Docker antigo..."

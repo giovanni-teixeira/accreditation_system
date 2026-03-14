@@ -13,8 +13,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Adicione aqui os passos para deploy no seu servidor web via SSH
-      # Exemplo genérico usando appleboy/ssh-action para rodar o deploy.sh
       - name: Deploy to Server via SSH
         uses: appleboy/ssh-action@master
         with:

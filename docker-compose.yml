@@ -11,8 +11,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      # [LOCAL] Use 5433 para não conflitar com Postgres local
-      # [VPS] Altere para "5432:5432" ou remova se for usar acesso do host
+
       - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d alta_cafe"]
@@ -26,7 +25,7 @@ services:
     restart: always
     env_file: .env
     environment:
-      # [LOCAL/VPS] Certifique-se de que o host aqui seja 'postgres' (nome do serviço)
+
       DATABASE_URL: ${DATABASE_URL}
     depends_on:
       postgres:
