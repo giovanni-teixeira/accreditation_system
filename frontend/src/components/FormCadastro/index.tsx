@@ -135,6 +135,13 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
             });
         } catch (err) {
             console.error('Erro na consulta de endereço:', err);
+            setFormData(prev => ({
+                ...prev,
+                rua: '',
+                bairro: '',
+                cidade: '',
+                estado: ''
+            }));
             setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
         }
     };
