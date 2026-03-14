@@ -2,13 +2,15 @@
 
 .folhaA4 {
     width: 210mm;
-    height: 297mm;
+    height: 296mm; /* Reduzido levemente de 297mm para evitar página extra */
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
     background: white;
     font-family: Arial, sans-serif;
     color: black;
+    overflow: hidden; /* Impede transbordos que criam novas páginas */
+    box-sizing: border-box;
 }
 
 .quadrante {
