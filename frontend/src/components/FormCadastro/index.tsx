@@ -85,8 +85,9 @@ export default function FormCadastro({ onResult }: FormCadastroProps) {
     const fetchAddress = async (cepText: string) => {
         const zipCode = cepText.replace(/\D/g, '');
 
-        // No Brasil, espera 8 dígitos. Fora, deixamos livre mas avisamos o backend.
+        // No Brasil, espera 8 dígitos. Fora, deixamos livre (mínimo 3 para evitar spam)
         if (formData.pais === 'Brasil' && zipCode.length !== 8) return;
+        if (formData.pais !== 'Brasil' && zipCode.length < 3) return;
 
         try {
             const res = await fetch(API_ROUTES.ADDRESS.BUSCAR(zipCode, formData.pais));
@@ -96,10 +97,10 @@ export default function FormCadastro({ onResult }: FormCadastroProps) {
 
             setFormData(prev => ({
                 ...prev,
-                rua: data.rua || prev.rua,
-                bairro: data.bairro || prev.bairro,
-                cidade: data.cidade || prev.cidade,
-                estado: data.estado || prev.estado
+                rua: data.rua || '',
+                bairro: data.bairro || '',
+                cidade: data.cidade || '',
+                estado: data.estado || ''
             }));
             
             setCepLocked({
@@ -109,8 +110,22 @@ export default function FormCadastro({ onResult }: FormCadastroProps) {
                 estado: !!data.estado
             });
         } catch (err) {
-            console.error('Erro na consulta de endereço centralizada:', err);
+            console.error('Erro na consulta de endereço:', err);
+            // Ao falhar ou não encontrar, liberamos os campos para preenchimento manual
             setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
+        }
+    };
+
+    const handleCepKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            fetchAddress(formData.cep);
+        }
+    };
+
+    const handleCepBlur = () => {
+        if (formData.cep) {
+            fetchAddress(formData.cep);
         }
     };
 
@@ -255,7 +270,16 @@ export default function FormCadastro({ onResult }: FormCadastroProps) {
 
                             <div className={styles.inputGroup}>
                                 <label>{formData.pais === 'Brasil' ? 'CEP' : 'ZIP / Postcode'}</label>
-                                <input type="text" name="cep" value={formData.cep} onChange={handleInputChange} maxLength={ formData.pais === 'Brasil' ? 9 : 15} placeholder={formData.pais === 'Brasil' ? "00000-000" : "Código Postal"} required />
+                                <input 
+                                    type="text" 
+                                    name="cep" 
+                                    value={formData.cep} 
+                                    onChange={handleInputChange} 
+                                    onBlur={handleCepBlur}
+                                    onKeyDown={handleCepKeyDown}
+                                    maxLength={ formData.pais === 'Brasil' ? 9 : 15} 
+                                    required 
+                                />
                             </div>
 
                             <div className={styles.inputGroupFull}>

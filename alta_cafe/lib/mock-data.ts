@@ -277,11 +277,11 @@ export const categoriasLabels: Record<string, string> = {
 }
 
 // Cores das categorias
-export const categoriaColors: Record<string, { bg: string; text: string }> = {
-  EXPOSITOR: { bg: 'bg-purple-100', text: 'text-purple-800' },
-  PRODUTOR: { bg: 'bg-amber-100', text: 'text-amber-800' },
-  VISITANTE: { bg: 'bg-sky-100', text: 'text-sky-800' },
-  IMPRENSA: { bg: 'bg-rose-100', text: 'text-rose-800' },
+export const categoriaColors: Record<string, { bg: string; text: string; hex: string }> = {
+  EXPOSITOR: { bg: 'bg-blue-100', text: 'text-blue-800', hex: '#0000FF' },
+  PRODUTOR: { bg: 'bg-green-100', text: 'text-green-800', hex: '#00FF00' },
+  VISITANTE: { bg: 'bg-purple-100', text: 'text-purple-800', hex: '#8B008B' },
+  IMPRENSA: { bg: 'bg-slate-100', text: 'text-slate-800', hex: '#778899' },
 }
 
 // Dados de cidades para relatórios

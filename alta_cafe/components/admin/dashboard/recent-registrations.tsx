@@ -39,7 +39,8 @@ export function RecentRegistrations() {
               <div className="flex items-center gap-3">
                 <Badge 
                   variant="secondary" 
-                  className={cn('font-medium', catColor.bg, catColor.text)}
+                  className={cn('font-medium text-white')}
+                  style={{ backgroundColor: catColor.hex }}
                 >
                   {categoriasLabels[credenciado.tipoCategoria]}
                 </Badge>

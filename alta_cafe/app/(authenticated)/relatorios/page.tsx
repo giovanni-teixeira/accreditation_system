@@ -34,10 +34,10 @@ import { dashboardKPIs, credenciados, cidadesData, diarioData, categoriasLabels 
 
 // Dados para gráfico de pizza
 const categoriaData = [
-  { name: 'Expositores', value: dashboardKPIs.expositores, color: '#8B5CF6' },
-  { name: 'Produtores', value: dashboardKPIs.produtores, color: '#F59E0B' },
-  { name: 'Visitantes', value: dashboardKPIs.visitantes, color: '#0EA5E9' },
-  { name: 'Imprensa', value: dashboardKPIs.imprensa, color: '#EC4899' },
+  { name: 'Expositores', value: dashboardKPIs.expositores, color: '#0000FF' },
+  { name: 'Produtores', value: dashboardKPIs.produtores, color: '#00FF00' },
+  { name: 'Visitantes', value: dashboardKPIs.visitantes, color: '#8B008B' },
+  { name: 'Imprensa', value: dashboardKPIs.imprensa, color: '#778899' },
 ]
 
 export default function RelatoriosPage() {
