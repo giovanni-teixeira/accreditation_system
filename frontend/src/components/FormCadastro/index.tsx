@@ -5,6 +5,7 @@ import styles from './style.module.css';
 import { cadastrarUsuario, CadastroResponse } from '@/controllers/CredenciadoController';
 import { API_ROUTES } from '@/config/api';
 import { MaskUtils } from '@/utils/mask.utils';
+import { validarCPF, validarCNPJ } from '@/utils/validation.utils';
 import { COUNTRIES } from '@/constants/countries';
 
 const ROLES = [
@@ -198,6 +199,18 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
             return;
         }
 
+        // Validação de Documentos Brasileiros
+        if (formData.pais === 'Brasil') {
+            if (!validarCPF(formData.cpf)) {
+                onResult({ sucesso: false, mensagem: 'O CPF informado é inválido. Por favor, verifique.' });
+                return;
+            }
+            if ((role === 'expositor' || role === 'imprensa') && !validarCNPJ(formData.cnpj)) {
+                onResult({ sucesso: false, mensagem: 'O CNPJ informado é inválido. Por favor, verifique.' });
+                return;
+            }
+        }
+
         startTransition(async () => {
             const cleanData: any = { ...formData, role };
 
@@ -269,34 +282,11 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                 </div>
 
                                 <div className={styles.inputGroup}>
-                                    <label>CPF</label>
-                                    <input type="text" name="cpf" value={formData.cpf} onChange={handleInputChange} required />
-                                </div>
-
-                                <div className={styles.inputGroup}>
-                                    <label>RG</label>
-                                    <input type="text" name="rg" value={formData.rg} onChange={handleInputChange} required />
-                                </div>
-
-                                <div className={styles.inputGroup}>
-                                    <label>Celular (WhatsApp)</label>
-                                    <input type="tel" name="celular" value={formData.celular} onChange={handleInputChange} required />
-                                </div>
-
-                                <div className={styles.inputGroup}>
-                                    <label>E-mail</label>
-                                    <input type="email" name="email" value={formData.email} onChange={handleInputChange} required />
-                                </div>
-                            </div>
-
-                            <h3 className={styles.sectionTitle}>3. Seu Endereço</h3>
-                            <div className={styles.inputGrid}>
-                                <div className={styles.inputGroupFull}>
                                     <label>País</label>
                                     <div className={styles.countrySearchContainer} ref={countryContainerRef}>
                                         <input 
                                             type="text" 
-                                            placeholder="Digite para buscar o país..." 
+                                            placeholder="Busque o seu país..." 
                                             value={countrySearch} 
                                             onChange={(e) => {
                                                 setCountrySearch(e.target.value);
@@ -326,6 +316,29 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                     </div>
                                 </div>
 
+                                <div className={styles.inputGroup}>
+                                    <label>{formData.pais === 'Brasil' ? 'CPF' : 'Documento de Identificação'}</label>
+                                    <input type="text" name="cpf" value={formData.cpf} onChange={handleInputChange} required />
+                                </div>
+
+                                <div className={styles.inputGroup}>
+                                    <label>RG (Opcional)</label>
+                                    <input type="text" name="rg" value={formData.rg} onChange={handleInputChange} />
+                                </div>
+
+                                <div className={styles.inputGroup}>
+                                    <label>Celular (WhatsApp)</label>
+                                    <input type="tel" name="celular" value={formData.celular} onChange={handleInputChange} required />
+                                </div>
+
+                                <div className={styles.inputGroup}>
+                                    <label>E-mail</label>
+                                    <input type="email" name="email" value={formData.email} onChange={handleInputChange} required />
+                                </div>
+                            </div>
+
+                            <h3 className={styles.sectionTitle}>3. Seu Endereço</h3>
+                            <div className={styles.inputGrid}>
                                 <div className={styles.inputGroup}>
                                     <label>{formData.pais === 'Brasil' ? 'CEP' : 'ZIP / Postcode'}</label>
                                     <input 
@@ -357,7 +370,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
 
                                 <div className={styles.inputGroup}>
                                     <label>Estado (UF)</label>
-                                    <input type="text" name="estado" value={formData.estado} onChange={handleInputChange} maxLength={2} disabled={cepLocked.estado || formDisabled} required />
+                                    <input type="text" name="estado" value={formData.estado} onChange={handleInputChange} maxLength={10} disabled={cepLocked.estado || formDisabled} required />
                                 </div>
 
                                 <div className={styles.inputGroup}>
