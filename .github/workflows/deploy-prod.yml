@@ -20,12 +20,12 @@ jobs:
           username: ${{ secrets.SERVER_USER_PROD }}
           password: ${{ secrets.SERVER_PASSWORD_PROD }}
           script: |
-            if [ ! -d "$HOME/alta-cafe-prod" ]; then
-              echo "Pasta de produção não encontrada. Realizando Clone Inicial..."
+            if [ ! -d "$HOME/HAKATON" ]; then
+              echo "Pasta do projeto não encontrada. Realizando Clone Inicial..."
               cd $HOME
-              git clone -b main https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/MaurilioSemeao/hakaton-alta-cafe.git alta-cafe-prod
+              git clone -b main https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/MaurilioSemeao/hakaton-alta-cafe.git HAKATON
             fi
-            cd $HOME/alta-cafe-prod
+            cd $HOME/HAKATON
             # Atualiza a URL do remote para garantir que o token seja usado no pull/fetch
             git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/MaurilioSemeao/hakaton-alta-cafe.git
             git fetch origin
