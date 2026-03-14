@@ -212,7 +212,26 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
     };
 
     const handleCountrySelect = (countryName: string) => {
-        setFormData(prev => ({ ...prev, pais: countryName, cep: '' }));
+        const isBrasil = countryName === 'Brasil';
+        
+        setFormData(prev => {
+            const nextData = { ...prev, pais: countryName, cep: '' };
+            
+            // Se mudou para Brasil, tenta aplicar máscaras nos documentos existentes baseada no feedback do usuário.
+            if (isBrasil) {
+                if (nextData.cpf) nextData.cpf = MaskUtils.cpf(nextData.cpf);
+                if (nextData.cnpj) nextData.cnpj = MaskUtils.cnpj(nextData.cnpj);
+                if (nextData.celular) nextData.celular = MaskUtils.celular(nextData.celular);
+            }
+            
+            // Limpa campos de endereço ao mudar de país para evitar confusão de CEPs baseada no feedback do usuário.
+            return {
+                ...nextData,
+                rua: '', bairro: '', cidade: '', estado: ''
+            };
+        });
+
+        setErrors({}); // Limpa erros de validação do país anterior
         setCountrySearch(countryName);
         setShowCountries(false);
         setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
