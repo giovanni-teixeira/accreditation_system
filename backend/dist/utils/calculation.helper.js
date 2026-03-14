@@ -24,9 +24,9 @@ class CalculationHelper {
             ETANOL: 0.02,
             DIESEL: 0.15,
             ELETRICO: 0.01,
-            NAO_INFORMADO: 0.10,
+            NAO_INFORMADO: 0.1,
         };
-        const factor = emissionFactors[fuelType.toUpperCase()] || 0.10;
+        const factor = emissionFactors[fuelType.toUpperCase()] || 0.1;
         return Number((distanceKm * 2 * factor).toFixed(3));
     }
     static toRad(degrees) {

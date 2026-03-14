@@ -1,4 +1,9 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus } from '@nestjs/common';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpStatus,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { Prisma } from '@prisma/client';
 import { BusinessException } from '../exceptions/business.exception';
@@ -19,7 +24,7 @@ export class PrismaExceptionFilter implements ExceptionFilter {
       status = exception.statusCode;
       message = exception.message;
       errorCode = 'BUSINESS_ERROR';
-    } 
+    }
     // Se for erro do Prisma
     else if (exception instanceof Prisma.PrismaClientKnownRequestError) {
       switch (exception.code) {
@@ -37,7 +42,8 @@ export class PrismaExceptionFilter implements ExceptionFilter {
           break;
         case 'P2003':
           status = HttpStatus.BAD_REQUEST;
-          message = 'Erro de relacionamento: Um dado referenciado não existe ou está em uso.';
+          message =
+            'Erro de relacionamento: Um dado referenciado não existe ou está em uso.';
           errorCode = 'FOREIGN_KEY_VIOLATION';
           break;
         default:

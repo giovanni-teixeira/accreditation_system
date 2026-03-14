@@ -22,8 +22,8 @@ let EventoRepository = class EventoRepository extends base_repository_1.BaseRepo
     async findFirst() {
         const result = await this.prisma.evento.findFirst({
             include: {
-                credenciados: true
-            }
+                credenciados: true,
+            },
         });
         return result;
     }

@@ -6,7 +6,11 @@ import { BaseRepository } from './base.repository';
 import { ICredencial } from '../domain/entities/credencial.entity';
 
 @Injectable()
-export class CredencialRepository extends BaseRepository<ICredencial, Prisma.CredencialCreateInput, Prisma.CredencialUpdateInput> {
+export class CredencialRepository extends BaseRepository<
+  ICredencial,
+  Prisma.CredencialCreateInput,
+  Prisma.CredencialUpdateInput
+> {
   constructor(protected readonly prisma: PrismaService) {
     super(prisma, prisma.credencial);
   }

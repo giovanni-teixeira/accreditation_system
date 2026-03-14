@@ -42,7 +42,7 @@ let CredenciadosController = class CredenciadosController {
             if (existe)
                 throw new business_exception_1.BusinessException('Já existe um credenciado com este CPF informado.');
             const tokenDados = qrcode_util_1.QrCodeHelper.generateSignedToken(evento.id, evento.privateKey, dto.nomeCompleto);
-            const addressData = await this.addressService.getAddress(dto.cep, 'Brasil');
+            const addressData = await this.addressService.getAddress(dto.cep, dto.pais || 'Brasil');
             const latOrigem = addressData?.latitude || null;
             const lonOrigem = addressData?.longitude || null;
             let distanciaKm = 0;
@@ -74,7 +74,7 @@ let CredenciadosController = class CredenciadosController {
                         estado: dto.estado,
                         latitude: latOrigem,
                         longitude: lonOrigem,
-                        pais: 'Brasil',
+                        pais: dto.pais || 'Brasil',
                     },
                 },
                 descarbonizacao: {

@@ -58,7 +58,6 @@ export class CriarCredenciadoDto {
 
   @ApiProperty()
   @IsString()
-  @Length(2, 2, { message: 'O estado deve ter exatamente 2 caracteres' })
   @IsNotEmpty({ message: 'O estado é obrigatório' })
   estado: string;
 

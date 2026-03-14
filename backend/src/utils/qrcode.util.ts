@@ -28,6 +28,7 @@ export const QrCodeHelper = {
     privateKeyBase64: string,
     _nome: string,
   ): QrCodeResult {
+    // 5 bytes = 10 caracteres hexadecimais
     const ticketId = crypto.randomBytes(5).toString('hex').toUpperCase();
     const qrToken = this.signPayload(eventoId, ticketId, privateKeyBase64);
 

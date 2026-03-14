@@ -191,6 +191,58 @@ input::placeholder {
     box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
 }
 
+/* Country Search Dropdown Styles */
+.countrySearchContainer {
+    position: relative;
+    width: 100%;
+}
+
+.countriesDropdown {
+    position: absolute;
+    top: 105%;
+    left: 0;
+    right: 0;
+    max-height: 250px;
+    overflow-y: auto;
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    padding: 0.5rem 0;
+}
+
+.countryOption {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    font-size: 0.9375rem;
+    color: var(--text-main);
+    transition: background-color 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.countryOption:hover {
+    background-color: var(--light-green);
+    color: var(--dark-green);
+}
+
+.countryCode {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background-color: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.noResults {
+    padding: 1rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
 /* LGPD Checkbox Customization */
 .lgpdSection {
     margin-top: 2rem;

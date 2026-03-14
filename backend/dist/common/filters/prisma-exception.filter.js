@@ -39,7 +39,8 @@ let PrismaExceptionFilter = class PrismaExceptionFilter {
                     break;
                 case 'P2003':
                     status = common_1.HttpStatus.BAD_REQUEST;
-                    message = 'Erro de relacionamento: Um dado referenciado não existe ou está em uso.';
+                    message =
+                        'Erro de relacionamento: Um dado referenciado não existe ou está em uso.';
                     errorCode = 'FOREIGN_KEY_VIOLATION';
                     break;
                 default:

@@ -16,6 +16,7 @@ export declare class AddressService {
     private readonly logger;
     constructor(addressRepository: AddressRepository, configService: ConfigService);
     getAddress(cep: string, country?: string): Promise<StandardAddress | null>;
+    private reverseGeocode;
     private tryBrazilianApis;
     private geocodeAddress;
     private tryInternationalApi;

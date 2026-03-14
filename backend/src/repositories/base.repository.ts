@@ -13,8 +13,8 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
       return await this.model.create({ data, include });
     } catch (error) {
       if (error.code && error.code.startsWith('P')) {
-          // O PrismaExceptionFilter cuidará disso no nível de Controller
-          throw error;
+        // O PrismaExceptionFilter cuidará disso no nível de Controller
+        throw error;
       }
       throw new BusinessException(`Falha ao criar registro: ${error.message}`);
     }
@@ -24,7 +24,9 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
     try {
       return await this.model.findMany({ include });
     } catch (error) {
-      throw new BusinessException(`Falha ao buscar registros: ${error.message}`);
+      throw new BusinessException(
+        `Falha ao buscar registros: ${error.message}`,
+      );
     }
   }
 
@@ -36,7 +38,9 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
       });
       return result as T | null;
     } catch (error) {
-      throw new BusinessException(`Erro ao buscar registro pelo ID: ${error.message}`);
+      throw new BusinessException(
+        `Erro ao buscar registro pelo ID: ${error.message}`,
+      );
     }
   }
 
@@ -48,7 +52,9 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
       });
     } catch (error) {
       if (error.code && error.code.startsWith('P')) throw error;
-      throw new BusinessException(`Falha ao atualizar registro: ${error.message}`);
+      throw new BusinessException(
+        `Falha ao atualizar registro: ${error.message}`,
+      );
     }
   }
 
@@ -59,7 +65,9 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
       });
     } catch (error) {
       if (error.code && error.code.startsWith('P')) throw error;
-      throw new BusinessException(`Falha ao excluir registro: ${error.message}`);
+      throw new BusinessException(
+        `Falha ao excluir registro: ${error.message}`,
+      );
     }
   }
 }

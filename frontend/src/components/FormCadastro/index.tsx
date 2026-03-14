@@ -5,8 +5,7 @@ import styles from './style.module.css';
 import { cadastrarUsuario, CadastroResponse } from '@/controllers/CredenciadoController';
 import { API_ROUTES } from '@/config/api';
 import { MaskUtils } from '@/utils/mask.utils';
-import SuccessModal from '../SuccessModal';
-import ErrorModal from '../ErrorModal';
+import { COUNTRIES } from '@/constants/countries';
 
 const ROLES = [
     { id: 'expositor', label: 'Expositor', icon: '🏢' },
@@ -46,6 +45,11 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
     const [role, setRole] = useState<string>('');
     const [isPending, startTransition] = useTransition();
     const [cepLocked, setCepLocked] = useState({ rua: false, bairro: false, cidade: false, estado: false });
+
+    // State para Busca de País
+    const [countrySearch, setCountrySearch] = useState('Brasil');
+    const [showCountries, setShowCountries] = useState(false);
+    const countryContainerRef = useRef<HTMLDivElement>(null);
 
     // Bloqueia se estiver pendente (enviando) ou se o pai solicitar (modal aberto)
     const formDisabled = isPending || isBlocked;
@@ -87,10 +91,20 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
         }
     }, [role]);
 
+    // Fechar dropdown ao clicar fora
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (countryContainerRef.current && !countryContainerRef.current.contains(event.target as Node)) {
+                setShowCountries(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
     const fetchAddress = async (cepText: string) => {
         const zipCode = cepText.replace(/\D/g, '');
 
-        // No Brasil, espera 8 dígitos. Fora, deixamos livre (mínimo 3 para evitar spam)
         if (formData.pais === 'Brasil' && zipCode.length !== 8) return;
         if (formData.pais !== 'Brasil' && zipCode.length < 3) return;
 
@@ -116,7 +130,6 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
             });
         } catch (err) {
             console.error('Erro na consulta de endereço:', err);
-            // Ao falhar ou não encontrar, liberamos os campos para preenchimento manual
             setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
         }
     };
@@ -140,8 +153,6 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
 
         let finalValue = value;
 
-        // Delega a aplicação de máscaras para o utilitário MaskUtils
-        // Delega a aplicação de máscaras para o utilitário MaskUtils
         if (name === 'cep') {
             finalValue = formData.pais === 'Brasil' ? MaskUtils.cep(value) : value.toUpperCase();
         } else if (name === 'cpf') finalValue = MaskUtils.cpf(value);
@@ -162,6 +173,17 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
         }
     };
 
+    const handleCountrySelect = (countryName: string) => {
+        setFormData(prev => ({ ...prev, pais: countryName, cep: '' }));
+        setCountrySearch(countryName);
+        setShowCountries(false);
+        setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
+    };
+
+    const filteredCountries = COUNTRIES.filter(c => 
+        c.name.toLowerCase().includes(countrySearch.toLowerCase())
+    );
+
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -176,7 +198,6 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
         startTransition(async () => {
             const cleanData: any = { ...formData, role };
 
-            // Processamento de dados antes do envio (uppercase e remoção de máscaras)
             for (const key in cleanData) {
                 if (typeof cleanData[key] === 'string') {
                     if (['cpf', 'celular', 'cnpj', 'ccir', 'cep'].includes(key)) {
@@ -200,6 +221,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                     cnpj: '', siteEmpresa: '', nomeEmpresa: '',
                     ccir: '', nomePropriedade: '', nomeVeiculo: ''
                 });
+                setCountrySearch('Brasil');
             }
         });
     };
@@ -262,16 +284,43 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                     <label>E-mail</label>
                                     <input type="email" name="email" value={formData.email} onChange={handleInputChange} required />
                                 </div>
+                            </div>
 
-                                <div className={styles.inputGroup}>
+                            <h3 className={styles.sectionTitle}>3. Seu Endereço</h3>
+                            <div className={styles.inputGrid}>
+                                <div className={styles.inputGroupFull}>
                                     <label>País</label>
-                                    <select name="pais" value={formData.pais} onChange={handleInputChange} required>
-                                        <option value="Brasil">Brasil</option>
-                                        <option value="Argentina">Argentina</option>
-                                        <option value="Colômbia">Colômbia</option>
-                                        <option value="Estados Unidos">Estados Unidos</option>
-                                        <option value="Outro">Outro</option>
-                                    </select>
+                                    <div className={styles.countrySearchContainer} ref={countryContainerRef}>
+                                        <input 
+                                            type="text" 
+                                            placeholder="Digite para buscar o país..." 
+                                            value={countrySearch} 
+                                            onChange={(e) => {
+                                                setCountrySearch(e.target.value);
+                                                setShowCountries(true);
+                                            }}
+                                            onFocus={() => setShowCountries(true)}
+                                            required
+                                        />
+                                        {showCountries && (
+                                            <div className={styles.countriesDropdown}>
+                                                {filteredCountries.length > 0 ? (
+                                                    filteredCountries.map(c => (
+                                                        <div 
+                                                            key={c.code} 
+                                                            className={styles.countryOption}
+                                                            onClick={() => handleCountrySelect(c.name)}
+                                                        >
+                                                            <span>{c.name}</span>
+                                                            <span className={styles.countryCode}>{c.code}</span>
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <div className={styles.noResults}>Nenhum país encontrado</div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
                                 <div className={styles.inputGroup}>
@@ -323,7 +372,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                             {/* DADOS ESPECÍFICOS */}
                             {(role === 'expositor' || role === 'produtor' || role === 'imprensa') && (
                                 <div ref={dadosEspecificosRef}>
-                                    <h3 className={styles.sectionTitle}>3. Informações Complementares ({role})</h3>
+                                    <h3 className={styles.sectionTitle}>4. Informações Complementares ({role})</h3>
                                     <div className={styles.inputGrid}>
 
                                         {role === 'expositor' && (

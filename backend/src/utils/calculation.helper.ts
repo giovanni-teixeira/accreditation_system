@@ -8,7 +8,12 @@ export class CalculationHelper {
    * Calcula a distância entre dois pontos usando a fórmula de Haversine
    * e aplica o fator de correção rodoviário.
    */
-  static calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  static calculateDistance(
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number,
+  ): number {
     if (!lat1 || !lon1 || !lat2 || !lon2) return 0;
 
     const dLat = this.toRad(lat2 - lat1);
@@ -38,11 +43,11 @@ export class CalculationHelper {
       ETANOL: 0.02,
       DIESEL: 0.15,
       ELETRICO: 0.01,
-      NAO_INFORMADO: 0.10,
+      NAO_INFORMADO: 0.1,
     };
 
-    const factor = emissionFactors[fuelType.toUpperCase()] || 0.10;
-    
+    const factor = emissionFactors[fuelType.toUpperCase()] || 0.1;
+
     // Ida e Volta (* 2)
     return Number((distanceKm * 2 * factor).toFixed(3));
   }

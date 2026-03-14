@@ -35,4 +35,4 @@ import { JwtStrategy } from './controllers/guards/jwt.strategy';
     JwtStrategy,
   ],
 })
-export class AppModule { }
+export class AppModule {}

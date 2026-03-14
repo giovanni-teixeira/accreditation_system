@@ -23,10 +23,14 @@ let AddressService = AddressService_1 = class AddressService {
         this.configService = configService;
     }
     async getAddress(cep, country = 'Brasil') {
-        const cleanCep = cep.replace(/\D/g, '');
-        const cached = await this.addressRepository.findByCep(cleanCep);
-        if (cached) {
-            this.logger.log(`Endereço encontrado no cache: ${cleanCep}`);
+        const cleanCep = cep.replace(/\D/g, '').toUpperCase();
+        const cacheKey = `${country.substring(0, 2).toUpperCase()}:${cleanCep}`;
+        let cached = await this.addressRepository.findByCep(cleanCep);
+        if (!cached) {
+            cached = await this.addressRepository.findByCep(cacheKey);
+        }
+        if (cached && cached.pais.toLowerCase() === country.toLowerCase()) {
+            this.logger.log(`Endereço encontrado no cache: ${cleanCep} (${country})`);
             return {
                 cep: cached.cep,
                 rua: cached.rua,
@@ -38,30 +42,59 @@ let AddressService = AddressService_1 = class AddressService {
                 longitude: cached.longitude ?? null,
             };
         }
+        let addressData = null;
         if (country.toLowerCase() === 'brasil' || country.toUpperCase() === 'BR') {
-            const brasilData = await this.tryBrazilianApis(cleanCep);
-            if (brasilData) {
-                await this.addressRepository.create({
-                    ...brasilData,
-                    pais: 'Brasil',
-                });
-                return { ...brasilData, pais: 'Brasil' };
-            }
+            addressData = await this.tryBrazilianApis(cleanCep);
         }
-        const internationalData = await this.tryInternationalApi(cep, country);
-        if (internationalData) {
-            if (internationalData.latitude === null || internationalData.longitude === null) {
-                const geo = await this.geocodeAddress(internationalData.rua, internationalData.cidade, internationalData.estado, country);
+        else {
+            addressData = await this.tryInternationalApi(cep, country);
+            if (!addressData) {
+                this.logger.log(`Fallback Nominatim para Postcode: ${cep}, ${country}`);
+                const geo = await this.geocodeAddress('', '', '', `${cep} ${country}`);
                 if (geo) {
-                    internationalData.latitude = geo.latitude;
-                    internationalData.longitude = geo.longitude;
+                    addressData = await this.reverseGeocode(geo.latitude, geo.longitude, cep);
                 }
             }
-            await this.addressRepository.create({
-                ...internationalData,
-                pais: country,
+        }
+        if (addressData) {
+            try {
+                await this.addressRepository.create({
+                    ...addressData,
+                    cep: cacheKey,
+                    pais: country,
+                });
+            }
+            catch (e) {
+                this.logger.warn(`Erro ao salvar cache (provável duplicata): ${e.message}`);
+            }
+            return { ...addressData, pais: country };
+        }
+        return null;
+    }
+    async reverseGeocode(lat, lon, cep) {
+        try {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+            const response = await fetch(url, {
+                headers: { 'User-Agent': 'Hakaton-Alta-Cafe-App' },
             });
-            return { ...internationalData, pais: country };
+            const data = await response.json();
+            if (data && data.address) {
+                return {
+                    cep,
+                    rua: data.address.road || data.address.pedestrian || '',
+                    bairro: data.address.suburb || data.address.neighbourhood || '',
+                    cidade: data.address.city ||
+                        data.address.town ||
+                        data.address.village ||
+                        '',
+                    estado: data.address.state || data.address.region || '',
+                    latitude: lat,
+                    longitude: lon,
+                };
+            }
+        }
+        catch (e) {
+            this.logger.error(`Falha no Reverse Geocoding: ${e.message}`);
         }
         return null;
     }
@@ -77,8 +110,12 @@ let AddressService = AddressService_1 = class AddressService {
                     bairro: data.neighborhood || '',
                     cidade: data.city || '',
                     estado: data.state || '',
-                    latitude: data.location?.coordinates?.latitude ? parseFloat(data.location.coordinates.latitude) : null,
-                    longitude: data.location?.coordinates?.longitude ? parseFloat(data.location.coordinates.longitude) : null,
+                    latitude: data.location?.coordinates?.latitude
+                        ? parseFloat(data.location.coordinates.latitude)
+                        : null,
+                    longitude: data.location?.coordinates?.longitude
+                        ? parseFloat(data.location.coordinates.longitude)
+                        : null,
                 };
                 if (result.latitude === null || result.longitude === null) {
                     const geo = await this.geocodeAddress(result.rua, result.cidade, result.estado, 'Brasil');
@@ -127,14 +164,14 @@ let AddressService = AddressService_1 = class AddressService {
             const url = `https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`;
             const response = await fetch(url, {
                 headers: {
-                    'User-Agent': 'Hakaton-Alta-Cafe-App'
-                }
+                    'User-Agent': 'Hakaton-Alta-Cafe-App',
+                },
             });
-            const data = await response.json();
+            const data = (await response.json());
             if (data && data.length > 0) {
                 return {
                     latitude: parseFloat(data[0].lat),
-                    longitude: parseFloat(data[0].lon)
+                    longitude: parseFloat(data[0].lon),
                 };
             }
         }

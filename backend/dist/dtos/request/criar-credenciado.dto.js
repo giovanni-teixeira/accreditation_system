@@ -91,7 +91,6 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.Length)(2, 2, { message: 'O estado deve ter exatamente 2 caracteres' }),
     (0, class_validator_1.IsNotEmpty)({ message: 'O estado é obrigatório' }),
     __metadata("design:type", String)
 ], CriarCredenciadoDto.prototype, "estado", void 0);

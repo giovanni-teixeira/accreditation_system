@@ -33,7 +33,7 @@
 }
 
 .logoEvento {
-    max-height: 73px; /* 2px menor que os 75px anteriores */
+    max-height: 82px; /* Aumentado conforme solicitado */
     width: auto;
     display: block;
 }

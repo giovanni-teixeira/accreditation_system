@@ -28,7 +28,7 @@ const SuccessModal = ({ isOpen, onClose, userData }: SuccessModalProps) => {
 
             // Pré-carrega o QR Code como SVG para máxima qualidade no PDF
             if (userData.qrToken) {
-                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(userData.qrToken)}&format=svg&qzone=1&ecc=M`;
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(userData.qrToken)}&format=svg&qzone=1&ecc=L`;
                 fetch(qrUrl)
                     .then(response => response.blob())
                     .then(blob => {

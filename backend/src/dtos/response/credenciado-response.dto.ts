@@ -25,10 +25,10 @@ export class CredenciadoResponseDto {
     this.descarbonizacao = partial.descarbonizacao;
     this.credencial = partial.credencial
       ? {
-        ticketId: partial.credencial.ticketId,
-        status: partial.credencial.status,
-        qrToken: partial.credencial.qrToken,
-      }
+          ticketId: partial.credencial.ticketId,
+          status: partial.credencial.status,
+          qrToken: partial.credencial.qrToken,
+        }
       : null;
   }
 }
