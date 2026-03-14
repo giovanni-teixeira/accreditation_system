@@ -10,7 +10,7 @@ interface CredentialPDFProps {
 
 const CredentialPDF = forwardRef<HTMLDivElement, CredentialPDFProps>(({ userData, corTipo }, ref) => {
     // Prioriza o QR Code em Base64 (pré-carregado) para o PDF
-    const qrSource = (userData as any).qrBase64 || `https://api.qrserver.com/v1/create-qr-code/?size=165x165&ecc=L&data=${encodeURIComponent(userData.qrToken)}&format=png&qzone=1`;
+    const qrSource = (userData as any).qrBase64 || `https://api.qrserver.com/v1/create-qr-code/?size=180x180&ecc=L&data=${encodeURIComponent(userData.qrToken)}&format=png&qzone=1`;
 
     return (
         <div id="credencial" ref={ref} className={styles.folhaA4} style={{ '--cor-tipo': corTipo } as any}>

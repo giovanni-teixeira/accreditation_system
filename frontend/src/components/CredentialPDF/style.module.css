@@ -60,15 +60,16 @@
 .qrContainer {
     display: flex;
     justify-content: center;
-    margin-bottom: 2px;
+    margin-bottom: 5mm;
 }
 
 .qrCode {
-    width: 135px; /* Maior conforme solicitado */
-    height: 135px;
+    width: 140px;
+    height: 140px;
     border: 1px solid #000;
     padding: 3px;
     background: white;
+    box-sizing: border-box;
 }
 
 .faixaTipo {
