@@ -269,18 +269,11 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                 return;
             }
             
-            // CNPJ obrigatório apenas para Expositores Brasileiros baseada no feedback do usuário.
-            if (role === 'expositor') {
+            // CNPJ obrigatório para Expositores e Imprensa Brasileiros baseada no feedback do usuário.
+            if (role === 'expositor' || role === 'imprensa') {
                 if (!formData.cnpj || !Validador.validarCNPJ(formData.cnpj)) {
                     setErrors(prev => ({ ...prev, cnpj: 'Documento obrigatório/inválido' }));
-                    onResult({ sucesso: false, mensagem: 'O CNPJ é obrigatório para expositores brasileiros.' });
-                    return;
-                }
-            } else if (role === 'imprensa' && formData.cnpj) {
-                // Se preencheu CNPJ como imprensa, valida
-                if (!Validador.validarCNPJ(formData.cnpj)) {
-                    setErrors(prev => ({ ...prev, cnpj: 'Documento inválido' }));
-                    onResult({ sucesso: false, mensagem: 'O CNPJ informado é inválido.' });
+                    onResult({ sucesso: false, mensagem: `O CNPJ é obrigatório para ${role === 'expositor' ? 'expositores' : 'membros da imprensa'} brasileiros.` });
                     return;
                 }
             }
@@ -487,8 +480,8 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                                         value={formData.cnpj} 
                                                         onChange={handleInputChange} 
                                                         onBlur={handleBlur}
-                                                        placeholder={(formData.pais === 'Brasil' && role === 'expositor') ? "00.000.000/0000-00" : "Opcional"}
-                                                        required={formData.pais === 'Brasil' && role === 'expositor'} 
+                                                        placeholder={(formData.pais === 'Brasil' && (role === 'expositor' || role === 'imprensa')) ? "00.000.000/0000-00" : "Opcional"}
+                                                        required={formData.pais === 'Brasil' && (role === 'expositor' || role === 'imprensa')} 
                                                     />
                                                     {errors.cnpj && <span className={styles.validationError}>{errors.cnpj}</span>}
                                                 </div>
@@ -527,7 +520,8 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                                         value={formData.cnpj} 
                                                         onChange={handleInputChange} 
                                                         onBlur={handleBlur}
-                                                        placeholder="Opcional"
+                                                        placeholder={(formData.pais === 'Brasil' && (role === 'expositor' || role === 'imprensa')) ? "00.000.000/0000-00" : "Opcional"}
+                                                        required={formData.pais === 'Brasil' && (role === 'expositor' || role === 'imprensa')} 
                                                     />
                                                     {errors.cnpj && <span className={styles.validationError}>{errors.cnpj}</span>}
                                                 </div>
