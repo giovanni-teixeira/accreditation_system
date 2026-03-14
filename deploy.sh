@@ -12,24 +12,17 @@ git fetch origin
 git reset --hard origin/dev
 git pull origin dev
 
-# 1.5 Gerenciamento do Arquivo de Ambiente (.env) e SSL
-echo "🔐 1.5 Preparando variáveis de ambiente e certificados..."
+# 1.5 Gerenciamento do Arquivo de Ambiente (.env) e Nginx baseada no feedback do usuário.
+echo "🔐 1.5 Preparando configurações de ambiente..."
 if [ -f "$HOME/alta-cafe-config/.env" ]; then
   cp "$HOME/alta-cafe-config/.env" "backend/.env"
   echo "✅ Arquivo backend/.env atualizado."
 fi
 
-# Criar pasta de certificados se não existir
-mkdir -p nginx/certs
-
-# Se os certificados SSL não existirem (reais ou montados), cria dummies para o Nginx não crashar
-# Nota: No servidor real, o Docker montará /etc/letsencrypt. baseada no feedback do usuário.
-if [ ! -f "nginx/certs/fullchain.pem" ] || [ ! -f "nginx/certs/privkey.pem" ]; then
-  echo "ℹ️ Criando certificados de desenvolvimento (dummy) em nginx/certs/..."
-  openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-    -keyout nginx/certs/privkey.pem \
-    -out nginx/certs/fullchain.pem \
-    -subj "/C=BR/ST=SP/L=Franca/O=AltaCafe/CN=localhost"
+# Configura o Nginx para Desenvolvimento (Sem SSL) baseada no feedback do usuário.
+if [ -f "nginx/nginx.dev.conf" ]; then
+  cp nginx/nginx.dev.conf nginx/nginx.conf
+  echo "✅ Nginx configurado para AMBIENTE DEV (HTTP)."
 fi
 
 

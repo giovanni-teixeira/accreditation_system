@@ -11,8 +11,8 @@ echo "📥 1. Sincronizando branch 'main'..."
 git fetch origin
 git reset --hard origin/main
 
-# 1.5 Gerenciamento do Arquivo de Ambiente (.env) e SSL
-echo "🔐 1.5 Sincronizando Variáveis de Ambiente e SSL..."
+# 1.5 Gerenciamento do Arquivo de Ambiente (.env) e Nginx baseada no feedback do usuário.
+echo "🔐 1.5 Preparando configurações de ambiente..."
 if [ -f "./.env" ]; then
   cp "./.env" "backend/.env"
   echo "✅ Arquivo backend/.env atualizado."
@@ -21,17 +21,10 @@ elif [ -f "$HOME/alta-cafe-config/.env" ]; then
   echo "✅ Arquivo backend/.env atualizado a partir do config global."
 fi
 
-# Criar pasta de certificados se não existir
-mkdir -p nginx/certs
-
-# Se os certificados SSL não existirem (reais ou montados), cria dummies para o Nginx não crashar
-# No servidor real, o Docker montará /etc/letsencrypt. baseada no feedback do usuário.
-if [ ! -f "nginx/certs/fullchain.pem" ] || [ ! -f "nginx/certs/privkey.pem" ]; then
-  echo "ℹ️ Criando certificados temporários em nginx/certs/..."
-  openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-    -keyout nginx/certs/privkey.pem \
-    -out nginx/certs/fullchain.pem \
-    -subj "/C=BR/ST=SP/L=Franca/O=AltaCafe/CN=localhost"
+# Configura o Nginx para Produção (Com SSL) baseada no feedback do usuário.
+if [ -f "nginx/nginx.prod.conf" ]; then
+  cp nginx/nginx.prod.conf nginx/nginx.conf
+  echo "✅ Nginx configurado para AMBIENTE PROD (HTTPS)."
 fi
 
 # 2. Derrubando containers
