@@ -100,6 +100,8 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
         function handleClickOutside(event: MouseEvent) {
             if (countryContainerRef.current && !countryContainerRef.current.contains(event.target as Node)) {
                 setShowCountries(false);
+                // Reverte para o país selecionado oficialmente se a busca for inválida baseada no feedback do usuário.
+                setCountrySearch(formData.pais);
             }
         }
         document.addEventListener('mousedown', handleClickOutside);
@@ -249,6 +251,13 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                 sucesso: false,
                 mensagem: 'É necessário ler e aceitar os termos da LGPD (Política de Privacidade) para concluir o credenciamento.'
             });
+            return;
+        }
+
+        // Validação de País Obrigatório baseada no feedback do usuário.
+        const countryExists = COUNTRIES.some(c => c.name === formData.pais);
+        if (!countryExists) {
+            onResult({ sucesso: false, mensagem: 'Por favor, selecione um país válido da lista.' });
             return;
         }
 
