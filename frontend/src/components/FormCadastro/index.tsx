@@ -62,7 +62,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
     const [formData, setFormData] = useState<FormDataState>({
         nomeCompleto: '', cpf: '', rg: '', celular: '', email: '',
         cep: '', pais: 'Brasil', rua: '', bairro: '', cidade: '', estado: '',
-        tipoCombustivel: 'NAO_INFORMADO', aceiteLgpd: false,
+        tipoCombustivel: '', aceiteLgpd: false,
         cnpj: '', siteEmpresa: '', nomeEmpresa: '',
         ccir: '', nomePropriedade: '', nomeVeiculo: ''
     });
@@ -453,7 +453,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                 <div className={styles.inputGroup}>
                                     <label>Combustível do Veículo</label>
                                     <select name="tipoCombustivel" value={formData.tipoCombustivel} onChange={handleInputChange} required>
-                                        <option value="NAO_INFORMADO">Não Informado</option>
+                                        <option value="" disabled>Selecione uma opção</option>
                                         <option value="GASOLINA">Gasolina</option>
                                         <option value="ETANOL">Etanol</option>
                                         <option value="DIESEL">Diesel</option>
