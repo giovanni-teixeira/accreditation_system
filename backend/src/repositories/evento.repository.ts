@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Prisma, Evento as PrismaEvento } from '@prisma/client';
 import { BaseRepository } from './base.repository';
-import { IEvento } from '../domain/entities/evento.entity';
+import { IEvento } from '../interfaces/evento.interface';
 
 @Injectable()
 export class EventoRepository extends BaseRepository<
@@ -25,3 +25,4 @@ export class EventoRepository extends BaseRepository<
     return result as IEvento | null;
   }
 }
+

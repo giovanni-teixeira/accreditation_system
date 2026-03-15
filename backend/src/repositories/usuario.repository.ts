@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Prisma, UsuarioOrganizacao as PrismaUsuario } from '@prisma/client';
 import { BaseRepository } from './base.repository';
-import { IUsuarioOrganizacao } from '../domain/entities/usuario-organizacao.entity';
+import { IUsuarioOrganizacao } from '../interfaces/usuario-organizacao.interface';
 
 @Injectable()
 export class UsuarioRepository extends BaseRepository<
@@ -39,3 +39,4 @@ export class UsuarioRepository extends BaseRepository<
     return result as IUsuarioOrganizacao | null;
   }
 }
+

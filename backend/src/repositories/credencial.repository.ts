@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Prisma, Credencial as PrismaCredencial } from '@prisma/client';
 import { BaseRepository } from './base.repository';
-import { ICredencial } from '../domain/entities/credencial.entity';
+import { ICredencial } from '../interfaces/credencial.interface';
 
 @Injectable()
 export class CredencialRepository extends BaseRepository<
@@ -26,3 +26,4 @@ export class CredencialRepository extends BaseRepository<
     return result as ICredencial | null;
   }
 }
+

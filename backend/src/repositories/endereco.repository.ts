@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma, Endereco as PrismaEndereco } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { BaseRepository } from './base.repository';
-import { IEndereco } from '../domain/entities/endereco.entity';
+import { IEndereco } from '../interfaces/endereco.interface';
 
 @Injectable()
 export class EnderecoRepository extends BaseRepository<
@@ -23,3 +23,4 @@ export class EnderecoRepository extends BaseRepository<
     return result as IEndereco | null;
   }
 }
+
