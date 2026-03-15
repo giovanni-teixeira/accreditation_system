@@ -1,0 +1,29 @@
+:root {
+    --primary-green: #2ecc71;
+    --dark-green: #27ae60;
+    --light-green: #e9f7ef;
+    --coffee-brown: #4e342e;
+    --light-brown: #795548;
+    --dark-brown: #894c29;
+    --bg-color: #fcfcfc;
+    --text-main: #894c29;
+    --text-muted: #424242;
+    --border-color: #d1d5db;
+    --white: #ffffff;
+    --error: #e74c3c;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --transition-fast: 0.2s ease;
+
+    /* Status Modal specific vars baseada no feedback do usuário. */
+    --modal-success: #2ecc71;
+    --modal-dark-success: #27ae60;
+    --modal-light-success: #e8fcf0;
+    --modal-border-success: #d1f7e1;
+    
+    --modal-error: #e74c3c;
+    --modal-dark-error: #c0392b;
+    --modal-light-error: #fdf2f2;
+    --modal-border-error: #fae3e3;
+}
