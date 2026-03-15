@@ -19,5 +19,8 @@ export declare class AddressService {
     private reverseGeocode;
     private tryBrazilianApis;
     private geocodeAddress;
+    private tryZipBase;
+    private tryGeonames;
     private tryInternationalApi;
+    private tryZippopotamus;
 }

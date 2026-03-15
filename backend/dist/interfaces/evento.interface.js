@@ -1,3 +1,3 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-//# sourceMappingURL=evento.entity.js.map
+//# sourceMappingURL=evento.interface.js.map

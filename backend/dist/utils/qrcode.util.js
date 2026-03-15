@@ -38,16 +38,16 @@ const nacl = __importStar(require("tweetnacl"));
 const util = __importStar(require("tweetnacl-util"));
 const crypto = __importStar(require("crypto"));
 exports.QrCodeHelper = {
-    signPayload(eventoId, ticketId, privateKeyBase64) {
-        const messageStr = `${eventoId}|${ticketId}`;
+    signPayload(eventoId, ticketId, nome, privateKeyBase64) {
+        const messageStr = `${eventoId}|${ticketId}|${nome.substring(0, 25).toUpperCase()}`;
         const message = util.decodeUTF8(messageStr);
         const privateKey = util.decodeBase64(privateKeyBase64);
         const signature = nacl.sign.detached(message, privateKey);
         return `${messageStr}.${util.encodeBase64(signature)}`;
     },
-    generateSignedToken(eventoId, privateKeyBase64, _nome) {
-        const ticketId = crypto.randomBytes(5).toString('hex').toUpperCase();
-        const qrToken = this.signPayload(eventoId, ticketId, privateKeyBase64);
+    generateSignedToken(eventoId, privateKeyBase64, nome) {
+        const ticketId = crypto.randomBytes(3).toString('hex').toUpperCase();
+        const qrToken = this.signPayload(eventoId, ticketId, nome, privateKeyBase64);
         return { ticketId, qrToken };
     },
 };

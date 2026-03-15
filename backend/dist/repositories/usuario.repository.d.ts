@@ -1,7 +1,7 @@
 import { PrismaService } from '../prisma.service';
 import { Prisma } from '@prisma/client';
 import { BaseRepository } from './base.repository';
-import { IUsuarioOrganizacao } from '../domain/entities/usuario-organizacao.entity';
+import { IUsuarioOrganizacao } from '../interfaces/usuario-organizacao.interface';
 export declare class UsuarioRepository extends BaseRepository<IUsuarioOrganizacao, Prisma.UsuarioOrganizacaoCreateInput, Prisma.UsuarioOrganizacaoUpdateInput> {
     protected readonly prisma: PrismaService;
     constructor(prisma: PrismaService);

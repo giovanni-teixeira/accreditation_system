@@ -1,3 +1,3 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-//# sourceMappingURL=endereco.entity.js.map
+//# sourceMappingURL=endereco.interface.js.map

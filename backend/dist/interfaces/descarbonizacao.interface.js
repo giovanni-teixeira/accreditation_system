@@ -8,4 +8,4 @@ var TipoCombustivel;
     TipoCombustivel["DIESEL"] = "DIESEL";
     TipoCombustivel["ELETRICO"] = "ELETRICO";
 })(TipoCombustivel || (exports.TipoCombustivel = TipoCombustivel = {}));
-//# sourceMappingURL=descarbonizacao.entity.js.map
+//# sourceMappingURL=descarbonizacao.interface.js.map

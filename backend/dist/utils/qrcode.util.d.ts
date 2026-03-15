@@ -3,6 +3,6 @@ export interface QrCodeResult {
     qrToken: string;
 }
 export declare const QrCodeHelper: {
-    signPayload(eventoId: string, ticketId: string, privateKeyBase64: string): string;
-    generateSignedToken(eventoId: string, privateKeyBase64: string, _nome: string): QrCodeResult;
+    signPayload(eventoId: string, ticketId: string, nome: string, privateKeyBase64: string): string;
+    generateSignedToken(eventoId: string, privateKeyBase64: string, nome: string): QrCodeResult;
 };

@@ -10,4 +10,4 @@ var TipoCategoria;
     TipoCategoria["ORGANIZACAO"] = "ORGANIZACAO";
     TipoCategoria["TERCEIRIZADO"] = "TERCEIRIZADO";
 })(TipoCategoria || (exports.TipoCategoria = TipoCategoria = {}));
-//# sourceMappingURL=credenciado.entity.js.map
+//# sourceMappingURL=credenciado.interface.js.map

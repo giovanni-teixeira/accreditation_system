@@ -6,4 +6,4 @@ var PerfilAcesso;
     PerfilAcesso["LEITOR_CATRACA"] = "LEITOR_CATRACA";
     PerfilAcesso["ADMIN"] = "ADMIN";
 })(PerfilAcesso || (exports.PerfilAcesso = PerfilAcesso = {}));
-//# sourceMappingURL=usuario-organizacao.entity.js.map
+//# sourceMappingURL=usuario-organizacao.interface.js.map

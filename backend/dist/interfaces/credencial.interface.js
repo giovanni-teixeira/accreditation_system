@@ -1,3 +1,3 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-//# sourceMappingURL=credencial.entity.js.map
+//# sourceMappingURL=credencial.interface.js.map
