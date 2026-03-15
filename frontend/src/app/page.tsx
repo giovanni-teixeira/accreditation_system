@@ -1,26 +1,27 @@
 'use client';
 
 import { useState } from 'react';
-import FormCadastro from '@/components/FormCadastro';
+import FormCadastro from '@/features/registration-form/FormCadastro';
 import SearchCPF from '@/components/SearchCPF';
-import SuccessModal from '@/components/SuccessModal';
-import ErrorModal from '@/components/ErrorModal';
+import { StatusModal } from '@/components/ui/StatusModal';
 import { CadastroResponse } from '@/controllers/CredenciadoController';
 import styles from './page.module.css';
 
 export default function Home() {
+  const [modalType, setModalType] = useState<'success' | 'error'>('success');
+  const [modalOpen, setModalOpen] = useState(false);
   const [successData, setSuccessData] = useState<any>(null);
   const [errorMsg, setErrorMsg] = useState<string>('');
-  const [isSuccessOpen, setIsSuccessOpen] = useState(false);
-  const [isErrorOpen, setIsErrorOpen] = useState(false);
 
   const handleResult = (result: CadastroResponse) => {
     if (result.sucesso) {
       setSuccessData(result.dadosRecebidos);
-      setIsSuccessOpen(true);
+      setModalType('success');
+      setModalOpen(true);
     } else {
       setErrorMsg(result.mensagem);
-      setIsErrorOpen(true);
+      setModalType('error');
+      setModalOpen(true);
     }
   };
 
@@ -43,36 +44,26 @@ export default function Home() {
             <h2 className={styles.formTitle}>Credenciamento de Participante</h2>
             <p className={styles.formSubtitle}>Preencha seus dados para garantir acesso ao evento.</p>
 
-            <FormCadastro onResult={handleResult} isBlocked={isSuccessOpen || isErrorOpen} />
+            <FormCadastro onResult={handleResult} isBlocked={modalOpen} />
           </div>
         </section>
       </div>
 
-      {/* MODAIS COMPARTILHADOS */}
-      {isSuccessOpen && successData && (
-        <SuccessModal
-          isOpen={isSuccessOpen}
-          onClose={() => setIsSuccessOpen(false)}
-          userData={{
-            ...successData,
-            nomeCompleto: successData.nomeCompleto || successData.nome,
-            cidade: successData.cidade || successData.endereco?.cidade,
-            estado: successData.estado || successData.endereco?.estado,
-            nomeEmpresa: successData.nomeEmpresa,
-            qrToken: successData.credencial?.qrToken || successData.qrToken,
-            // Normaliza o perfil para o modal
-            role: successData.role || successData.tipoCategoria?.toLowerCase()
-          }}
-        />
-      )}
-
-      {isErrorOpen && (
-        <ErrorModal
-          isOpen={isErrorOpen}
-          onClose={() => setIsErrorOpen(false)}
-          messages={errorMsg}
-        />
-      )}
+      <StatusModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        type={modalType}
+        messages={errorMsg}
+        userData={successData ? {
+          ...successData,
+          nomeCompleto: successData.nomeCompleto || successData.nome,
+          cidade: successData.cidade || successData.endereco?.cidade,
+          estado: successData.estado || successData.endereco?.estado,
+          nomeEmpresa: successData.nomeEmpresa,
+          qrToken: successData.credencial?.qrToken || successData.qrToken,
+          role: successData.role || successData.tipoCategoria?.toLowerCase()
+        } : undefined}
+      />
     </main>
   );
 }
