@@ -9,4 +9,6 @@ export interface IEndereco {
   pais: string;
   latitude?: number;
   longitude?: number;
+  createdAt: Date;
+  updatedAt: Date;
 }

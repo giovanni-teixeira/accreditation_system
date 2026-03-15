@@ -21,10 +21,10 @@ export class CriarCredenciadoDto {
   @IsNotEmpty({ message: 'O CPF é obrigatório' })
   cpf: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty({ message: 'O RG é obrigatório' })
-  rg: string;
+  rg?: string;
 
   @ApiProperty()
   @IsString()
@@ -99,4 +99,14 @@ export class CriarCredenciadoDto {
   @IsOptional()
   @IsString()
   siteEmpresa?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  nomePropriedade?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  nomeVeiculo?: string;
 }
