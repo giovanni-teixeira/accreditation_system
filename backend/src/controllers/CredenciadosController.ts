@@ -96,7 +96,9 @@ export class CredenciadosController {
           ccir: dto.ccir,
           nomeEmpresa: dto.nomeEmpresa,
           siteEmpresa: dto.siteEmpresa,
-          aceiteLgpd: true,
+          nomePropriedade: dto.nomePropriedade,
+          nomeVeiculo: dto.nomeVeiculo,
+          aceiteLgpd: dto.aceiteLgpd,
           tipoCategoria: tipoCategoria,
           evento: { connect: { id: evento.id } },
           endereco: {
