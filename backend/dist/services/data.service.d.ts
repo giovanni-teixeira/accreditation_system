@@ -4,6 +4,8 @@ export declare class DataService {
     constructor(prisma: PrismaService);
     listEventos(): Promise<{
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
         nomeEvento: string;
         isGratuito: boolean;
         localEvento: string | null;
@@ -21,11 +23,13 @@ export declare class DataService {
     listCredenciados(): Promise<({
         endereco: {
             id: string;
+            createdAt: Date;
+            updatedAt: Date;
             latitude: number | null;
             longitude: number | null;
-            cep: string;
-            rua: string;
-            bairro: string;
+            cep: string | null;
+            rua: string | null;
+            bairro: string | null;
             cidade: string;
             estado: string;
             pais: string;
@@ -33,6 +37,8 @@ export declare class DataService {
         } | null;
         descarbonizacao: {
             id: string;
+            createdAt: Date;
+            updatedAt: Date;
             distanciaIdaVoltaKm: number;
             tipoCombustivel: import(".prisma/client").$Enums.TipoCombustivel;
             latitudeOrigem: number | null;
@@ -42,36 +48,43 @@ export declare class DataService {
         } | null;
         credencial: {
             id: string;
+            createdAt: Date;
+            updatedAt: Date;
             ticketId: string;
             qrToken: string;
             downloads: number;
             printCount: number;
             status: string;
-            createdAt: Date;
             credenciadoId: string;
         } | null;
     } & {
         nomeCompleto: string;
         cpf: string;
-        rg: string;
+        rg: string | null;
         celular: string;
         email: string;
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
         eventoId: string;
         tipoCategoria: import(".prisma/client").$Enums.TipoCategoria;
         cnpj: string | null;
         ccir: string | null;
         nomeEmpresa: string | null;
         siteEmpresa: string | null;
+        nomePropriedade: string | null;
+        nomeVeiculo: string | null;
         aceiteLgpd: boolean;
     })[]>;
     listEnderecos(): Promise<{
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
         latitude: number | null;
         longitude: number | null;
-        cep: string;
-        rua: string;
-        bairro: string;
+        cep: string | null;
+        rua: string | null;
+        bairro: string | null;
         cidade: string;
         estado: string;
         pais: string;
@@ -79,6 +92,7 @@ export declare class DataService {
     }[]>;
     listEnderecoCache(): Promise<{
         id: string;
+        createdAt: Date;
         latitude: number | null;
         longitude: number | null;
         cep: string;
@@ -91,6 +105,8 @@ export declare class DataService {
     }[]>;
     listDescarbonizacao(): Promise<{
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
         distanciaIdaVoltaKm: number;
         tipoCombustivel: import(".prisma/client").$Enums.TipoCombustivel;
         latitudeOrigem: number | null;
@@ -100,18 +116,19 @@ export declare class DataService {
     }[]>;
     listCredenciais(): Promise<{
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
         ticketId: string;
         qrToken: string;
         downloads: number;
         printCount: number;
         status: string;
-        createdAt: Date;
         credenciadoId: string;
     }[]>;
     listQrScans(): Promise<{
         id: string;
-        ticketId: string;
         createdAt: Date;
+        ticketId: string;
         scannerId: string;
         scanType: string;
     }[]>;

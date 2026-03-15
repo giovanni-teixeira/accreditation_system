@@ -12,12 +12,16 @@ export interface ICredenciado {
     tipoCategoria: TipoCategoria;
     nomeCompleto: string;
     cpf: string;
-    rg: string;
+    rg?: string;
     celular: string;
     email: string;
     cnpj?: string;
     ccir?: string;
     nomeEmpresa?: string;
     siteEmpresa?: string;
+    nomePropriedade?: string;
+    nomeVeiculo?: string;
     aceiteLgpd: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }

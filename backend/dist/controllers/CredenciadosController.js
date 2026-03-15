@@ -42,7 +42,9 @@ let CredenciadosController = class CredenciadosController {
             if (existe)
                 throw new business_exception_1.BusinessException('Já existe um credenciado com este CPF informado.');
             const tokenDados = qrcode_util_1.QrCodeHelper.generateSignedToken(evento.id, evento.privateKey, dto.nomeCompleto);
-            const addressData = await this.addressService.getAddress(dto.cep, dto.pais || 'Brasil');
+            const addressData = dto.cep
+                ? await this.addressService.getAddress(dto.cep, dto.pais || 'Brasil')
+                : null;
             const latOrigem = addressData?.latitude || null;
             const lonOrigem = addressData?.longitude || null;
             let distanciaKm = 0;
@@ -62,14 +64,16 @@ let CredenciadosController = class CredenciadosController {
                 ccir: dto.ccir,
                 nomeEmpresa: dto.nomeEmpresa,
                 siteEmpresa: dto.siteEmpresa,
-                aceiteLgpd: true,
+                nomePropriedade: dto.nomePropriedade,
+                nomeVeiculo: dto.nomeVeiculo,
+                aceiteLgpd: dto.aceiteLgpd,
                 tipoCategoria: tipoCategoria,
                 evento: { connect: { id: evento.id } },
                 endereco: {
                     create: {
-                        cep: dto.cep,
-                        rua: dto.rua,
-                        bairro: dto.bairro,
+                        cep: dto.cep ?? null,
+                        rua: dto.rua ?? null,
+                        bairro: dto.bairro ?? null,
                         cidade: dto.cidade,
                         estado: dto.estado,
                         latitude: latOrigem,
@@ -79,11 +83,13 @@ let CredenciadosController = class CredenciadosController {
                 },
                 descarbonizacao: {
                     create: {
-                        distanciaIdaVoltaKm: distanciaKm * 2,
+                        distanciaIdaVoltaKm: dto.distanciaManualKm ? Number(dto.distanciaManualKm) * 2 : distanciaKm * 2,
                         tipoCombustivel: tipoCombustivel,
                         latitudeOrigem: latOrigem,
                         longitudeOrigem: lonOrigem,
-                        pegadaCo2: pegadaCo2,
+                        pegadaCo2: dto.distanciaManualKm
+                            ? calculation_helper_1.CalculationHelper.calculateCo2Footprint(Number(dto.distanciaManualKm), tipoCombustivel) * 2
+                            : pegadaCo2,
                     },
                 },
                 credencial: {

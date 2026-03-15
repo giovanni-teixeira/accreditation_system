@@ -1,0 +1,157 @@
+/* Unificação de StatusModal baseada no feedback do usuário. */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    animation: fadeIn 0.3s ease;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+}
+
+.statusModalContent {
+    background-color: #fff;
+    border-radius: 12px;
+    width: 95%;
+    max-width: 500px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.contentSuccess { border-top: 6px solid var(--modal-success); }
+.contentError { border-top: 6px solid var(--modal-error); }
+
+.statusHeader {
+    padding: 30px 24px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.headerSuccess { 
+    background-color: var(--modal-light-success); 
+    border-bottom: 1px solid var(--modal-border-success);
+}
+.headerError { 
+    background-color: var(--modal-light-error); 
+    border-bottom: 1px solid var(--modal-border-error);
+}
+
+.statusIcon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 32px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.iconSuccess { background-color: var(--modal-success); }
+.iconError { background-color: var(--modal-error); }
+
+.statusHeader h2 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.titleSuccess { color: var(--modal-dark-success); }
+.titleError { color: var(--modal-dark-error); }
+
+.statusBody {
+    padding: 24px;
+    background-color: #ffffff;
+}
+
+.errorList {
+    background-color: #fffaf9;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #ffd8d6;
+    color: #e74c3c;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.errorList li { margin-bottom: 10px; }
+.errorList li:last-child { margin-bottom: 0; }
+
+.yellowBanner {
+    background-color: #fff9db;
+    border: 1px solid #ffec99;
+    border-left: 5px solid #fcc419;
+    padding: 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #495057;
+    font-size: 1rem;
+}
+
+.yellowBanner strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #212529;
+}
+
+.modalActions {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btnPrimaryAction {
+    padding: 14px 24px;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex: 2;
+}
+
+.btnSuccessAction { background-color: var(--modal-success); }
+.btnSuccessAction:hover { background-color: var(--modal-dark-success); transform: translateY(-2px); }
+
+.btnErrorAction { background-color: var(--modal-error); width: 100%; }
+.btnErrorAction:hover { background-color: var(--modal-dark-error); }
+
+.btnSecondaryAction {
+    padding: 14px 24px;
+    background-color: #f1f3f5;
+    color: #495057;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    flex: 1;
+}
+
+.btnSecondaryAction:hover { background-color: #e9ecef; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }

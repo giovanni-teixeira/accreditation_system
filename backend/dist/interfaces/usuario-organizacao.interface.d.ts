@@ -8,4 +8,6 @@ export interface IUsuarioOrganizacao {
     senhaHash: string;
     perfilAcesso: PerfilAcesso;
     setor?: string;
+    createdAt: Date;
+    updatedAt: Date;
 }

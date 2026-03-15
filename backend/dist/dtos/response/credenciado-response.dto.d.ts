@@ -10,5 +10,7 @@ export declare class CredenciadoResponseDto {
     credencial?: any;
     descarbonizacao?: any;
     nomeEmpresa?: string;
+    nomePropriedade?: string;
+    nomeVeiculo?: string;
     constructor(partial: any);
 }

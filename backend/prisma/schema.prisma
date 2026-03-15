@@ -93,9 +93,9 @@ model Credenciado {
 model Endereco {
   id            String @id @db.VarChar(5) @default(dbgenerated("generate_short_id()"))
   credenciadoId String @unique @map("credenciado_id") @db.VarChar(5)
-  cep           String
-  rua           String
-  bairro        String
+  cep           String?
+  rua           String?
+  bairro        String?
   cidade        String
   estado        String
   pais          String @default("Brasil")

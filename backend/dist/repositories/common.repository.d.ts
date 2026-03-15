@@ -5,11 +5,13 @@ export declare class CommonRepository {
     constructor(prisma: PrismaService);
     createEndereco(data: Prisma.EnderecoCreateWithoutCredenciadoInput, credenciadoId: string): Promise<{
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
         latitude: number | null;
         longitude: number | null;
-        cep: string;
-        rua: string;
-        bairro: string;
+        cep: string | null;
+        rua: string | null;
+        bairro: string | null;
         cidade: string;
         estado: string;
         pais: string;
@@ -17,16 +19,19 @@ export declare class CommonRepository {
     }>;
     createCredencial(data: Prisma.CredencialCreateWithoutCredenciadoInput, credenciadoId: string): Promise<{
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
         ticketId: string;
         qrToken: string;
         downloads: number;
         printCount: number;
         status: string;
-        createdAt: Date;
         credenciadoId: string;
     }>;
     createDescarbonizacao(data: Prisma.DescarbonizacaoCreateWithoutCredenciadoInput, credenciadoId: string): Promise<{
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
         distanciaIdaVoltaKm: number;
         tipoCombustivel: import(".prisma/client").$Enums.TipoCombustivel;
         latitudeOrigem: number | null;

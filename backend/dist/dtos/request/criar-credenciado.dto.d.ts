@@ -2,12 +2,12 @@ import { TipoCombustivel, TipoCategoria } from '@prisma/client';
 export declare class CriarCredenciadoDto {
     nomeCompleto: string;
     cpf: string;
-    rg: string;
+    rg?: string;
     celular: string;
     email: string;
-    cep: string;
-    rua: string;
-    bairro: string;
+    cep?: string;
+    rua?: string;
+    bairro?: string;
     cidade: string;
     estado: string;
     pais: string;
@@ -18,4 +18,7 @@ export declare class CriarCredenciadoDto {
     ccir?: string;
     nomeEmpresa?: string;
     siteEmpresa?: string;
+    nomePropriedade?: string;
+    nomeVeiculo?: string;
+    distanciaManualKm?: number;
 }
