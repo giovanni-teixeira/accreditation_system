@@ -1,0 +1,56 @@
+.radioCard {
+    background-color: var(--white);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.radioCard:hover,
+.radioCard.selected {
+    border-color: #22c55e;
+    background-color: #0f3d2e;
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-4px);
+}
+
+.radioCard.selected .cardLabel {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.radioCard.selected .cardIcon {
+    transform: scale(1.1);
+}
+
+.hiddenRadio {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.cardIcon {
+    font-size: 1.875rem;
+    margin-bottom: 0.5rem;
+    transition: transform 0.2s ease;
+}
+
+.cardLabel {
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--text-main);
+}
+
+.disabledCard {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

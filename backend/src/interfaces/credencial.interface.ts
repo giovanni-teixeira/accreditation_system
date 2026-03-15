@@ -7,4 +7,5 @@ export interface ICredencial {
   downloads: number;
   printCount: number;
   createdAt: Date;
+  updatedAt: Date;
 }

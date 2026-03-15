@@ -32,7 +32,7 @@ enum TipoCombustivel {
 }
 
 model Evento {
-  id           String        @id @db.VarChar(6)
+  id           String        @id @db.VarChar(5) @default(dbgenerated("generate_short_id()"))
   nomeEvento   String        @unique @map("nome_evento")
   isGratuito   Boolean       @default(true) @map("is_gratuito")
   localEvento  String?       @map("local_evento")
@@ -40,35 +40,43 @@ model Evento {
   longitude    Float?        @map("longitude")
   privateKey   String?       @map("private_key")
   publicKey    String?       @map("public_key")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
   credenciados Credenciado[]
 
   @@map("evento")
 }
 
 model UsuarioOrganizacao {
-  id           String       @id @default(uuid()) @db.Uuid
+  id           String       @id @db.VarChar(5) @default(dbgenerated("generate_short_id()"))
   login        String       @unique
   senhaHash    String       @map("senha_hash")
   perfilAcesso PerfilAcesso @map("perfil_acesso")
   setor        String?      @map("setor")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
 
-  @@map("usuario_organizacao")
+  @@map("usuario_organização")
 }
 
 model Credenciado {
-  id            String        @id @default(uuid()) @db.Uuid
-  eventoId      String        @map("evento_id") @db.VarChar(6)
-  tipoCategoria TipoCategoria @map("tipo_categoria")
-  nomeCompleto  String        @map("nome_completo")
-  cpf           String        @unique
-  rg            String
-  celular       String
-  email         String
-  cnpj          String?
-  ccir          String?
-  nomeEmpresa   String?       @map("nome_empresa")
-  siteEmpresa   String?       @map("site_empresa")
-  aceiteLgpd    Boolean       @map("aceite_lgpd")
+  id              String        @id @db.VarChar(5) @default(dbgenerated("generate_short_id()"))
+  eventoId        String        @map("evento_id") @db.VarChar(5)
+  tipoCategoria   TipoCategoria @map("tipo_categoria")
+  nomeCompleto    String        @map("nome_completo")
+  cpf             String        @unique
+  rg              String?
+  celular         String
+  email           String
+  cnpj            String?
+  ccir            String?
+  nomeEmpresa     String?       @map("nome_empresa")
+  siteEmpresa     String?       @map("site_empresa")
+  nomePropriedade String?       @map("nome_propriedade")
+  nomeVeiculo     String?       @map("nome_veiculo")
+  aceiteLgpd      Boolean       @map("aceite_lgpd")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
 
   evento          Evento           @relation(fields: [eventoId], references: [id], onDelete: Restrict)
   endereco        Endereco?
@@ -83,16 +91,18 @@ model Credenciado {
 }
 
 model Endereco {
-  id            String @id @default(uuid()) @db.Uuid
-  credenciadoId String @unique @map("credenciado_id") @db.Uuid
-  cep           String
-  rua           String
-  bairro        String
+  id            String @id @db.VarChar(5) @default(dbgenerated("generate_short_id()"))
+  credenciadoId String @unique @map("credenciado_id") @db.VarChar(5)
+  cep           String?
+  rua           String?
+  bairro        String?
   cidade        String
   estado        String
   pais          String @default("Brasil")
   latitude      Float?
   longitude     Float?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   credenciado Credenciado @relation(fields: [credenciadoId], references: [id], onDelete: Cascade)
 
@@ -100,7 +110,7 @@ model Endereco {
 }
 
 model EnderecoCache {
-  id         String   @id @default(uuid()) @db.Uuid
+  id         String   @id @db.VarChar(5) @default(dbgenerated("generate_short_id()"))
   cep        String   @unique
   pais       String   @default("Brasil")
   rua        String
@@ -110,18 +120,21 @@ model EnderecoCache {
   latitude   Float?
   longitude  Float?
   atualizado DateTime @default(now()) @updatedAt
+  createdAt  DateTime @default(now()) @map("created_at")
 
   @@map("endereco_cache")
 }
 
 model Descarbonizacao {
-  id                  String          @id @default(uuid()) @db.Uuid
-  credenciadoId       String          @unique @map("credenciado_id") @db.Uuid
+  id                  String          @id @db.VarChar(5) @default(dbgenerated("generate_short_id()"))
+  credenciadoId       String          @unique @map("credenciado_id") @db.VarChar(5)
   distanciaIdaVoltaKm Float           @map("distancia_ida_volta_km")
   tipoCombustivel     TipoCombustivel @map("tipo_combustivel")
   latitudeOrigem      Float?          @map("latitude_origem")
   longitudeOrigem     Float?          @map("longitude_origem")
   pegadaCo2           Float?          @map("pegada_co2_kg")
+  createdAt           DateTime        @default(now()) @map("created_at")
+  updatedAt           DateTime        @updatedAt @map("updated_at")
 
   credenciado Credenciado @relation(fields: [credenciadoId], references: [id], onDelete: Cascade)
 
@@ -129,14 +142,15 @@ model Descarbonizacao {
 }
 
 model Credencial {
-  id            String   @id @default(uuid()) @db.Uuid
-  credenciadoId String   @unique @map("credenciado_id") @db.Uuid
+  id            String   @id @db.VarChar(5) @default(dbgenerated("generate_short_id()"))
+  credenciadoId String   @unique @map("credenciado_id") @db.VarChar(5)
   ticketId      String   @unique @map("ticket_id")
   qrToken       String   @map("qr_token") @db.Text
   downloads     Int      @default(0)
   printCount    Int      @default(0) @map("print_count")
   status        String   @default("ACTIVE")
   createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   credenciado Credenciado @relation(fields: [credenciadoId], references: [id], onDelete: Cascade)
   scans       QrScan[]
@@ -146,7 +160,7 @@ model Credencial {
 }
 
 model QrScan {
-  id        String   @id @default(uuid()) @db.Uuid
+  id        String   @id @db.VarChar(5) @default(dbgenerated("generate_short_id()"))
   ticketId  String   @map("ticket_id")
   scannerId String   @map("scanner_id")
   scanType  String   @map("scan_type")

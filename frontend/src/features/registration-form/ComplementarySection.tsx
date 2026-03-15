@@ -1,0 +1,115 @@
+import { ChangeEvent, RefObject } from 'react';
+import styles from './FormCadastro.module.css';
+import { InputGroup } from '@/components/ui/InputGroup';
+
+interface ComplementarySectionProps {
+    role: string;
+    formData: any;
+    handleInputChange: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+    formDisabled: boolean;
+    cnpjInputRef: RefObject<HTMLInputElement | null>;
+    ccirInputRef: RefObject<HTMLInputElement | null>;
+}
+
+export function ComplementarySection({
+    role,
+    formData,
+    handleInputChange,
+    formDisabled,
+    cnpjInputRef,
+    ccirInputRef
+}: ComplementarySectionProps) {
+    if (!['expositor', 'produtor', 'imprensa'].includes(role)) return null;
+
+    return (
+        <div>
+            <h3 className={styles.sectionTitle}>4. Informações Complementares ({role.toUpperCase()})</h3>
+            <div className={styles.inputGrid}>
+                {role === 'expositor' && (
+                    <>
+                        <InputGroup
+                            label="CNPJ da Empresa"
+                            name="cnpj"
+                            value={formData.cnpj}
+                            onChange={handleInputChange}
+                            placeholder="00.000.000/0000-00"
+                            required
+                            disabled={formDisabled}
+                            ref={cnpjInputRef}
+                        />
+                        <InputGroup
+                            label="Nome da Empresa"
+                            name="nomeEmpresa"
+                            value={formData.nomeEmpresa}
+                            onChange={handleInputChange}
+                            placeholder="Nome Fantasia"
+                            required
+                            disabled={formDisabled}
+                        />
+                        <InputGroup
+                            label="Site / Instagram"
+                            name="siteEmpresa"
+                            value={formData.siteEmpresa}
+                            onChange={handleInputChange}
+                            placeholder="www.empresa.com.br (Opcional)"
+                            disabled={formDisabled}
+                        />
+                    </>
+                )}
+
+                {role === 'produtor' && (
+                    <>
+                        <InputGroup
+                            label="CCIR (Incra)"
+                            name="ccir"
+                            value={formData.ccir}
+                            onChange={handleInputChange}
+                            placeholder="Número do CCIR (Opcional)"
+                            disabled={formDisabled}
+                            ref={ccirInputRef}
+                        />
+                        <InputGroup
+                            label="Nome da Propriedade"
+                            name="nomePropriedade"
+                            value={formData.nomePropriedade}
+                            onChange={handleInputChange}
+                            placeholder="Ex: Fazenda Bela Vista"
+                            required
+                            disabled={formDisabled}
+                        />
+                        <InputGroup
+                            label="Veículo Utilizado"
+                            name="nomeVeiculo"
+                            value={formData.nomeVeiculo}
+                            onChange={handleInputChange}
+                            placeholder="Ex: Toyota Hilux"
+                            disabled={formDisabled}
+                        />
+                    </>
+                )}
+
+                {role === 'imprensa' && (
+                    <>
+                        <InputGroup
+                            label="Veículo de Imprensa"
+                            name="nomeEmpresa"
+                            value={formData.nomeEmpresa}
+                            onChange={handleInputChange}
+                            placeholder="Nome do Jornal / Portal"
+                            required
+                            disabled={formDisabled}
+                        />
+                        <InputGroup
+                            label="Página / Rede Social"
+                            name="siteEmpresa"
+                            value={formData.siteEmpresa}
+                            onChange={handleInputChange}
+                            placeholder="link da página (Opcional)"
+                            disabled={formDisabled}
+                        />
+                    </>
+                )}
+            </div>
+        </div>
+    );
+}

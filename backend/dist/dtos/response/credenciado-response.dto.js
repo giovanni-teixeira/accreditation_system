@@ -12,6 +12,8 @@ class CredenciadoResponseDto {
     credencial;
     descarbonizacao;
     nomeEmpresa;
+    nomePropriedade;
+    nomeVeiculo;
     constructor(partial) {
         this.id = partial.id;
         this.nomeCompleto = partial.nomeCompleto;
@@ -20,6 +22,8 @@ class CredenciadoResponseDto {
         this.tipoCategoria = partial.tipoCategoria;
         this.tipoCombustivel = partial.tipoCombustivel;
         this.nomeEmpresa = partial.nomeEmpresa;
+        this.nomePropriedade = partial.nomePropriedade;
+        this.nomeVeiculo = partial.nomeVeiculo;
         this.endereco = partial.endereco;
         this.descarbonizacao = partial.descarbonizacao;
         this.credencial = partial.credencial

@@ -32,6 +32,9 @@ class CriarCredenciadoDto {
     ccir;
     nomeEmpresa;
     siteEmpresa;
+    nomePropriedade;
+    nomeVeiculo;
+    distanciaManualKm;
 }
 exports.CriarCredenciadoDto = CriarCredenciadoDto;
 __decorate([
@@ -47,9 +50,9 @@ __decorate([
     __metadata("design:type", String)
 ], CriarCredenciadoDto.prototype, "cpf", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)({ message: 'O RG é obrigatório' }),
     __metadata("design:type", String)
 ], CriarCredenciadoDto.prototype, "rg", void 0);
 __decorate([
@@ -65,21 +68,21 @@ __decorate([
     __metadata("design:type", String)
 ], CriarCredenciadoDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)({ message: 'O CEP é obrigatório' }),
     __metadata("design:type", String)
 ], CriarCredenciadoDto.prototype, "cep", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)({ message: 'A rua é obrigatória' }),
     __metadata("design:type", String)
 ], CriarCredenciadoDto.prototype, "rua", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)({ message: 'O bairro é obrigatório' }),
     __metadata("design:type", String)
 ], CriarCredenciadoDto.prototype, "bairro", void 0);
 __decorate([
@@ -141,4 +144,22 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CriarCredenciadoDto.prototype, "siteEmpresa", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CriarCredenciadoDto.prototype, "nomePropriedade", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CriarCredenciadoDto.prototype, "nomeVeiculo", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], CriarCredenciadoDto.prototype, "distanciaManualKm", void 0);
 //# sourceMappingURL=criar-credenciado.dto.js.map

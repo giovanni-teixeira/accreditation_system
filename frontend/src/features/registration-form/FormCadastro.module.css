@@ -1,0 +1,229 @@
+/* Styles specific to the Registration Form Feature baseada no feedback do usuário. */
+
+.formContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.sectionTitle {
+    color: var(--coffee-brown);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.roleSelection {
+    margin-bottom: 0.5rem;
+}
+
+.inputGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+    .inputGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.inputGroup label,
+.inputGroupFull label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--light-brown);
+}
+
+.inputGroup input,
+.inputGroup select,
+.inputGroupFull input,
+.inputGroupFull select {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background-color: var(--bg-color);
+    color: var(--coffee-brown);
+    width: 100%;
+}
+
+.inputGroup input:focus,
+.inputGroup select:focus,
+.inputGroupFull input:focus,
+.inputGroupFull select:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
+}
+
+.inputGroupFull {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+@media (min-width: 768px) {
+    .inputGroupFull {
+        grid-column: span 2;
+    }
+}
+
+.inputHint {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+}
+
+.radioGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .radioGrid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.lgpdSection {
+    margin-top: 2rem;
+    background-color: var(--bg-color);
+    padding: 1.25rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--coffee-brown);
+    transition: all 0.3s ease;
+}
+
+.lgpdError {
+    border-left-color: #e74c3c;
+    background-color: rgba(231, 76, 60, 0.05);
+}
+
+.checkboxLabel {
+    display: flex;
+    position: relative;
+    padding-left: 2.2rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    align-items: center;
+    line-height: 1.4;
+    min-height: 24px;
+}
+
+.checkboxLabel input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.lgpdLink {
+    color: var(--coffee-brown);
+    text-decoration: underline;
+    font-weight: 600;
+    margin-left: 0.3rem;
+}
+
+.checkmark {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: var(--white);
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.checkboxLabel input:checked~.checkmark {
+    background-color: var(--primary-green);
+    border-color: var(--primary-green);
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.checkboxLabel input:checked~.checkmark:after {
+    display: block;
+}
+
+.submitBtn {
+    background-color: var(--primary-green);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1rem;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.submitBtn:hover {
+    background-color: var(--dark-green);
+    transform: translateY(-2px);
+}
+
+/* Address Field Actions baseada no feedback do usuário. */
+.labelWithAction {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.inlineCheckbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--dark-green);
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.inlineCheckbox input {
+    width: 16px !important;
+    height: 16px !important;
+    cursor: pointer;
+    accent-color: var(--primary-green);
+}
+
+.dynamicFormAnimation {
+    animation: slideDown 0.4s ease-out forwards;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

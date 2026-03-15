@@ -1,25 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary-green: #2ecc71;
-  --dark-green: #27ae60;
-  --light-green: #e9f7ef;
-  --coffee-brown: #4e342e;
-  --light-brown: #795548;
-  --dark-brown: #894c29;
-  --bg-color: #fcfcfc;
-  --text-main: #894c29;
-  --text-muted: #616161;
-  --border-color: #e0e0e0;
-  --white: #5b5555;
-  --error: #e74c3c;
-
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-
-  --transition-fast: 0.2s ease;
-  --transition-normal: 0.3s ease;
+  /* Variáveis globais movidas para src/styles/variables.css baseada no feedback do usuário. */
 }
 
 * {
@@ -52,12 +34,7 @@ textarea {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-color: #fcfbfb;
-    --text-main: #894c29;
-    --text-muted: #aaaaaa;
-    --border-color: #333333;
-    --light-green: #1e3a29;
-    --white: #ffffff;
+    /* Sobrescritas de modo escuro desabilitadas para manter fidelidade ao tema baseada no feedback do usuário. */
   }
 }
 

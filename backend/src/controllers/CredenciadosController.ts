@@ -50,10 +50,9 @@ export class CredenciadosController {
       );
 
       // 4. Buscar Localização (Geo) do Credenciado e do Evento
-      const addressData = await this.addressService.getAddress(
-        dto.cep,
-        dto.pais || 'Brasil',
-      );
+      const addressData = dto.cep 
+        ? await this.addressService.getAddress(dto.cep, dto.pais || 'Brasil')
+        : null;
 
       const latOrigem = addressData?.latitude || null;
       const lonOrigem = addressData?.longitude || null;
@@ -96,14 +95,16 @@ export class CredenciadosController {
           ccir: dto.ccir,
           nomeEmpresa: dto.nomeEmpresa,
           siteEmpresa: dto.siteEmpresa,
-          aceiteLgpd: true,
+          nomePropriedade: dto.nomePropriedade,
+          nomeVeiculo: dto.nomeVeiculo,
+          aceiteLgpd: dto.aceiteLgpd,
           tipoCategoria: tipoCategoria,
           evento: { connect: { id: evento.id } },
           endereco: {
             create: {
-              cep: dto.cep,
-              rua: dto.rua,
-              bairro: dto.bairro,
+              cep: dto.cep ?? null,
+              rua: dto.rua ?? null,
+              bairro: dto.bairro ?? null,
               cidade: dto.cidade,
               estado: dto.estado,
               latitude: latOrigem,
@@ -113,11 +114,13 @@ export class CredenciadosController {
           },
           descarbonizacao: {
             create: {
-              distanciaIdaVoltaKm: distanciaKm * 2,
+              distanciaIdaVoltaKm: dto.distanciaManualKm ? Number(dto.distanciaManualKm) * 2 : distanciaKm * 2,
               tipoCombustivel: tipoCombustivel,
               latitudeOrigem: latOrigem,
               longitudeOrigem: lonOrigem,
-              pegadaCo2: pegadaCo2,
+              pegadaCo2: dto.distanciaManualKm 
+                ? CalculationHelper.calculateCo2Footprint(Number(dto.distanciaManualKm), tipoCombustivel) * 2 
+                : pegadaCo2,
             },
           },
           credencial: {

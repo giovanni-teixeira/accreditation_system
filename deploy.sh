@@ -39,6 +39,8 @@ docker compose up -d --build
 
 # 3.5 Sincronizando Banco de Dados (Migrações)
 echo "🗄️ 3.5 Estruturando e Sincronizando o Banco de Dados com Prisma..."
+# Criar a função generate_short_id() se não existir baseada no feedback do usuário.
+docker exec -i postgres_db psql -U postgres -d alta_cafe < backend/prisma/init_functions.sql
 docker exec backend_api npx prisma db push
 
 # 4. Limpeza de Imagens Órfãs

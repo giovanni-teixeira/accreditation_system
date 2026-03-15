@@ -10,6 +10,7 @@ services:
       POSTGRES_DB: alta_cafe
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./backend/prisma/init_functions.sql:/docker-entrypoint-initdb.d/init_functions.sql
     ports:
       # [LOCAL] Use 5433 para não conflitar com Postgres local
       # [VPS] Altere para "5432:5432" ou remova se for usar acesso do host

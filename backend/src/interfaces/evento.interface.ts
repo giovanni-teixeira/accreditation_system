@@ -7,4 +7,6 @@ export interface IEvento {
   longitude?: number;
   privateKey?: string;
   publicKey?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

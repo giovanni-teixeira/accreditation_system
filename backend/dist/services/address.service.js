@@ -48,6 +48,10 @@ let AddressService = AddressService_1 = class AddressService {
         let addressData = null;
         if (country.toLowerCase() === 'brasil' || country.toUpperCase() === 'BR') {
             addressData = await this.tryBrazilianApis(cleanCep);
+            if (!addressData) {
+                this.logger.log(`APIs Brasileiras falharam. Tentando Zippopotam.us para BR: ${cleanCep}`);
+                addressData = await this.tryInternationalApi(cleanCep, 'BR');
+            }
         }
         else {
             addressData = await this.tryInternationalApi(cep, country);
@@ -183,29 +187,92 @@ let AddressService = AddressService_1 = class AddressService {
         }
         return null;
     }
-    async tryInternationalApi(cep, country) {
-        const apiKey = this.configService.get('ZIPCODE_API_KEY');
+    async tryZipBase(cep, country) {
+        const apiKey = this.configService.get('ZIPBASE_API_KEY');
         if (!apiKey)
             return null;
         try {
-            this.logger.log(`Consultando Zipcodebase: ${cep}, ${country}`);
-            const response = await fetch(`https://app.zipcodebase.com/api/v1/search?apikey=${apiKey}&codes=${cep}&country=${country}`);
+            this.logger.log(`Consultando ZipBase.io: ${cep}, ${country}`);
+            const response = await fetch(`https://zipbase.io/api/v1/lookup?postalCode=${cep}&country=${country}`, {
+                headers: { 'X-API-Key': apiKey },
+            });
             const data = await response.json();
-            const result = data.results?.[cep]?.[0];
-            if (result) {
+            if (response.ok && data) {
                 return {
                     cep,
-                    rua: result.line_1 || '',
-                    bairro: result.province_sub || '',
-                    cidade: result.city || '',
-                    estado: result.province || '',
-                    latitude: result.latitude ? parseFloat(result.latitude) : null,
-                    longitude: result.longitude ? parseFloat(result.longitude) : null,
+                    rua: data.address || '',
+                    bairro: data.neighborhood || '',
+                    cidade: data.city || '',
+                    estado: data.state || '',
+                    latitude: data.latitude ? parseFloat(data.latitude) : null,
+                    longitude: data.longitude ? parseFloat(data.longitude) : null,
                 };
             }
         }
         catch (e) {
-            this.logger.error(`Falha no Zipcodebase: ${e.message}`);
+            this.logger.error(`Falha no ZipBase.io: ${e.message}`);
+        }
+        return null;
+    }
+    async tryGeonames(cep, country) {
+        const username = this.configService.get('GEONAMES_USERNAME') || 'demo';
+        try {
+            this.logger.log(`Consultando Geonames: ${cep}, ${country}`);
+            const response = await fetch(`http://api.geonames.org/postalCodeLookupJSON?postalcode=${cep}&country=${country}&username=${username}`);
+            const data = await response.json();
+            if (data && data.postalcodes && data.postalcodes.length > 0) {
+                const place = data.postalcodes[0];
+                return {
+                    cep,
+                    rua: '',
+                    bairro: '',
+                    cidade: place.placeName || '',
+                    estado: place.adminName1 || '',
+                    latitude: place.lat ? parseFloat(place.lat) : null,
+                    longitude: place.lng ? parseFloat(place.lng) : null,
+                };
+            }
+        }
+        catch (e) {
+            this.logger.error(`Falha no Geonames: ${e.message}`);
+        }
+        return null;
+    }
+    async tryInternationalApi(cep, country) {
+        let address = await this.tryZippopotamus(cep, country);
+        if (address)
+            return address;
+        address = await this.tryZipBase(cep, country);
+        if (address)
+            return address;
+        address = await this.tryGeonames(cep, country);
+        if (address)
+            return address;
+        return null;
+    }
+    async tryZippopotamus(cep, country) {
+        try {
+            this.logger.log(`Consultando Zippopotam.us: ${cep}, ${country}`);
+            const countryCode = country.length === 2
+                ? country.toLowerCase()
+                : country.substring(0, 2).toLowerCase();
+            const response = await fetch(`http://api.zippopotam.us/${countryCode}/${cep}`);
+            const data = await response.json();
+            if (response.ok && data.places && data.places.length > 0) {
+                const place = data.places[0];
+                return {
+                    cep,
+                    rua: '',
+                    bairro: '',
+                    cidade: place['place name'] || '',
+                    estado: place['state abbreviation'] || place['state'] || '',
+                    latitude: place.latitude ? parseFloat(place.latitude) : null,
+                    longitude: place.longitude ? parseFloat(place.longitude) : null,
+                };
+            }
+        }
+        catch (e) {
+            this.logger.error(`Falha no Zippopotam.us: ${e.message}`);
         }
         return null;
     }

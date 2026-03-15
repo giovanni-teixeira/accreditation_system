@@ -13,4 +13,6 @@ export interface IDescarbonizacao {
   latitudeOrigem?: number;
   longitudeOrigem?: number;
   pegadaCo2?: number;
+  createdAt: Date;
+  updatedAt: Date;
 }

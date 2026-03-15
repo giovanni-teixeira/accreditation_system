@@ -21,6 +21,8 @@ const common_repository_1 = require("./repositories/common.repository");
 const address_repository_1 = require("./repositories/address.repository");
 const address_service_1 = require("./services/address.service");
 const AddressController_1 = require("./controllers/AddressController");
+const data_service_1 = require("./services/data.service");
+const DataController_1 = require("./controllers/DataController");
 const jwt_strategy_1 = require("./controllers/guards/jwt.strategy");
 let AppModule = class AppModule {
 };
@@ -35,7 +37,7 @@ exports.AppModule = AppModule = __decorate([
                 signOptions: { expiresIn: '24h' },
             }),
         ],
-        controllers: [AuthController_1.AuthController, CredenciadosController_1.CredenciadosController, AddressController_1.AddressController],
+        controllers: [AuthController_1.AuthController, CredenciadosController_1.CredenciadosController, AddressController_1.AddressController, DataController_1.DataController],
         providers: [
             prisma_service_1.PrismaService,
             usuario_repository_1.UsuarioRepository,
@@ -44,6 +46,7 @@ exports.AppModule = AppModule = __decorate([
             common_repository_1.CommonRepository,
             address_repository_1.AddressRepository,
             address_service_1.AddressService,
+            data_service_1.DataService,
             jwt_strategy_1.JwtStrategy,
         ],
     })

@@ -16,7 +16,7 @@ export async function cadastrarUsuario(formData: any): Promise<CadastroResponse>
         const { role, ...dados } = formData;
         let novoUsuario: Credenciado;
 
-        // Instancia o modelo correto baseado no tipo de usuário 
+
         switch (role) {
             case 'expositor':
                 novoUsuario = new Expositor(dados as any);
@@ -36,7 +36,7 @@ export async function cadastrarUsuario(formData: any): Promise<CadastroResponse>
                 break;
         }
 
-        // Regra de validação de domínio do frontend
+
         novoUsuario.validar();
 
 
@@ -45,7 +45,7 @@ export async function cadastrarUsuario(formData: any): Promise<CadastroResponse>
             throw new Error('Perfil inválido no sistema.');
         }
 
-        // Requisição delegada ao Serviço de Credenciados
+
         const usuarioCriado = await CredenciadoService.cadastrar(role, dados);
 
         return {
@@ -65,7 +65,7 @@ export async function cadastrarUsuario(formData: any): Promise<CadastroResponse>
 
 export async function buscarPorCpf(cpf: string): Promise<CadastroResponse> {
     try {
-        const cleanCpf = cpf.replace(/\D/g, '');
+        const cleanCpf = cpf.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
         const data = await CredenciadoService.buscarPorCpf(cleanCpf);
 
         return {

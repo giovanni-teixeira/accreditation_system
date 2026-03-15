@@ -1,4 +1,5 @@
 import './globals.css'
+import '../styles/variables.css'
 
 export const metadata = {
   title: 'Cadastro - Alta Café',

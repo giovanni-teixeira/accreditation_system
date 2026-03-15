@@ -6,6 +6,7 @@ import {
   Length,
   IsEnum,
   IsOptional,
+  IsNumber,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { TipoCombustivel, TipoCategoria } from '@prisma/client';
@@ -21,10 +22,10 @@ export class CriarCredenciadoDto {
   @IsNotEmpty({ message: 'O CPF é obrigatório' })
   cpf: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty({ message: 'O RG é obrigatório' })
-  rg: string;
+  rg?: string;
 
   @ApiProperty()
   @IsString()
@@ -36,20 +37,20 @@ export class CriarCredenciadoDto {
   @IsNotEmpty({ message: 'O e-mail é obrigatório' })
   email: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty({ message: 'O CEP é obrigatório' })
-  cep: string;
+  cep?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty({ message: 'A rua é obrigatória' })
-  rua: string;
+  rua?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty({ message: 'O bairro é obrigatório' })
-  bairro: string;
+  bairro?: string;
 
   @ApiProperty()
   @IsString()
@@ -99,4 +100,19 @@ export class CriarCredenciadoDto {
   @IsOptional()
   @IsString()
   siteEmpresa?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  nomePropriedade?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  nomeVeiculo?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumber()
+  distanciaManualKm?: number;
 }
