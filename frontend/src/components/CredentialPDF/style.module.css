@@ -36,10 +36,11 @@
     max-height: 30mm; /* Convertido de 102px para mm para consistência */
     width: auto;
     display: block;
+    margin-bottom: 5mm;
 }
 
 .nomeUsuario {
-    font-size: 19pt; /* Aumento leve para peso visual */
+    font-size: 19pt;
     font-weight: bold;
     text-transform: uppercase;
     text-align: center;
@@ -55,15 +56,15 @@
     font-size: 13pt;
     text-align: center;
     line-height: 1.2;
-    margin-top: 6mm; /* Aumentado espaçamento entre nome e empresa */
+    margin-top: 3mm; /* Aumentado espaçamento entre nome e empresa */
 }
 
 .qrContainer {
     display: flex;
     justify-content: center;
     align-items: center; /* Garante centralização vertical se houver espaço */
-    margin-top: 8mm; /* Desce o QR Code ainda mais */
-    margin-bottom: 5mm;
+    margin-top: 3mm; /* Desce o QR Code ainda mais */
+    margin-bottom: 2mm;
 }
 
 .qrCode {

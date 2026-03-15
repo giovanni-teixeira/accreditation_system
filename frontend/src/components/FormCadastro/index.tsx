@@ -47,15 +47,15 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
     const [isPending, startTransition] = useTransition();
     const [cepLocked, setCepLocked] = useState({ rua: false, bairro: false, cidade: false, estado: false });
 
-    // State para Busca de País
+
     const [countrySearch, setCountrySearch] = useState('Brasil');
     const [showCountries, setShowCountries] = useState(false);
     const countryContainerRef = useRef<HTMLDivElement>(null);
 
-    // Controle de Erros de Validação baseada no feedback do usuário.
+
     const [errors, setErrors] = useState<{ cpf?: string; cnpj?: string }>({});
 
-    // Bloqueia se estiver pendente (enviando) ou se o pai solicitar (modal aberto)
+
     const formDisabled = isPending || isBlocked;
 
 
@@ -95,12 +95,12 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
         }
     }, [role]);
 
-    // Fechar dropdown ao clicar fora
+
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (countryContainerRef.current && !countryContainerRef.current.contains(event.target as Node)) {
                 setShowCountries(false);
-                // Reverte para o país selecionado oficialmente se a busca for inválida baseada no feedback do usuário.
+
                 setCountrySearch(formData.pais);
             }
         }
@@ -118,7 +118,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
         try {
             const res = await fetch(API_ROUTES.ADDRESS.BUSCAR(zipCode, formData.pais));
             if (!res.ok) throw new Error('Não encontrado');
-            
+
             const data = await res.json();
 
             setFormData(prev => ({
@@ -128,7 +128,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                 cidade: data.cidade || '',
                 estado: data.estado || ''
             }));
-            
+
             setCepLocked({
                 rua: !!data.rua,
                 bairro: !!data.bairro,
@@ -168,8 +168,8 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
         let finalValue = value;
 
         if (name === 'cep') {
-            finalValue = formData.pais === 'Brasil' 
-                ? MaskUtils.cep(value) 
+            finalValue = formData.pais === 'Brasil'
+                ? MaskUtils.cep(value)
                 : value.replace(/[^a-zA-Z0-9\s-]/g, '').toUpperCase();
         } else if (name === 'cpf') {
             finalValue = formData.pais === 'Brasil' ? MaskUtils.cpf(value) : value.toUpperCase();
@@ -192,7 +192,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
             setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
         }
 
-        // Limpa erro ao digitar baseada no feedback do usuário.
+
         if (name === 'cpf' || name === 'cnpj') {
             setErrors(prev => ({ ...prev, [name]: undefined }));
         }
@@ -215,31 +215,30 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
 
     const handleCountrySelect = (countryName: string) => {
         const isBrasil = countryName === 'Brasil';
-        
+
         setFormData(prev => {
             const nextData = { ...prev, pais: countryName, cep: '' };
-            
-            // Se mudou para Brasil, tenta aplicar máscaras nos documentos existentes baseada no feedback do usuário.
+
+
             if (isBrasil) {
                 if (nextData.cpf) nextData.cpf = MaskUtils.cpf(nextData.cpf);
                 if (nextData.cnpj) nextData.cnpj = MaskUtils.cnpj(nextData.cnpj);
                 if (nextData.celular) nextData.celular = MaskUtils.celular(nextData.celular);
             }
-            
-            // Limpa campos de endereço ao mudar de país para evitar confusão de CEPs baseada no feedback do usuário.
+
             return {
                 ...nextData,
                 rua: '', bairro: '', cidade: '', estado: ''
             };
         });
 
-        setErrors({}); // Limpa erros de validação do país anterior
+        setErrors({});
         setCountrySearch(countryName);
         setShowCountries(false);
         setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
     };
 
-    const filteredCountries = COUNTRIES.filter(c => 
+    const filteredCountries = COUNTRIES.filter(c =>
         c.name.toLowerCase().includes(countrySearch.toLowerCase())
     );
 
@@ -268,7 +267,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                 onResult({ sucesso: false, mensagem: 'O CPF informado é inválido. Por favor, verifique.' });
                 return;
             }
-            
+
             // CNPJ obrigatório para Expositores e Imprensa Brasileiros baseada no feedback do usuário.
             if (role === 'expositor' || role === 'imprensa') {
                 if (!formData.cnpj || !Validador.validarCNPJ(formData.cnpj)) {
@@ -352,10 +351,10 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                 <div className={styles.inputGroup}>
                                     <label>País</label>
                                     <div className={styles.countrySearchContainer} ref={countryContainerRef}>
-                                        <input 
-                                            type="text" 
-                                            placeholder="Busque o seu país..." 
-                                            value={countrySearch} 
+                                        <input
+                                            type="text"
+                                            placeholder="Busque o seu país..."
+                                            value={countrySearch}
                                             onChange={(e) => {
                                                 setCountrySearch(e.target.value);
                                                 setShowCountries(true);
@@ -367,8 +366,8 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                             <div className={styles.countriesDropdown}>
                                                 {filteredCountries.length > 0 ? (
                                                     filteredCountries.map(c => (
-                                                        <div 
-                                                            key={c.code} 
+                                                        <div
+                                                            key={c.code}
                                                             className={styles.countryOption}
                                                             onClick={() => handleCountrySelect(c.name)}
                                                         >
@@ -386,14 +385,14 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
 
                                 <div className={styles.inputGroup}>
                                     <label>{formData.pais === 'Brasil' ? 'CPF' : 'Documento de Identificação'}</label>
-                                    <input 
-                                        type="text" 
-                                        name="cpf" 
-                                        value={formData.cpf} 
-                                        onChange={handleInputChange} 
+                                    <input
+                                        type="text"
+                                        name="cpf"
+                                        value={formData.cpf}
+                                        onChange={handleInputChange}
                                         onBlur={handleBlur}
                                         placeholder={formData.pais === 'Brasil' ? "000.000.000-00" : "Passaporte ou ID"}
-                                        required 
+                                        required
                                     />
                                     {errors.cpf && <span className={styles.validationError}>{errors.cpf}</span>}
                                 </div>
@@ -418,16 +417,16 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                             <div className={styles.inputGrid}>
                                 <div className={styles.inputGroup}>
                                     <label>{formData.pais === 'Brasil' ? 'CEP' : 'ZIP / Postcode'}</label>
-                                    <input 
-                                        type="text" 
-                                        name="cep" 
-                                        value={formData.cep} 
-                                        onChange={handleInputChange} 
+                                    <input
+                                        type="text"
+                                        name="cep"
+                                        value={formData.cep}
+                                        onChange={handleInputChange}
                                         onBlur={handleCepBlur}
                                         onKeyDown={handleCepKeyDown}
-                                        maxLength={ formData.pais === 'Brasil' ? 9 : 15} 
+                                        maxLength={ formData.pais === 'Brasil' ? 9 : 15}
                                         placeholder={formData.pais === 'Brasil' ? "00000-000" : "Postal Code"}
-                                        required 
+                                        required
                                     />
                                 </div>
 
@@ -473,15 +472,15 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                             <>
                                                 <div className={styles.inputGroup}>
                                                     <label>{formData.pais === 'Brasil' ? 'CNPJ' : 'Tax ID / Business Registration'}</label>
-                                                    <input 
-                                                        ref={cnpjInputRef} 
-                                                        type="text" 
-                                                        name="cnpj" 
-                                                        value={formData.cnpj} 
-                                                        onChange={handleInputChange} 
+                                                    <input
+                                                        ref={cnpjInputRef}
+                                                        type="text"
+                                                        name="cnpj"
+                                                        value={formData.cnpj}
+                                                        onChange={handleInputChange}
                                                         onBlur={handleBlur}
                                                         placeholder={formData.pais === 'Brasil' ? "00.000.000/0000-00" : "Opcional"}
-                                                        required={formData.pais === 'Brasil'} 
+                                                        required={formData.pais === 'Brasil'}
                                                     />
                                                     {errors.cnpj && <span className={styles.validationError}>{errors.cnpj}</span>}
                                                 </div>
@@ -513,15 +512,15 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                             <>
                                                 <div className={styles.inputGroup}>
                                                     <label>CNPJ</label>
-                                                    <input 
-                                                        ref={cnpjInputRef} 
-                                                        type="text" 
-                                                        name="cnpj" 
-                                                        value={formData.cnpj} 
-                                                        onChange={handleInputChange} 
+                                                    <input
+                                                        ref={cnpjInputRef}
+                                                        type="text"
+                                                        name="cnpj"
+                                                        value={formData.cnpj}
+                                                        onChange={handleInputChange}
                                                         onBlur={handleBlur}
                                                         placeholder={formData.pais === 'Brasil' ? "00.000.000/0000-00" : "Opcional"}
-                                                        required={formData.pais === 'Brasil'} 
+                                                        required={formData.pais === 'Brasil'}
                                                     />
                                                     {errors.cnpj && <span className={styles.validationError}>{errors.cnpj}</span>}
                                                 </div>

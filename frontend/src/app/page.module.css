@@ -67,12 +67,6 @@
   user-select: none;
 }
 
-.tagline:hover {
-  color: var(--primary-green);
-  text-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
-  transform: scale(1.05);
-}
-
 .formSection {
   display: flex;
   justify-content: center;
