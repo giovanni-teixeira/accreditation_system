@@ -65,7 +65,7 @@ export async function cadastrarUsuario(formData: any): Promise<CadastroResponse>
 
 export async function buscarPorCpf(cpf: string): Promise<CadastroResponse> {
     try {
-        const cleanCpf = cpf.replace(/\D/g, '');
+        const cleanCpf = cpf.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
         const data = await CredenciadoService.buscarPorCpf(cleanCpf);
 
         return {

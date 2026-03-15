@@ -15,13 +15,16 @@ export default function SearchCPF({ onSearchResult }: SearchCPFProps) {
     const [isLoading, setIsLoading] = useState(false);
 
     const handleCpfChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const masked = MaskUtils.cpf(e.target.value);
+        const val = e.target.value;
+        // Se contiver qualquer letra, switch para PassportID, senão mantém CPF
+        const hasLetters = /[a-zA-Z]/.test(val);
+        const masked = hasLetters ? MaskUtils.passportID(val) : MaskUtils.cpf(val);
         setCpf(masked);
     };
 
     const handleSearch = async (e: FormEvent) => {
         e.preventDefault();
-        if (cpf.length < 14) return;
+        if (cpf.length < 3) return; // Permitir buscar IDs menores se necessário baseada no feedback do usuário.
 
         setIsLoading(true);
         try {
@@ -48,14 +51,14 @@ export default function SearchCPF({ onSearchResult }: SearchCPFProps) {
                     onChange={handleCpfChange}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
-                    placeholder={isFocused ? "000.000.000-00" : ""}
+                    placeholder={isFocused ? "Ex: 000.000.000-00 ou AB1234567" : ""}
                     maxLength={14}
                 />
-                <label className={styles.label}>Buscar credencial pelo CPF</label>
+                <label className={styles.label}>Buscar credencial pelo CPF / Passport / ID</label>
                 <button
                     type="submit"
                     className={styles.searchIcon}
-                    disabled={isLoading || cpf.length < 14}
+                    disabled={isLoading || cpf.length < 3}
                     title="Buscar"
                 >
                     {isLoading ? (

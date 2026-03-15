@@ -96,6 +96,15 @@ export class MaskUtils {
     }
 
     /**
+     * Aplica máscara de Passport / ID (Padrão ICAO/BR): 2 Letras + 7 Números (9 caracteres)
+     */
+    static passportID(value: string): string {
+        const letters = value.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 2);
+        const numbers = value.slice(letters.length).replace(/\D/g, '').slice(0, 7);
+        return (letters + numbers).slice(0, 9);
+    }
+
+    /**
      * Remove caracteres especiais, mantendo apenas letras e números (Alfanumérico)
      */
     static unmask(value: string): string {

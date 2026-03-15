@@ -89,7 +89,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
         let finalValue = value;
 
         if (name === 'cep') finalValue = formData.pais === 'Brasil' ? MaskUtils.cep(value) : value.toUpperCase();
-        else if (name === 'cpf') finalValue = formData.pais === 'Brasil' ? MaskUtils.cpf(value) : value.toUpperCase();
+        else if (name === 'cpf') finalValue = formData.pais === 'Brasil' ? MaskUtils.cpf(value) : MaskUtils.passportID(value);
         else if (name === 'celular') finalValue = formData.pais === 'Brasil' ? MaskUtils.celular(value) : value;
         else if (name === 'cnpj') finalValue = formData.pais === 'Brasil' ? MaskUtils.cnpj(value) : value.toUpperCase();
         else if (name === 'ccir') finalValue = MaskUtils.ccir(value);
@@ -118,14 +118,19 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
 
             const cleanData = { ...formData, celular: finalCelular, role };
 
-            // Sanitização de campos numéricos e opcionais baseada no feedback do usuário.
+            // Sanitização de campos numéricos e documentos baseada no feedback do usuário.
             if (cleanData.semCep && cleanData.distanciaManualKm) {
                 cleanData.distanciaManualKm = Number(cleanData.distanciaManualKm) as any;
             } else {
                 delete (cleanData as any).distanciaManualKm;
             }
 
-            // Remove strings vazias de campos opcionais para evitar erros de validação no backend baseada no feedback do usuário.
+            if (cleanData.cpf) cleanData.cpf = MaskUtils.unmask(cleanData.cpf);
+            if (cleanData.cnpj) cleanData.cnpj = MaskUtils.unmask(cleanData.cnpj);
+            if (cleanData.ccir) cleanData.ccir = MaskUtils.unmask(cleanData.ccir);
+            if (cleanData.cep) cleanData.cep = MaskUtils.unmask(cleanData.cep);
+
+            // Remove strings vazias de campos opcionais baseada no feedback do usuário.
             ['rg', 'cnpj', 'ccir', 'nomeEmpresa', 'siteEmpresa', 'nomePropriedade', 'nomeVeiculo', 'cep', 'rua', 'bairro'].forEach(key => {
                 if (!(cleanData as any)[key]) {
                     delete (cleanData as any)[key];
@@ -214,7 +219,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                     }
                                 }}
                                 required 
-                                placeholder={formData.pais === 'Brasil' ? '000.000.000-00' : 'Passaporte ou ID'}
+                                placeholder={formData.pais === 'Brasil' ? '000.000.000-00' : 'Ex: AB1234567'}
                             />
 
                             {formData.pais === 'Brasil' && (
