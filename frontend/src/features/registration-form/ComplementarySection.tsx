@@ -77,14 +77,6 @@ export function ComplementarySection({
                             required
                             disabled={formDisabled}
                         />
-                        <InputGroup
-                            label="Veículo Utilizado"
-                            name="nomeVeiculo"
-                            value={formData.nomeVeiculo}
-                            onChange={handleInputChange}
-                            placeholder="Ex: Toyota Hilux"
-                            disabled={formDisabled}
-                        />
                     </>
                 )}
 
