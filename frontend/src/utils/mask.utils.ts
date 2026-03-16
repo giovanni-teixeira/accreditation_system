@@ -1,10 +1,6 @@
-/**
- * Utilitário de máscaras de input para o sistema Alta Café
- */
+
 export class MaskUtils {
-    /**
-     * Aplica máscara de CEP: 00000-000
-     */
+
     static cep(value: string): string {
         const clean = value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
 

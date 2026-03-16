@@ -86,7 +86,7 @@ export class Produtor extends Credenciado {
 
     validar() {
         super.validar();
-        if (!this.ccir || !this.nomePropriedade) {
+        if (!this.nomePropriedade) {
             throw new Error("Produtor precisa de CCIR e Nome da Propriedade.");
         }
     }
