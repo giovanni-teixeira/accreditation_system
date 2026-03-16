@@ -123,8 +123,8 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
         setErrors(prev => ({ ...prev, lgpd: false }));
 
         startTransition(async () => {
-            const finalCelular = (formData.pais === 'Brasil' && !formData.celular.startsWith('+55')) 
-                ? `+55${formData.celular.replace(/\D/g, '')}` 
+            const finalCelular = (formData.pais === 'Brasil' && !formData.celular.startsWith('+55'))
+                ? `+55${formData.celular.replace(/\D/g, '')}`
                 : formData.celular;
 
             const cleanData = { ...formData, celular: finalCelular, role };
@@ -194,13 +194,13 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                 value={formData.pais}
                                 options={COUNTRIES}
                                 onSelect={(opt) => {
-                                    setFormData(prev => ({ 
-                                        ...prev, 
-                                        pais: opt.name, 
-                                        cep: '', 
-                                        rua: '', 
-                                        bairro: '', 
-                                        cidade: '', 
+                                    setFormData(prev => ({
+                                        ...prev,
+                                        pais: opt.name,
+                                        cep: '',
+                                        rua: '',
+                                        bairro: '',
+                                        cidade: '',
                                         estado: '',
                                         semCep: false,
                                         distanciaManualKm: ''
@@ -211,13 +211,13 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                 required
                                 disabled={formDisabled}
                             />
-                            
-                            <InputGroup 
-                                label={formData.pais === 'Brasil' ? 'CPF' : 'Documento de Identificação'} 
-                                name="cpf" 
-                                value={formData.cpf} 
-                                onChange={handleInputChange} 
-                                error={errors.cpf} 
+
+                            <InputGroup
+                                label={formData.pais === 'Brasil' ? 'CPF' : 'Documento de Identificação'}
+                                name="cpf"
+                                value={formData.cpf}
+                                onChange={handleInputChange}
+                                error={errors.cpf}
                                 onBlur={(e) => {
                                     if (formData.pais === 'Brasil' && e.target.value) {
                                         if (!Validador.validarCPF(e.target.value)) {
@@ -229,7 +229,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                         setErrors(prev => ({ ...prev, cpf: undefined }));
                                     }
                                 }}
-                                required 
+                                required
                                 placeholder={formData.pais === 'Brasil' ? '000.000.000-00' : 'Ex: AB1234567'}
                             />
 
@@ -237,7 +237,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                 <InputGroup label="RG" name="rg" value={formData.rg} onChange={handleInputChange} placeholder="Opcional" />
                             )}
                             <InputGroup label="Celular (WhatsApp)" name="celular" value={formData.celular} onChange={handleInputChange} required placeholder="(00) 00000-0000" />
-                            
+
                             <div className={styles.inputGroupFull}>
                                 <InputGroup label="E-mail" name="email" type="email" value={formData.email} onChange={handleInputChange} required placeholder="exemplo@email.com" />
                             </div>
@@ -270,8 +270,8 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                 <input type="checkbox" name="aceiteLgpd" checked={formData.aceiteLgpd} onChange={handleInputChange} />
                                 <span className={styles.checkmark}></span>
                                 <span>
-                                    Declaro que li e concordo com a coleta e tratamento dos meus dados pessoais conforme a Lei Geral de Proteção de Dados (LGPD) e autorizo o envio de comunicações sobre o evento Alta Café. Acesse a 
-                                    <a href="/politica-privacidade" target="_blank" className={styles.lgpdLink}>Política de Privacidade aqui.</a>
+                                    Declaro que li e concordo com a coleta e tratamento dos meus dados pessoais conforme a Lei Geral de Proteção de Dados (LGPD) e autorizo o envio de comunicações sobre o evento Alta Café. Acesse a
+                                    <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" className={styles.lgpdLink}>Política de Privacidade aqui.</a>
                                 </span>
                             </label>
                             {errors.lgpd && <p style={{ color: '#e74c3c', fontSize: '0.75rem', marginTop: '5px' }}>Você precisa aceitar os termos para continuar.</p>}
