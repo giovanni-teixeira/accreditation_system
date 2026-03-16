@@ -137,14 +137,14 @@ const CredentialPDF = forwardRef<HTMLDivElement, CredentialPDFProps>(({ userData
                 </div>
 
                 <div className={styles.tituloSecao}>APOIO</div>
-                <div className={styles.gridLogos}>
+                <div className={`${styles.gridLogos} ${styles.apoio}`}>
                     <img src="/imagens/FAESP.png" alt="FAESP" crossOrigin="anonymous" />
                     <img src="/imagens/sebrae.png" alt="sebrae" crossOrigin="anonymous" />
                     <img src="/imagens/OCB.png" alt="OCB" crossOrigin="anonymous" />
                 </div>
 
                 <div className={styles.tituloSecao}>APOIO DE MÍDIA</div>
-                <div className={styles.gridLogos}>
+                <div className={`${styles.gridLogos} ${styles.midia}`}>
                     <img src="/imagens/EPTV.png" alt="EPTV" crossOrigin="anonymous" />
                     <img src="/imagens/epagro.png" alt="epagro" crossOrigin="anonymous" />
                     <img src="/imagens/Attalea.png" alt="Attalea" crossOrigin="anonymous" />

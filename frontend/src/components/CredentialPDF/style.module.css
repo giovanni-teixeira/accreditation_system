@@ -114,20 +114,26 @@
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 4mm;
+    gap: 15px;
+    margin-bottom: 2mm;
     width: 100%;
 }
 
 .gridLogos img {
-    max-width: 85px;
-    max-height: 45px;
+    max-width: 90px;
+    max-height: 50px;
     object-fit: contain;
 }
 
 .gridLogos.patrocinio img {
-    max-width: 180px;
-    max-height: 70px;
+    max-width: 190px;
+    max-height: 85px;
+}
+
+.gridLogos.apoio img,
+.gridLogos.midia img {
+    max-width: 110px;
+    max-height: 60px;
 }
 
 .labelEvento {
@@ -146,9 +152,10 @@
     font-size: 9pt;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    padding: 8mm 5mm;
+    justify-content: space-between;
+    padding: 10mm 6mm;
     align-items: center;
+    box-sizing: border-box;
 }
 
 .tituloRegras {
