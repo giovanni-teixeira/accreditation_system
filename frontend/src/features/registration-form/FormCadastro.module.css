@@ -227,3 +227,35 @@
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+.addressRow {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 1.5rem;
+    grid-column: span 1;
+}
+
+@media (min-width: 768px) {
+    .addressRow {
+        grid-column: span 2;
+        grid-template-columns: 4fr 1fr;
+    }
+}
+
+.phoneRow {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    width: 100%;
+}
+
+.ddiInput {
+    text-align: center;
+    font-weight: 600;
+}
+
+@media (max-width: 480px) {
+    .phoneRow {
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+}

@@ -31,12 +31,12 @@ export function AddressSection({
 
     return (
         <div className={styles.inputGrid}>
-            {/* Linha 1: [CEP ou ESTADO] + Cidade baseada no feedback do usuário. */}
+            {/* Linha 1: [CEP ou ESTADO] + Cidade. */}
             <div className={styles.inputGroup}>
                 <div className={styles.labelWithAction}>
                     <label>
-                        {formData.semCep 
-                            ? (isBrasil ? 'Estado (UF)' : 'Estado / Província') 
+                        {formData.semCep
+                            ? (isBrasil ? 'Estado (UF)' : 'Estado / Província')
                             : (isBrasil ? 'CEP' : 'ZIP / Postcode')}
                     </label>
                     {!formDisabled && (
@@ -68,7 +68,7 @@ export function AddressSection({
                 </div>
 
                 {formData.semCep ? (
-                    // Estado no lugar do CEP quando semCep é true baseada no feedback do usuário.
+                    // Estado no lugar do CEP quando semCep é true.
                     isBrasil ? (
                         <SearchableInput
                             label=""
@@ -91,7 +91,7 @@ export function AddressSection({
                         />
                     )
                 ) : (
-                    // CEP normal baseada no feedback do usuário.
+                    // CEP normal .
                     <input
                         type="text"
                         name="cep"
@@ -117,23 +117,32 @@ export function AddressSection({
                 required
             />
 
-            {/* Linha 2 de Rua (apenas se tiver CEP) baseada no feedback do usuário. */}
+            {/* Linha 2 de Rua + Número (apenas se tiver CEP) */}
             {!formData.semCep && (
-                <div className={styles.inputGroupFull}>
+                <div className={styles.addressRow}>
                     <InputGroup
                         label="Rua / Logradouro"
                         name="rua"
                         value={formData.rua}
                         onChange={handleInputChange}
                         disabled={cepLocked.rua || formDisabled}
-                        placeholder="Nome da rua e número"
+                        placeholder="Nome da rua"
                         required
-                        fullWidth
+                    />
+
+                    <InputGroup
+                        label="Número"
+                        name="numero"
+                        value={formData.numero}
+                        onChange={handleInputChange}
+                        disabled={formDisabled}
+                        placeholder="Nº"
+                        required
                     />
                 </div>
             )}
 
-            {/* Linha 3: Bairro + [Estado ou Combustível] baseada no feedback do usuário. */}
+            {/* Linha 3: Bairro + [Estado ou Combustível] . */}
             <InputGroup
                 label="Bairro"
                 name="bairro"
@@ -145,7 +154,7 @@ export function AddressSection({
             />
 
             {formData.semCep ? (
-                // Se não tem CEP, o Combustível sobe para o lado do Bairro baseada no feedback do usuário.
+                // Se não tem CEP, o Combustível sobe para o lado do Bairro.
                 <div className={styles.inputGroup}>
                     <label>Combustível do Veículo</label>
                     <select name="tipoCombustivel" value={formData.tipoCombustivel} onChange={handleInputChange} required disabled={formDisabled}>
@@ -158,7 +167,7 @@ export function AddressSection({
                     </select>
                 </div>
             ) : (
-                // Se tem CEP, o Estado fica aqui baseada no feedback do usuário.
+                // Se tem CEP, o Estado fica aqui.
                 isBrasil ? (
                     <InputGroup
                         label="Estado (UF)"
@@ -183,7 +192,7 @@ export function AddressSection({
                 )
             )}
 
-            {/* Linha 4: Combustível (se tem CEP) ou Distância (se não tem CEP) baseada no feedback do usuário. */}
+            {/* Linha 4: Combustível (se tem CEP) ou Distância (se não tem CEP). */}
             {formData.semCep ? (
                 <InputGroup
                     label="Distância estimada (km ida)"

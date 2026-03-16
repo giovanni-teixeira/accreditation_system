@@ -8,7 +8,6 @@ interface ComplementarySectionProps {
     handleInputChange: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
     formDisabled: boolean;
     cnpjInputRef: RefObject<HTMLInputElement | null>;
-    ccirInputRef: RefObject<HTMLInputElement | null>;
 }
 
 export function ComplementarySection({
@@ -16,8 +15,7 @@ export function ComplementarySection({
     formData,
     handleInputChange,
     formDisabled,
-    cnpjInputRef,
-    ccirInputRef
+    cnpjInputRef
 }: ComplementarySectionProps) {
     if (!['expositor', 'produtor', 'imprensa'].includes(role)) return null;
 
@@ -59,15 +57,6 @@ export function ComplementarySection({
 
                 {role === 'produtor' && (
                     <>
-                        <InputGroup
-                            label="CCIR (Incra)"
-                            name="ccir"
-                            value={formData.ccir}
-                            onChange={handleInputChange}
-                            placeholder="Número do CCIR (Opcional)"
-                            disabled={formDisabled}
-                            ref={ccirInputRef}
-                        />
                         <InputGroup
                             label="Nome da Propriedade"
                             name="nomePropriedade"

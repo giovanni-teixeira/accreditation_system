@@ -69,17 +69,14 @@ export class Expositor extends Credenciado {
 }
 
 export interface IProdutorArgs extends ICredenciadoArgs {
-    ccir: string;
     nomePropriedade: string;
 }
 
 export class Produtor extends Credenciado {
-    ccir: string;
     nomePropriedade: string;
 
     constructor(data: IProdutorArgs) {
         super(data);
-        this.ccir = data.ccir;
         this.nomePropriedade = data.nomePropriedade;
         this.tipo = 'Produtor';
     }
@@ -87,7 +84,7 @@ export class Produtor extends Credenciado {
     validar() {
         super.validar();
         if (!this.nomePropriedade) {
-            throw new Error("Produtor precisa de CCIR e Nome da Propriedade.");
+            throw new Error("Produtor precisa do Nome da Propriedade.");
         }
     }
 }

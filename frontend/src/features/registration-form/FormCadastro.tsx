@@ -29,8 +29,9 @@ interface FormDataState {
     cep: string; pais: string; rua: string; bairro: string; cidade: string; estado: string;
     tipoCombustivel: string; aceiteLgpd: boolean;
     cnpj: string; siteEmpresa: string; nomeEmpresa: string;
-    ccir: string; nomePropriedade: string; nomeVeiculo: string;
+    nomePropriedade: string; nomeVeiculo: string;
     semCep: boolean; distanciaManualKm: string;
+    numero: string; ddi: string;
 }
 
 interface FormCadastroProps {
@@ -48,8 +49,9 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
         cep: '', pais: 'Brasil', rua: '', bairro: '', cidade: '', estado: '',
         tipoCombustivel: '', aceiteLgpd: false,
         cnpj: '', siteEmpresa: '', nomeEmpresa: '',
-        ccir: '', nomePropriedade: '', nomeVeiculo: '',
-        semCep: false, distanciaManualKm: ''
+        nomePropriedade: '', nomeVeiculo: '',
+        semCep: false, distanciaManualKm: '',
+        numero: '', ddi: '55'
     });
 
     const { cepLocked, setCepLocked, fetchAddress } = useAddress(formData.pais);
@@ -57,7 +59,6 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
     const dadosPessoaisRef = useRef<HTMLDivElement>(null);
     const nomeInputRef = useRef<HTMLInputElement>(null);
     const cnpjInputRef = useRef<HTMLInputElement>(null);
-    const ccirInputRef = useRef<HTMLInputElement>(null);
 
     const formDisabled = isPending || isBlocked;
 
@@ -73,9 +74,10 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
             cnpj: '',
             nomeEmpresa: '',
             siteEmpresa: '',
-            ccir: '',
             nomePropriedade: '',
-            nomeVeiculo: ''
+            nomeVeiculo: '',
+            numero: '',
+            ddi: prev.pais === 'Brasil' ? '55' : ''
         }));
     }, [role]);
 
@@ -103,7 +105,6 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
         else if (name === 'cpf') finalValue = formData.pais === 'Brasil' ? MaskUtils.cpf(value) : MaskUtils.passportID(value);
         else if (name === 'celular') finalValue = formData.pais === 'Brasil' ? MaskUtils.celular(value) : value;
         else if (name === 'cnpj') finalValue = MaskUtils.cnpj(value);
-        else if (name === 'ccir') finalValue = MaskUtils.ccir(value);
 
         setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : finalValue }));
 
@@ -123,11 +124,13 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
         setErrors(prev => ({ ...prev, lgpd: false }));
 
         startTransition(async () => {
-            const finalCelular = (formData.pais === 'Brasil' && !formData.celular.startsWith('+55'))
-                ? `+55${formData.celular.replace(/\D/g, '')}`
-                : formData.celular;
-
-            const cleanData = { ...formData, celular: finalCelular, role };
+            const cleanCelular = formData.celular.replace(/\D/g, '');
+            const finalCelular = formData.ddi ? `+${formData.ddi}${cleanCelular}` : cleanCelular;
+            
+            // Concatena Rua e Número para o backend baseada no feedback do usuário.
+            const ruaCompleta = formData.numero ? `${formData.rua}, ${formData.numero}` : formData.rua;
+            
+            const cleanData = { ...formData, celular: finalCelular, role, rua: ruaCompleta };
 
             // Sanitização de campos numéricos e documentos baseada no feedback do usuário.
             if (cleanData.semCep && cleanData.distanciaManualKm) {
@@ -138,11 +141,10 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
 
             if (cleanData.cpf) cleanData.cpf = MaskUtils.unmask(cleanData.cpf);
             if (cleanData.cnpj) cleanData.cnpj = MaskUtils.unmask(cleanData.cnpj);
-            if (cleanData.ccir) cleanData.ccir = MaskUtils.unmask(cleanData.ccir);
             if (cleanData.cep) cleanData.cep = MaskUtils.unmask(cleanData.cep);
 
             // Remove strings vazias de campos opcionais baseada no feedback do usuário.
-            ['rg', 'cnpj', 'ccir', 'nomeEmpresa', 'siteEmpresa', 'nomePropriedade', 'nomeVeiculo', 'cep', 'rua', 'bairro'].forEach(key => {
+            ['rg', 'cnpj', 'nomeEmpresa', 'siteEmpresa', 'nomePropriedade', 'nomeVeiculo', 'cep', 'rua', 'bairro'].forEach(key => {
                 if (!(cleanData as any)[key]) {
                     delete (cleanData as any)[key];
                 }
@@ -156,8 +158,9 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                     cep: '', pais: 'Brasil', rua: '', bairro: '', cidade: '', estado: '',
                     tipoCombustivel: '', aceiteLgpd: false,
                     cnpj: '', siteEmpresa: '', nomeEmpresa: '',
-                    ccir: '', nomePropriedade: '', nomeVeiculo: '',
-                    semCep: false, distanciaManualKm: ''
+                    nomePropriedade: '', nomeVeiculo: '',
+                    semCep: false, distanciaManualKm: '',
+                    numero: '', ddi: '55'
                 });
                 setRole('');
             }
@@ -203,7 +206,8 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                         cidade: '',
                                         estado: '',
                                         semCep: false,
-                                        distanciaManualKm: ''
+                                        distanciaManualKm: '',
+                                        ddi: opt.name === 'Brasil' ? '55' : ''
                                     }));
                                     setCepLocked({ rua: false, bairro: false, cidade: false, estado: false });
                                 }}
@@ -236,7 +240,25 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                             {formData.pais === 'Brasil' && (
                                 <InputGroup label="RG" name="rg" value={formData.rg} onChange={handleInputChange} placeholder="Opcional" />
                             )}
-                            <InputGroup label="Celular (WhatsApp)" name="celular" value={formData.celular} onChange={handleInputChange} required placeholder="(00) 00000-0000" />
+                            <div className={styles.phoneRow}>
+                                <div className={styles.inputGroup} style={{ width: '80px' }}>
+                                    <label>DDI</label>
+                                    <input
+                                        type="text"
+                                        name="ddi"
+                                        value={formData.ddi}
+                                        onChange={handleInputChange}
+                                        placeholder="+55"
+                                        maxLength={4}
+                                        required
+                                        className={styles.ddiInput}
+                                        disabled={formData.pais === 'Brasil' || formDisabled}
+                                    />
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <InputGroup label="Celular (WhatsApp)" name="celular" value={formData.celular} onChange={handleInputChange} required placeholder="(00) 00000-0000" />
+                                </div>
+                            </div>
 
                             <div className={styles.inputGroupFull}>
                                 <InputGroup label="E-mail" name="email" type="email" value={formData.email} onChange={handleInputChange} required placeholder="exemplo@email.com" />
@@ -262,7 +284,6 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                             handleInputChange={handleInputChange}
                             formDisabled={formDisabled}
                             cnpjInputRef={cnpjInputRef}
-                            ccirInputRef={ccirInputRef}
                         />
 
                         <div className={`${styles.lgpdSection} ${errors.lgpd ? styles.lgpdError : ''}`}>
