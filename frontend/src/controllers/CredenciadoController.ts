@@ -77,7 +77,7 @@ export async function buscarPorCpf(cpf: string): Promise<CadastroResponse> {
         console.error("Erro na busca por CPF:", error);
         return {
             sucesso: false,
-            mensagem: error.message || "CPF não encontrado na base de dados."
+            mensagem: error.message || "Documento não encontrado nos registros."
         };
     }
 }

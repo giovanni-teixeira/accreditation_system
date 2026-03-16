@@ -40,7 +40,7 @@ export class CredenciadosController {
       const existe = await this.credenciadoRepository.findByCpf(dto.cpf);
       if (existe)
         throw new BusinessException(
-          'Já existe um credenciado com este CPF informado.',
+          'Já existe um credenciado com este documento informado.',
         );
 
       const tokenDados = QrCodeHelper.generateSignedToken(
@@ -151,7 +151,7 @@ export class CredenciadosController {
       const res = await this.credenciadoRepository.findByCpf(cpf);
       if (!res)
         throw new BusinessException(
-          'Nenhum credenciado encontrado para o CPF informado.',
+          'Documento não encontrado nos registros.',
           404,
         );
       return new CredenciadoResponseDto(res);
