@@ -15,6 +15,8 @@ interface StatusModalProps {
         cidade: string;
         estado: string;
         nomeEmpresa?: string;
+        nomeVeiculo?: string;
+        nomePropriedade?: string;
         role: string;
         qrToken: string;
     };

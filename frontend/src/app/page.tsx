@@ -60,6 +60,8 @@ export default function Home() {
           cidade: successData.cidade || successData.endereco?.cidade,
           estado: successData.estado || successData.endereco?.estado,
           nomeEmpresa: successData.nomeEmpresa,
+          nomeVeiculo: successData.nomeVeiculo,
+          nomePropriedade: successData.nomePropriedade,
           qrToken: successData.credencial?.qrToken || successData.qrToken,
           role: successData.role || successData.tipoCategoria?.toLowerCase()
         } : undefined}

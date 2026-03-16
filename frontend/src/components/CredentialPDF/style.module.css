@@ -52,11 +52,19 @@
     line-height: 1.1;
 }
 
-.cidadeEmpresa {
+.cidadeUF {
     font-size: 13pt;
     text-align: center;
     line-height: 1.2;
-    margin-top: 3mm; /* Aumentado espaçamento entre nome e empresa */
+    margin-top: 3mm;
+}
+
+.infoAdicional {
+    font-size: 13pt;
+    text-align: center;
+    line-height: 1.2;
+    margin-top: 1mm;
+    min-height: 1.2em;
 }
 
 .qrContainer {

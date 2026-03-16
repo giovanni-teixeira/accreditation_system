@@ -107,6 +107,16 @@ export function ComplementarySection({
                             placeholder="link da página (Opcional)"
                             disabled={formDisabled}
                         />
+                        <InputGroup
+                          label="CNPJ da Empresa"
+                          name="cnpj"
+                          value={formData.cnpj}
+                          onChange={handleInputChange}
+                          placeholder="00.000.000/0000-00"
+                          required
+                          disabled={formDisabled}
+                          ref={cnpjInputRef}
+                        />
                     </>
                 )}
             </div>

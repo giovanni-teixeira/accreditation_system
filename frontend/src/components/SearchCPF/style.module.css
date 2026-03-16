@@ -28,6 +28,7 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none;
     opacity: 0.8;
+    white-space: nowrap; /* Garante que não quebre linha baseada no feedback do usuário. */
 }
 
 .input {
@@ -94,5 +95,27 @@
 @keyframes spin {
     to {
         transform: rotate(360deg);
+    }
+}
+
+/* Smartphone Responsiveness baseada no feedback do usuário. */
+@media (max-width: 480px) {
+    .label {
+        font-size: 0.85rem; /* Reduzido para caber em telas pequenas baseada no feedback do usuário. */
+    }
+
+    .input {
+        font-size: 1rem;
+    }
+
+    .searchContainer.active .label,
+    .input:focus+.label,
+    .input:not(:placeholder-shown)+.label {
+        bottom: 32px;
+        font-size: 0.7rem;
+    }
+    
+    .searchContainer {
+        max-width: 100%;
     }
 }

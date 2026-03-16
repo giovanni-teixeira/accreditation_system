@@ -12,6 +12,25 @@ const CredentialPDF = forwardRef<HTMLDivElement, CredentialPDFProps>(({ userData
     // Prioriza o QR Code em Base64 (pré-carregado) para o PDF
     const qrSource = (userData as any).qrBase64 || `https://api.qrserver.com/v1/create-qr-code/?size=180x180&ecc=L&data=${encodeURIComponent(userData.qrToken)}&format=png&qzone=1`;
 
+
+    const SHOW_FIELDS = {
+        imprensa: true,
+        expositor: true,
+        produtor: true,
+    };
+
+    const getExtraInfo = () => {
+        const role = userData.role?.toLowerCase();
+        if (!SHOW_FIELDS[role as keyof typeof SHOW_FIELDS]) return null;
+
+        if (role === 'imprensa') return userData.nomeVeiculo;
+        if (role === 'expositor') return userData.nomeEmpresa;
+        if (role === 'produtor' ) return userData.nomePropriedade;
+        return null;
+    };
+
+    const extraInfo = getExtraInfo();
+
     return (
         <div id="credencial" ref={ref} className={styles.folhaA4} style={{ '--cor-tipo': corTipo } as any}>
             {/* QUADRANTE 1 */}
@@ -22,15 +41,15 @@ const CredentialPDF = forwardRef<HTMLDivElement, CredentialPDFProps>(({ userData
 
                 <div className={styles.nomeUsuario}>{userData.nomeCompleto}</div>
 
-                <div className={styles.cidadeEmpresa}>
+                <div className={styles.cidadeUF}>
                     {userData.cidade} - {userData.estado}
-                    {userData.nomeEmpresa && (
-                        <>
-                            <br />
-                            <strong>{userData.nomeEmpresa}</strong>
-                        </>
-                    )}
                 </div>
+
+                {extraInfo && (
+                    <div className={styles.infoAdicional}>
+                        <strong>{extraInfo}</strong>
+                    </div>
+                )}
 
                 <div className={styles.qrContainer}>
                     <img src={qrSource} className={styles.qrCode} alt="QR Code" crossOrigin="anonymous" />
@@ -49,22 +68,22 @@ const CredentialPDF = forwardRef<HTMLDivElement, CredentialPDFProps>(({ userData
 
                 <div className={styles.nomeUsuario}>{userData.nomeCompleto}</div>
 
-                <div className={styles.cidadeEmpresa}>
+                <div className={styles.cidadeUF}>
                     {userData.cidade} - {userData.estado}
-                    {userData.nomeEmpresa && (
-                        <>
-                            <br />
-                            <strong>{userData.nomeEmpresa}</strong>
-                        </>
-                    )}
                 </div>
+
+                {extraInfo && (
+                    <div className={styles.infoAdicional}>
+                        <strong>{extraInfo}</strong>
+                    </div>
+                )}
 
                 <div className={styles.qrContainer}>
                     <img src={qrSource} className={styles.qrCode} alt="QR Code" crossOrigin="anonymous" />
                 </div>
 
                 <div className={styles.faixaTipo}>
-                    {userData.role?.toUpperCase() === 'CAFEICULTOR' ? 'PRODUTOR' : userData.role}
+                    {userData.role?.toUpperCase() === 'CAFEICULTOR' ? 'PRODUTOR'  : userData.role}
                 </div>
             </div>
 
