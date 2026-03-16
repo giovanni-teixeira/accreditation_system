@@ -243,19 +243,49 @@
 
 .phoneRow {
     display: flex;
-    gap: 1rem;
+    gap: 0.5rem; /* Gap menor para ficarem colados */
     align-items: flex-end;
     width: 100%;
+}
+
+.ddiContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.ddiContainer label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--light-brown);
 }
 
 .ddiInput {
     text-align: center;
     font-weight: 600;
+    width: 60px !important; /* Um pouco mais largo para acomodar +000 */
+    height: 48px; /* Combinando com a altura padrão */
+    padding: 0.75rem 0.5rem !important; /* Padding lateral reduzido */
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background-color: var(--bg-color);
+    color: var(--coffee-brown);
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.ddiInput:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
+}
+
+.phoneInputWrapper {
+    flex: 1;
 }
 
 @media (max-width: 480px) {
     .phoneRow {
-        flex-direction: row;
-        gap: 0.5rem;
+        gap: 0.3rem;
     }
 }

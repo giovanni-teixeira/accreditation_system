@@ -241,21 +241,23 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                                 <InputGroup label="RG" name="rg" value={formData.rg} onChange={handleInputChange} placeholder="Opcional" />
                             )}
                             <div className={styles.phoneRow}>
-                                <div className={styles.inputGroup} style={{ width: '80px' }}>
-                                    <label>DDI</label>
-                                    <input
-                                        type="text"
-                                        name="ddi"
-                                        value={formData.ddi}
-                                        onChange={handleInputChange}
-                                        placeholder="+55"
-                                        maxLength={4}
-                                        required
-                                        className={styles.ddiInput}
-                                        disabled={formData.pais === 'Brasil' || formDisabled}
-                                    />
-                                </div>
-                                <div style={{ flex: 1 }}>
+                                {formData.pais !== 'Brasil' && (
+                                    <div className={styles.ddiContainer}>
+                                        <label>DDI</label>
+                                        <input
+                                            type="text"
+                                            name="ddi"
+                                            value={formData.ddi}
+                                            onChange={handleInputChange}
+                                            placeholder="+1"
+                                            maxLength={4}
+                                            required
+                                            className={styles.ddiInput}
+                                            disabled={formDisabled}
+                                        />
+                                    </div>
+                                )}
+                                <div className={styles.phoneInputWrapper}>
                                     <InputGroup label="Celular (WhatsApp)" name="celular" value={formData.celular} onChange={handleInputChange} required placeholder="(00) 00000-0000" />
                                 </div>
                             </div>
