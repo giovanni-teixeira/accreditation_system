@@ -106,23 +106,29 @@ const CredentialPDF = forwardRef<HTMLDivElement, CredentialPDFProps>(({ userData
                   </div>
                 <div className={styles.tituloSecao}>ORGANIZAÇÃO E REALIZAÇÃO</div>
                 <div className={styles.gridLogos}>
-                    <img src="/imagens/" alt="EPTV" />
-                    <img src="/imagens/epagro.png" alt="Epagro" />
-                    <img src="/imagens/Attalea.png" alt="Attalea" />
+                    <img src="/imagens/AAlves.png" alt="EPTV" />
+                    <img src="/imagens/AgroPL.png" alt="Epagro" />
+                    <img src="/imagens/OIMASA.png" alt="OIMASA" />
+                    <img src="/imagens/Olimáquinas.png" alt="Attalea" />
+                    <img src="/imagens/Robusta.png" alt="Robusta" />
+                    <img src="/imagens/Sami.png" alt="Sami" />
+                    <img src="/imagens/Sindicato Rural.png" alt="Sindicato Rural" />
+                    <img src="/imagens/aeagro.png" alt="AEAgro" />
                 </div>
 
-                <div className={styles.tituloSecao}>PATROCINADORES</div>
+                <div className={styles.tituloSecao}>APOIO</div>
+              <div className={styles.gridLogos}>
+                <img src="/imagens/FAESP.png" alt="Alta Cafe" />
+                <img src="/imagens/sebrae.png" alt="Agro PL" />
+                <img src="/imagens/OCB.png" alt="Guapua" />
+
+              </div>
+
+              <div className={styles.tituloSecao}>APOIO DE MÍDIA</div>
                 <div className={styles.gridLogos}>
-                    <img src="/imagens/altacafe.png" alt="Alta Cafe" />
-                    <img src="/imagens/aeagro.png" alt="AEAgro" />
-                    <img src="/imagens/Sindicato Rural.png" alt="Sindicato Rural" />
-                    <img src="/imagens/Sami.png" alt="Sami" />
-                    <img src="/imagens/AgroPL.png" alt="Agro PL" />
-                    <img src="/imagens/Guapuã.png" alt="Guapua" />
-                    <img src="/imagens/OIMASA.png" alt="OIMASA" />
-                    <img src="/imagens/Olimáquinas.png" alt="Olimaquinas" />
-                    <img src="/imagens/Robusta.png" alt="Robusta" />
-                    <img src="/imagens/AAlves.png" alt="AAlves" />
+                    <img src="/imagens/EPTV.png" alt="Alta Cafe" />
+                    <img src="/imagens/epagro.png" alt="Agro PL" />
+                    <img src="/imagens/Attalea.png" alt="Guapua" />
                 </div>
             </div>
         </div>
