@@ -92,8 +92,8 @@ export function ComplementarySection({
                     <>
                         <InputGroup
                             label="Veículo de Imprensa"
-                            name="nomeEmpresa"
-                            value={formData.nomeEmpresa}
+                            name="nomeVeiculo"
+                            value={formData.nomeVeiculo}
                             onChange={handleInputChange}
                             placeholder="Nome do Jornal / Portal"
                             required

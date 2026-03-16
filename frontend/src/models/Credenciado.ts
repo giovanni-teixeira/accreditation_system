@@ -121,7 +121,7 @@ export class Imprensa extends Credenciado {
     validar() {
         super.validar();
         if (!this.nomeVeiculo) {
-            throw new Error("Imprensa precisa de CNPJ e Nome do Veículo.");
+            throw new Error("Imprensa precisa Nome do Veículo.");
         }
     }
 }
