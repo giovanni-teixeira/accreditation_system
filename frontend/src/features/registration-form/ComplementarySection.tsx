@@ -32,7 +32,7 @@ export function ComplementarySection({
                             name="cnpj"
                             value={formData.cnpj}
                             onChange={handleInputChange}
-                            placeholder={formData.pais === 'Brasil' ? "00.000.000/0000-00" : "00.000.000/0000-00 (Opcional)"}
+                            placeholder="00.000.000/0000-00"
                             required={formData.pais === 'Brasil'}
                             disabled={formDisabled}
                             ref={cnpjInputRef}

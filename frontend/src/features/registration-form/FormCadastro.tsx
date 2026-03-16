@@ -66,6 +66,17 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
             dadosPessoaisRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
             setTimeout(() => nomeInputRef.current?.focus(), 500);
         }
+
+        // Limpa campos da Seção 3 (Complementar) ao trocar de perfil baseada no feedback do usuário.
+        setFormData(prev => ({
+            ...prev,
+            cnpj: '',
+            nomeEmpresa: '',
+            siteEmpresa: '',
+            ccir: '',
+            nomePropriedade: '',
+            nomeVeiculo: ''
+        }));
     }, [role]);
 
     const handleFetchAddress = async (cep: string) => {
@@ -91,7 +102,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
         if (name === 'cep') finalValue = formData.pais === 'Brasil' ? MaskUtils.cep(value) : value.toUpperCase();
         else if (name === 'cpf') finalValue = formData.pais === 'Brasil' ? MaskUtils.cpf(value) : MaskUtils.passportID(value);
         else if (name === 'celular') finalValue = formData.pais === 'Brasil' ? MaskUtils.celular(value) : value;
-        else if (name === 'cnpj') finalValue = formData.pais === 'Brasil' ? MaskUtils.cnpj(value) : value.toUpperCase();
+        else if (name === 'cnpj') finalValue = MaskUtils.cnpj(value);
         else if (name === 'ccir') finalValue = MaskUtils.ccir(value);
 
         setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : finalValue }));
