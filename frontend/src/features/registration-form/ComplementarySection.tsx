@@ -32,8 +32,8 @@ export function ComplementarySection({
                             name="cnpj"
                             value={formData.cnpj}
                             onChange={handleInputChange}
-                            placeholder="00.000.000/0000-00"
-                            required
+                            placeholder={formData.pais === 'Brasil' ? "00.000.000/0000-00" : "00.000.000/0000-00 (Opcional)"}
+                            required={formData.pais === 'Brasil'}
                             disabled={formDisabled}
                             ref={cnpjInputRef}
                         />
@@ -108,14 +108,13 @@ export function ComplementarySection({
                             disabled={formDisabled}
                         />
                         <InputGroup
-                          label="CNPJ da Empresa"
-                          name="cnpj"
-                          value={formData.cnpj}
-                          onChange={handleInputChange}
-                          placeholder="00.000.000/0000-00"
-                          required
-                          disabled={formDisabled}
-                          ref={cnpjInputRef}
+                            label="CNPJ da Imprensa"
+                            name="cnpj"
+                            value={formData.cnpj}
+                            onChange={handleInputChange}
+                            placeholder="00.000.000/0000-00 (Opcional)"
+                            disabled={formDisabled}
+                            ref={cnpjInputRef}
                         />
                     </>
                 )}
