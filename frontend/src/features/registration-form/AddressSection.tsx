@@ -213,7 +213,6 @@ export function AddressSection({
                         <option value="ETANOL">Etanol</option>
                         <option value="DIESEL">Diesel</option>
                         <option value="ELETRICO">Elétrico</option>
-                        <option value="NAO_INFORMADO">Não Informado</option>
                     </select>
                 </div>
             )}

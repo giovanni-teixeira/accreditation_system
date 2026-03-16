@@ -4,6 +4,8 @@
     display: flex;
     flex-direction: column;
     gap: 2.5rem;
+    width: 100%;
+    min-width: 0;
 }
 
 .sectionTitle {
@@ -89,8 +91,15 @@
 .radioGrid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.25rem;
+    gap: 1rem;
     width: 100%;
+    align-items: stretch;
+    padding: 0.5rem 0; /* Espaço para o transform: translateY(-4px) dos cards */
+}
+@media (max-width: 380px) {
+    .radioGrid {
+        gap: 0.75rem;
+    }
 }
 
 @media (min-width: 768px) {
@@ -220,7 +229,9 @@
 }
 
 .dynamicFormAnimation {
+    width: 100%;
     animation: slideDown 0.4s ease-out forwards;
+    overflow: hidden; /* Evita que o translateY cause overflow momentâneo */
 }
 
 @keyframes slideDown {
@@ -230,8 +241,13 @@
 .addressRow {
     display: grid;
     grid-template-columns: 3fr 1fr;
-    gap: 1.5rem;
+    gap: 1rem; /* Reduzido de 1.5rem baseada no feedback do usuário. */
     grid-column: span 1;
+}
+@media (max-width: 380px) {
+    .addressRow {
+        gap: 0.5rem;
+    }
 }
 
 @media (min-width: 768px) {

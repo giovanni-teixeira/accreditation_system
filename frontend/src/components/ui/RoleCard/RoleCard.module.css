@@ -50,6 +50,18 @@
     color: var(--text-main);
 }
 
+@media (max-width: 480px) {
+    .radioCard {
+        padding: 1rem 0.5rem;
+    }
+    .cardLabel {
+        font-size: 0.75rem;
+    }
+    .cardIcon {
+        font-size: 1.5rem;
+    }
+}
+
 .disabledCard {
     opacity: 0.6;
     cursor: not-allowed;

@@ -64,7 +64,10 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
 
     useEffect(() => {
         if (role && dadosPessoaisRef.current) {
-            dadosPessoaisRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Garantir que a renderização inicial terminou antes de scrollar
+            requestAnimationFrame(() => {
+                dadosPessoaisRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
             setTimeout(() => nomeInputRef.current?.focus(), 500);
         }
 
@@ -169,7 +172,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
 
     return (
         <form id="cadastroForm" className={styles.formContainer} onSubmit={handleSubmit}>
-            <fieldset disabled={formDisabled} style={{ border: 'none', padding: 0, margin: 0, width: '100%' }}>
+            <fieldset disabled={formDisabled} style={{ border: 'none', padding: 0, margin: 0, width: '100%', minWidth: 0 }}>
                 <div className={styles.roleSelection}>
                     <h3 className={styles.sectionTitle}>1. Escolha seu Perfil</h3>
                     <div className={styles.radioGrid}>

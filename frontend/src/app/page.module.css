@@ -121,6 +121,19 @@
   }
 }
 
+@media (max-width: 480px) {
+  .header {
+    padding: 1rem 0;
+  }
+  .formCard {
+    padding: 1.25rem 0.875rem;
+    border-radius: 8px;
+  }
+  .container {
+    padding: 0 1rem;
+  }
+}
+
 @media (max-width: 768px) {
   .header {
     padding: 1rem 0;
