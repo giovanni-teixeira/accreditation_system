@@ -119,35 +119,35 @@ const CredentialPDF = forwardRef<HTMLDivElement, CredentialPDFProps>(({ userData
 
             {/* QUADRANTE 4 */}
             <div className={`${styles.quadrante} ${styles.q4}`}>
-              <div className={styles.tituloSecao}>PATROCÍNIO</div>
-                  <div className={styles.gridLogos}>
-                    <img src="/imagens/JPG.png" className={styles.logoEvento} alt="Logo Evento" />
-                  </div>
+                <div className={styles.tituloSecao}>PATROCÍNIO</div>
+                <div className={`${styles.gridLogos} ${styles.patrocinio}`}>
+                    <img src="/imagens/Jacto.png" alt="Jacto" crossOrigin="anonymous" />
+                </div>
+
                 <div className={styles.tituloSecao}>ORGANIZAÇÃO E REALIZAÇÃO</div>
                 <div className={styles.gridLogos}>
-                    <img src="/imagens/AAlves.png" alt="EPTV" />
-                    <img src="/imagens/AgroPL.png" alt="Epagro" />
-                    <img src="/imagens/OIMASA.png" alt="OIMASA" />
-                    <img src="/imagens/Olimáquinas.png" alt="Attalea" />
-                    <img src="/imagens/Robusta.png" alt="Robusta" />
-                    <img src="/imagens/Sami.png" alt="Sami" />
-                    <img src="/imagens/Sindicato Rural.png" alt="Sindicato Rural" />
-                    <img src="/imagens/aeagro.png" alt="AEAgro" />
+                    <img src="/imagens/AAlves.png" alt="AAlves" crossOrigin="anonymous" />
+                    <img src="/imagens/AgroPL.png" alt="AgroPL" crossOrigin="anonymous" />
+                    <img src="/imagens/OIMASA.png" alt="OIMASA" crossOrigin="anonymous" />
+                    <img src="/imagens/Olimáquinas.png" alt="Olimáquinas" crossOrigin="anonymous" />
+                    <img src="/imagens/Robusta.png" alt="Robusta" crossOrigin="anonymous" />
+                    <img src="/imagens/Sami.png" alt="Sami" crossOrigin="anonymous" />
+                    <img src="/imagens/Sindicato Rural.png" alt="Sindicato Rural" crossOrigin="anonymous" />
+                    <img src="/imagens/aeagro.png" alt="aeagro" crossOrigin="anonymous" />
                 </div>
 
                 <div className={styles.tituloSecao}>APOIO</div>
-              <div className={styles.gridLogos}>
-                <img src="/imagens/FAESP.png" alt="Alta Cafe" />
-                <img src="/imagens/sebrae.png" alt="Agro PL" />
-                <img src="/imagens/OCB.png" alt="Guapua" />
-
-              </div>
-
-              <div className={styles.tituloSecao}>APOIO DE MÍDIA</div>
                 <div className={styles.gridLogos}>
-                    <img src="/imagens/EPTV.png" alt="Alta Cafe" />
-                    <img src="/imagens/epagro.png" alt="Agro PL" />
-                    <img src="/imagens/Attalea.png" alt="Guapua" />
+                    <img src="/imagens/FAESP.png" alt="FAESP" crossOrigin="anonymous" />
+                    <img src="/imagens/sebrae.png" alt="sebrae" crossOrigin="anonymous" />
+                    <img src="/imagens/OCB.png" alt="OCB" crossOrigin="anonymous" />
+                </div>
+
+                <div className={styles.tituloSecao}>APOIO DE MÍDIA</div>
+                <div className={styles.gridLogos}>
+                    <img src="/imagens/EPTV.png" alt="EPTV" crossOrigin="anonymous" />
+                    <img src="/imagens/epagro.png" alt="epagro" crossOrigin="anonymous" />
+                    <img src="/imagens/Attalea.png" alt="Attalea" crossOrigin="anonymous" />
                 </div>
             </div>
         </div>
