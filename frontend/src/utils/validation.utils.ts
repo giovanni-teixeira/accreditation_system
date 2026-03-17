@@ -1,9 +1,6 @@
-/**
- * Utilitários de validação para documentos brasileiros (CPF e CNPJ). baseada no feedback do usuário.
- */
+/
 export class Validador {
     /**
-     * Valida o CPF informado. baseada no feedback do usuário.
      * @param cpf CPF formatado ou apenas números
      * @returns boolean
      */
@@ -37,7 +34,7 @@ export class Validador {
     }
 
     /**
-     * Valida o CNPJ informado. baseada no feedback do usuário.
+     * Valida o CNPJ informado.
      * @param cnpj CNPJ formatado ou apenas números
      * @returns boolean
      */

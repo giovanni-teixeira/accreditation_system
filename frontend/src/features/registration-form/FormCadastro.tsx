@@ -118,13 +118,38 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        // 1. Validação de LGPD
         if (!formData.aceiteLgpd) {
             setErrors(prev => ({ ...prev, lgpd: true }));
             onResult({ sucesso: false, mensagem: 'Leia e aceite os termos da LGPD.' });
             return;
         }
 
-        setErrors(prev => ({ ...prev, lgpd: false }));
+        // 2. Validação Estrita de Documentos (CPF/CNPJ) no momento do envio
+        // Re-validamos aqui para garantir que nada passe se o usuário ignorou o aviso visual
+        let validationError = false;
+        const newErrors = { ...errors, lgpd: false };
+
+        if (formData.pais === 'Brasil') {
+            if (!Validador.validarCPF(formData.cpf)) {
+                newErrors.cpf = 'Documento inválido';
+                validationError = true;
+            }
+            if (role === 'expositor' && formData.cnpj && !Validador.validarCNPJ(formData.cnpj)) {
+                newErrors.cnpj = 'CNPJ inválido';
+                validationError = true;
+            }
+        }
+
+        if (validationError) {
+            setErrors(newErrors);
+            onResult({ sucesso: false, mensagem: 'Por favor, corrija os erros destacados em vermelho antes de continuar.' });
+            // Focar no primeiro campo com erro se possível
+            return;
+        }
+
+        setErrors(newErrors);
 
         startTransition(async () => {
             const cleanCelular = formData.celular.replace(/\D/g, '');
