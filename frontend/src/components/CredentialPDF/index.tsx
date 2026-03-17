@@ -66,15 +66,17 @@ const CredentialPDF = forwardRef<HTMLDivElement, CredentialPDFProps>(({ userData
 
                 <div className={styles.nomeUsuario}>{userData.nomeCompleto}</div>
 
+                {extraInfo && (
+                  <div className={styles.infoAdicional}>
+                    <strong>{extraInfo}</strong>
+                  </div>
+                )}
+
                 <div className={styles.cidadeUF}>
                     {userData.cidade} - {userData.estado}
                 </div>
 
-                {extraInfo && (
-                    <div className={styles.infoAdicional}>
-                        <strong>{extraInfo}</strong>
-                    </div>
-                )}
+
 
                 <div className={styles.qrContainer}>
                     <img src={qrSource} className={styles.qrCode} alt="QR Code" crossOrigin="anonymous" />
