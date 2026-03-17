@@ -2,9 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
-import nacl from 'tweetnacl';
-import util from 'tweetnacl-util';
-import { API_ROUTES } from '@/config/api';
+import { AuthService } from '@/services/AuthService';
+import { ScannerService } from '@/services/ScannerService';
 
 export default function Scanner() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -18,11 +17,10 @@ export default function Scanner() {
   const lastScan = useRef<number>(0);
 
   useEffect(() => {
-    // Checa sessão ao carregar
-    const token = localStorage.getItem('ALTA_CAFE_JWT');
-    const key = localStorage.getItem('ALTA_CAFE_PUBLIC_KEY');
-    if (token && key) {
-      setPublicKey(key);
+    // Checa sessão ao carregar usando o serviço
+    const { publicKey: storedKey } = AuthService.getSession();
+    if (storedKey && AuthService.isLoggedIn()) {
+      setPublicKey(storedKey);
       setIsLoggedIn(true);
     }
   }, []);
@@ -33,26 +31,7 @@ export default function Scanner() {
     setIsLoading(true);
 
     try {
-      // Requisição centralizada pro Proxy Nginx `/api/...` burlando Ngrok Domains
-      const response = await fetch(API_ROUTES.AUTH.LOGIN_PORTARIA, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ login: loginForm.login, senhaHash: loginForm.senha })
-      });
-
-      if (!response.ok) {
-        throw new Error('Credenciais inválidas');
-      }
-
-      const data = await response.json();
-
-      if (!data.publicKey) {
-        throw new Error('Usuário sem permissão de portaria ou chave não encontrada no evento.');
-      }
-
-      localStorage.setItem('ALTA_CAFE_JWT', data.access_token);
-      localStorage.setItem('ALTA_CAFE_PUBLIC_KEY', data.publicKey);
-
+      const data = await AuthService.login(loginForm.login, loginForm.senha);
       setPublicKey(data.publicKey);
       setIsLoggedIn(true);
     } catch (err: any) {
@@ -64,8 +43,7 @@ export default function Scanner() {
 
   const handleLogout = () => {
     stopScanner();
-    localStorage.removeItem('ALTA_CAFE_JWT');
-    localStorage.removeItem('ALTA_CAFE_PUBLIC_KEY');
+    AuthService.logout();
     setIsLoggedIn(false);
     setPublicKey('');
   };
@@ -99,40 +77,25 @@ export default function Scanner() {
     if (Date.now() - lastScan.current < 2000) return;
     lastScan.current = Date.now();
 
-    try {
-      const parts = decodedText.split('.');
-      if (parts.length !== 2) throw new Error('Token adulterado (formato inválido)');
+    const result = ScannerService.validateScan(decodedText, publicKey);
 
-      const payloadRaw = parts[0]; // Formato: eventoId|ticketId
-      const signatureBase64 = parts[1];
-
-      // Verificação Assinatura Ed25519 offline
-      const messageUint8 = util.decodeUTF8(payloadRaw);
-      const signatureUint8 = util.decodeBase64(signatureBase64);
-      const publicKeyUint8 = util.decodeBase64(publicKey);
-
-      const isValid = nacl.sign.detached.verify(messageUint8, signatureUint8, publicKeyUint8);
-
-      if (!isValid) {
-        setScanResult({ status: 'ERROR', message: 'Assinatura Inválida', detailed: 'O QR Code foi adulterado ou pertence a outro evento.' });
-        return;
-      }
-
-      stopScanner();
-
-      // No novo formato, o payload é "eventoId|ticketId|nome"
-      const [eventoId, ticketId, nome] = payloadRaw.split('|');
-
-      setScanResult({
-        status: 'SUCCESS',
-        message: 'Acesso Liberado!',
-        detailed: `Nome: ${nome || 'Não informado'}\nTicket: ${ticketId}\nEvento: ${eventoId}`
+    if (!result.isValid) {
+      setScanResult({ 
+        status: 'ERROR', 
+        message: 'Falha na Validação', 
+        detailed: result.error 
       });
-
-    } catch (err: any) {
-      console.error('Erro Nacl Decode:', err);
-      setScanResult({ status: 'ERROR', message: 'Credencial Inválida', detailed: err.message || 'Dados corrompidos ou ilegíveis.' });
+      return;
     }
+
+    stopScanner();
+
+    const { nome, ticketId, eventoId } = result.data!;
+    setScanResult({
+      status: 'SUCCESS',
+      message: 'Acesso Liberado!',
+      detailed: `Nome: ${nome}\nTicket: ${ticketId}\nEvento: ${eventoId}`
+    });
   };
 
   const onScanFailure = (err: any) => {
