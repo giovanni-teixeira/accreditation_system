@@ -1,4 +1,4 @@
-/
+
 export class Validador {
     /**
      * @param cpf CPF formatado ou apenas números
