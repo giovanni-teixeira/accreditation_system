@@ -8,6 +8,8 @@ interface ComplementarySectionProps {
     handleInputChange: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
     formDisabled: boolean;
     cnpjInputRef: RefObject<HTMLInputElement | null>;
+    errors: any;
+    onCnpjBlur: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
 export function ComplementarySection({
@@ -15,7 +17,9 @@ export function ComplementarySection({
     formData,
     handleInputChange,
     formDisabled,
-    cnpjInputRef
+    cnpjInputRef,
+    errors,
+    onCnpjBlur
 }: ComplementarySectionProps) {
     if (!['expositor', 'produtor', 'imprensa'].includes(role)) return null;
 
@@ -34,6 +38,8 @@ export function ComplementarySection({
                             required={formData.pais === 'Brasil'}
                             disabled={formDisabled}
                             ref={cnpjInputRef}
+                            error={errors.cnpj}
+                            onBlur={onCnpjBlur}
                         />
                         <InputGroup
                             label="Nome da Empresa"
@@ -96,6 +102,8 @@ export function ComplementarySection({
                             placeholder="00.000.000/0000-00 (Opcional)"
                             disabled={formDisabled}
                             ref={cnpjInputRef}
+                            error={errors.cnpj}
+                            onBlur={onCnpjBlur}
                         />
                     </>
                 )}

@@ -136,7 +136,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                 newErrors.cpf = 'Documento inválido';
                 validationError = true;
             }
-            if (role === 'expositor' && formData.cnpj && !Validador.validarCNPJ(formData.cnpj)) {
+            if ((role === 'expositor' || role === 'imprensa') && formData.cnpj && !Validador.validarCNPJ(formData.cnpj)) {
                 newErrors.cnpj = 'CNPJ inválido';
                 validationError = true;
             }
@@ -144,8 +144,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
 
         if (validationError) {
             setErrors(newErrors);
-            onResult({ sucesso: false, mensagem: 'Por favor, corrija os erros destacados em vermelho antes de continuar.' });
-            // Focar no primeiro campo com erro se possível
+            onResult({ sucesso: false, mensagem: 'Verifique o CPF e o CNPJ' });
             return;
         }
 
@@ -154,13 +153,13 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
         startTransition(async () => {
             const cleanCelular = formData.celular.replace(/\D/g, '');
             const finalCelular = formData.ddi ? `+${formData.ddi}${cleanCelular}` : cleanCelular;
-            
-            // Concatena Rua e Número para o backend baseada no feedback do usuário.
+
+            // Concatena Rua e Número para o backend.
             const ruaCompleta = formData.numero ? `${formData.rua}, ${formData.numero}` : formData.rua;
-            
+
             const cleanData = { ...formData, celular: finalCelular, role, rua: ruaCompleta };
 
-            // Sanitização de campos numéricos e documentos baseada no feedback do usuário.
+            // Sanitização de campos numéricos e documentos.
             if (cleanData.semCep && cleanData.distanciaManualKm) {
                 cleanData.distanciaManualKm = Number(cleanData.distanciaManualKm) as any;
             } else {
@@ -171,7 +170,7 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
             if (cleanData.cnpj) cleanData.cnpj = MaskUtils.unmask(cleanData.cnpj);
             if (cleanData.cep) cleanData.cep = MaskUtils.unmask(cleanData.cep);
 
-            // Remove strings vazias de campos opcionais baseada no feedback do usuário.
+            // Remove strings vazias de campos opcionais.
             ['rg', 'cnpj', 'nomeEmpresa', 'siteEmpresa', 'nomePropriedade', 'nomeVeiculo', 'cep', 'rua', 'bairro'].forEach(key => {
                 if (!(cleanData as any)[key]) {
                     delete (cleanData as any)[key];
@@ -314,6 +313,18 @@ export default function FormCadastro({ onResult, isBlocked = false }: FormCadast
                             handleInputChange={handleInputChange}
                             formDisabled={formDisabled}
                             cnpjInputRef={cnpjInputRef}
+                            errors={errors}
+                            onCnpjBlur={(e) => {
+                                if (formData.pais === 'Brasil' && e.target.value) {
+                                    if (!Validador.validarCNPJ(e.target.value)) {
+                                        setErrors(prev => ({ ...prev, cnpj: 'CNPJ inválido' }));
+                                    } else {
+                                        setErrors(prev => ({ ...prev, cnpj: undefined }));
+                                    }
+                                } else {
+                                    setErrors(prev => ({ ...prev, cnpj: undefined }));
+                                }
+                            }}
                         />
 
                         <div className={`${styles.lgpdSection} ${errors.lgpd ? styles.lgpdError : ''}`}>
