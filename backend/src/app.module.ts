@@ -15,6 +15,10 @@ import { AddressController } from './controllers/AddressController';
 import { DataService } from './services/data.service';
 import { DataController } from './controllers/DataController';
 import { JwtStrategy } from './controllers/guards/jwt.strategy';
+import { ScansController } from './controllers/ScansController';
+import { ScansService } from './services/scans.service';
+import { QrScanRepository } from './repositories/qr-scan.repository';
+import { CredencialRepository as CredRepo } from './repositories/credencial.repository';
 
 @Module({
   imports: [
@@ -25,7 +29,7 @@ import { JwtStrategy } from './controllers/guards/jwt.strategy';
       signOptions: { expiresIn: '24h' },
     }),
   ],
-  controllers: [AuthController, CredenciadosController, AddressController, DataController],
+  controllers: [AuthController, CredenciadosController, AddressController, DataController, ScansController],
   providers: [
     PrismaService,
     UsuarioRepository,
@@ -35,6 +39,9 @@ import { JwtStrategy } from './controllers/guards/jwt.strategy';
     AddressRepository,
     AddressService,
     DataService,
+    ScansService,
+    QrScanRepository,
+    CredRepo,
     JwtStrategy,
   ],
 })

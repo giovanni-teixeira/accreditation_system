@@ -169,5 +169,6 @@ model QrScan {
   credencial Credencial @relation(fields: [ticketId], references: [ticketId], onDelete: Cascade)
 
   @@index([ticketId])
+  @@index([ticketId, createdAt])
   @@map("qrscans")
 }
