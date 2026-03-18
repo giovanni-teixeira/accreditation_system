@@ -31,6 +31,15 @@ export default function ScannerPage() {
             setIsLoggedIn(true);
         }
 
+        // Registrar Service Worker para PWA (Melhora a "instalabilidade")
+        if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/scanner/sw.js')
+                    .then(reg => console.log('SW registrado:', reg.scope))
+                    .catch(err => console.error('Erro SW:', err));
+            });
+        }
+
         // Tenta sincronizar scans offline a cada 30 segundos
         const syncInterval = setInterval(() => {
             const SyncService = require('@/services/SyncService').default;

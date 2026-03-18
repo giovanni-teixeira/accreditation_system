@@ -11,6 +11,7 @@ interface ScannerCameraProps {
 export const ScannerCamera: React.FC<ScannerCameraProps> = ({ onDetect, isPaused }) => {
     const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
     const lastScanRef = useRef<number>(0);
+    const [cameraError, setCameraError] = React.useState<string | null>(null);
 
     useEffect(() => {
 
@@ -20,8 +21,14 @@ export const ScannerCamera: React.FC<ScannerCameraProps> = ({ onDetect, isPaused
 
         const startScanner = async () => {
             if (isPaused) return;
+            setCameraError(null);
 
             try {
+                // Verificar requisito de HTTPS
+                if (!window.isSecureContext) {
+                    setCameraError("Acesso Negado: O scanner requer HTTPS (Conexão Segura) para acessar a câmera.");
+                    return;
+                }
                 const qrCodeSuccessCallback = (decodedText: string) => {
                     if (Date.now() - lastScanRef.current < 2000) return;
                     lastScanRef.current = Date.now();
@@ -46,8 +53,9 @@ export const ScannerCamera: React.FC<ScannerCameraProps> = ({ onDetect, isPaused
                     qrCodeSuccessCallback,
                     () => {}
                 );
-            } catch (err) {
+            } catch (err: any) {
                 console.error("Erro ao iniciar scanner:", err);
+                setCameraError("Não foi possível acessar a câmera. Verifique se as permissões estão liberadas no seu navegador.");
             }
         };
 
@@ -74,8 +82,14 @@ export const ScannerCamera: React.FC<ScannerCameraProps> = ({ onDetect, isPaused
 
     return (
         <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-black shadow-inner border-none focus:outline-none">
-            {/* Onde o vídeo será renderizado */}
-            <div id="qr-reader" className="w-full h-full [&_video]:object-cover border-none"></div>
+            <div id="qr-reader" className="w-full h-full [&_video]:object-cover border-none flex items-center justify-center">
+                {cameraError && (
+                    <div className="p-6 text-center text-red-500 bg-black/80 z-[60] absolute inset-0 flex flex-col items-center justify-center gap-4">
+                        <span className="text-4xl">⚠️</span>
+                        <p className="text-sm font-medium leading-relaxed">{cameraError}</p>
+                    </div>
+                )}
+            </div>
 
             {/* Camada de Gradiente (Vignette) suave */}
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_50%,_rgba(0,0,0,0.6)_100%)] pointer-events-none z-10" />
