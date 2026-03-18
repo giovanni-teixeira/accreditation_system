@@ -90,25 +90,27 @@ export default function ScannerPage() {
             <header className="flex flex-col items-center mb-10">
                 <div className="relative w-[180px] h-[90px]">
                     <img
-                        src="/img/logo.jpg"
+                        src="/scanner/img/logo.jpg"
                         alt="Alta Café Logo"
                         className="w-full h-full object-contain"
                     />
                 </div>
             </header>
 
-            <section className="relative w-full max-w-[420px] aspect-square rounded-lg overflow-hidden">
-                <ScannerCamera onDetect={onDetect} isPaused={isPaused} />
-                <StatusOverlay status={scanState.status} />
-                <FlashEffect active={flashActive} />
+            {isLoggedIn && (
+                <section className="relative w-full max-w-[420px] aspect-square rounded-lg overflow-hidden">
+                    <ScannerCamera onDetect={onDetect} isPaused={isPaused} />
+                    <StatusOverlay status={scanState.status} />
+                    <FlashEffect active={flashActive} />
 
-                {/* Badge de Sincronização Pendente */}
-                {pendingCount > 0 && (
-                    <div className="absolute top-4 right-4 bg-red-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg border-2 border-white animate-bounce z-50">
-                        {pendingCount} SINC. PENDENTE
-                    </div>
-                )}
-            </section>
+                    {/* Badge de Sincronização Pendente */}
+                    {pendingCount > 0 && (
+                        <div className="absolute top-4 right-4 bg-red-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg border-2 border-white animate-bounce z-50">
+                            {pendingCount} SINC. PENDENTE
+                        </div>
+                    )}
+                </section>
+            )}
 
             <footer className="w-full max-w-[400px] mt-6 flex flex-col gap-4">
                 <div className={`p-4 rounded-2xl border transition-all duration-300 ${
