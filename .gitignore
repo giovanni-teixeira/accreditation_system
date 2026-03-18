@@ -46,4 +46,4 @@ GUIA_DEPLOY_VPS.md
 # Build Folders
 backend/dist/
 dist/
-scanner_final/
+scanner_primary/

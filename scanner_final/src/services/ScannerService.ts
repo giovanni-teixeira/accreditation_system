@@ -23,7 +23,6 @@ export class ScannerService {
             const payloadRaw = parts[0];
             const signatureBase64 = parts[1];
 
-
             const messageUint8 = util.decodeUTF8(payloadRaw);
             const signatureUint8 = util.decodeBase64(signatureBase64);
             const publicKeyUint8 = util.decodeBase64(publicKey);
@@ -31,7 +30,7 @@ export class ScannerService {
             const isValid = nacl.sign.detached.verify(messageUint8, signatureUint8, publicKeyUint8);
 
             if (!isValid) {
-                return { isValid: false, error: 'Assinatura Inválida - O QR Code foi adulterado ou pertence a outro evento.' };
+                return { isValid: false, error: 'Assinatura Inválida - O QR Code não pertence a este evento.' };
             }
 
             const [eventoId, ticketId, nome] = payloadRaw.split('|');
@@ -44,10 +43,11 @@ export class ScannerService {
                     nome: nome || 'Não informado'
                 }
             };
-
         } catch (err: any) {
-            console.error('Erro na validação do scan:', err);
-            return { isValid: false, error: err.message || 'Dados corrompidos ou ilegíveis.' };
+            console.error('Erro crítico na validação do scan:', err);
+
+            const message = err?.message || 'Dados corrompidos ou ilegíveis.';
+            return { isValid: false, error: `Falha técnica: ${message}` };
         }
     }
 }

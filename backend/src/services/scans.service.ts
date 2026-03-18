@@ -52,4 +52,32 @@ export class ScansService {
       }
     };
   }
+
+  /**
+   * Processamento em lote (Batch) para alta escalabilidade
+   */
+  async bulkCheckIn(ticketIds: string[], scannerId: string) {
+    const results = {
+      processed: 0,
+      alreadyScanned: 0,
+      errors: 0,
+    };
+
+    // Usamos um loop controlado para garantir que cada registro seja validado individualmente hoje
+    // Mas a chamada do banco é sequencial rápida dentro do ambiente node
+    for (const ticketId of ticketIds) {
+      try {
+        const res = await this.checkIn(ticketId, scannerId);
+        if (res.alreadyScanned) {
+          results.alreadyScanned++;
+        } else {
+          results.processed++;
+        }
+      } catch (err) {
+        results.errors++;
+      }
+    }
+
+    return results;
+  }
 }

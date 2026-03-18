@@ -13,14 +13,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Alta Café Scanner",
-  description: "Validador Offline de Credenciais da Alta Café",
-  manifest: "/manifest.json",
+  title: "Portaria Alta Café - Scanner",
+  description: "Sistema de validação de ingressos e credenciais",
+  themeColor: "#2e7d32",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
-    title: "Scanner AC"
-  }
+    statusBarStyle: "default",
+    title: "Portaria Café",
+  },
 };
 
 export default function RootLayout({
@@ -29,8 +29,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="pt-BR">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased overscroll-none h-full selection:bg-primary-green/30`}
+      >
         {children}
       </body>
     </html>

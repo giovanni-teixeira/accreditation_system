@@ -30,7 +30,18 @@ export class ScansController {
   @ApiResponse({ status: 403, description: 'Acesso negado.' })
   @ApiResponse({ status: 404, description: 'Credencial não encontrada.' })
   async checkIn(@Body() body: { ticketId: string }, @Request() req: any) {
-    const scannerId = req.user.sub; // ID do usuário que está logado no scanner
+    const scannerId = req.user.sub;
     return await this.scansService.checkIn(body.ticketId, scannerId);
+  }
+
+  @Post('check-in-batch')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'LEITOR_CATRACA')
+  @ApiOperation({ summary: 'Sincronizar múltiplos scans de uma vez (Scalability)' })
+  @ApiResponse({ status: 200, description: 'Lote processado.' })
+  async checkInBatch(@Body() body: { ticketIds: string[] }, @Request() req: any) {
+    const scannerId = req.user.sub;
+    return await this.scansService.bulkCheckIn(body.ticketIds, scannerId);
   }
 }

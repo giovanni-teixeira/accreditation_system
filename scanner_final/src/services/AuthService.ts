@@ -23,13 +23,17 @@ export class AuthService {
         const data = await response.json();
 
         if (!data.publicKey) {
-            throw new Error('Usuário sem permissão de portaria ou chave não encontrada no evento.');
+            throw new Error('Usuário sem permissão de portaria ou chave não encontrada.');
         }
 
-        localStorage.setItem(this.STORAGE_KEY_TOKEN, data.access_token);
-        localStorage.setItem(this.STORAGE_KEY_PUBKEY, data.publicKey);
+        this.saveSession(data.access_token, data.publicKey);
 
         return data;
+    }
+
+    private static saveSession(token: string, publicKey: string) {
+        localStorage.setItem(this.STORAGE_KEY_TOKEN, token);
+        localStorage.setItem(this.STORAGE_KEY_PUBKEY, publicKey);
     }
 
     static logout(): void {
