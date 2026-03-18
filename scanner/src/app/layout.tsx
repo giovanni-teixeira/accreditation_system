@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Portaria Alta Café - Scanner",
   description: "Sistema de validação de ingressos e credenciais",
-  themeColor: "#2e7d32",
+  themeColor: "#5D4037",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

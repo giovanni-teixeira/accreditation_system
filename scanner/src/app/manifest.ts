@@ -8,7 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: '/scanner/',
     display: 'standalone',
     background_color: '#ffffff',
-    theme_color: '#2e7d32', // Verde primário
+    theme_color: '#5D4037', // Tom de Café
     icons: [
       {
         src: '/scanner/icons/icon-192.png',
