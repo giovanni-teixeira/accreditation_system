@@ -7,14 +7,17 @@ import { BusinessException } from '../common/exceptions/business.exception';
 export class ScansService {
   constructor(
     private readonly qrScanRepository: QrScanRepository,
-    private readonly credencialRepository: CredencialRepository
+    private readonly credencialRepository: CredencialRepository,
   ) {}
 
   async checkIn(ticketId: string, scannerId: string) {
     // 1. Verificar se a credencial existe e está ativa
     const credencial = await this.credencialRepository.findByTicketId(ticketId);
     if (!credencial) {
-      throw new BusinessException('Credencial não encontrada ou inválida.', 404);
+      throw new BusinessException(
+        'Credencial não encontrada ou inválida.',
+        404,
+      );
     }
 
     if (credencial.status !== 'ACTIVE') {
@@ -22,16 +25,17 @@ export class ScansService {
     }
 
     // 2. Verificar se já existe check-in HOJE
-    const existingScan = await this.qrScanRepository.findTodayRegistration(ticketId);
+    const existingScan =
+      await this.qrScanRepository.findTodayRegistration(ticketId);
     if (existingScan) {
       return {
         success: true,
         alreadyScanned: true,
         message: 'Credencial já verificada hoje.',
         data: {
-            nome: credencial.credenciado?.nomeCompleto || 'Desconhecido',
-            ticketId
-        }
+          nome: credencial.credenciado?.nomeCompleto || 'Desconhecido',
+          ticketId,
+        },
       };
     }
 
@@ -39,7 +43,7 @@ export class ScansService {
     await this.qrScanRepository.create({
       credencial: { connect: { ticketId: ticketId } },
       scannerId,
-      scanType: 'CHECK_IN'
+      scanType: 'CHECK_IN',
     });
 
     return {
@@ -48,8 +52,8 @@ export class ScansService {
       message: 'Acesso Liberado!',
       data: {
         nome: credencial.credenciado?.nomeCompleto || 'Desconhecido',
-        ticketId
-      }
+        ticketId,
+      },
     };
   }
 

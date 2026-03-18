@@ -4,6 +4,7 @@ import {
   Body,
   UseGuards,
   Request,
+  HttpException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -25,12 +26,18 @@ export class ScansController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'LEITOR_CATRACA')
-  @ApiOperation({ summary: 'Registrar check-in de uma credencial (Unicidade diária)' })
+  @ApiOperation({
+    summary: 'Registrar check-in de uma credencial (Unicidade diária)',
+  })
   @ApiResponse({ status: 200, description: 'Check-in processado.' })
   @ApiResponse({ status: 403, description: 'Acesso negado.' })
   @ApiResponse({ status: 404, description: 'Credencial não encontrada.' })
   async checkIn(@Body() body: { ticketId: string }, @Request() req: any) {
-    const scannerId = req.user.sub;
+    console.log('USER:', req.user);
+    const scannerId = req.user?.sub || req.user?.id;
+    if (!scannerId) {
+      throw new Error('Usuario não autenticado ou token inválido');
+    }
     return await this.scansService.checkIn(body.ticketId, scannerId);
   }
 
@@ -38,10 +45,20 @@ export class ScansController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'LEITOR_CATRACA')
-  @ApiOperation({ summary: 'Sincronizar múltiplos scans de uma vez (Scalability)' })
+  @ApiOperation({
+    summary: 'Sincronizar múltiplos scans de uma vez (Scalability)',
+  })
   @ApiResponse({ status: 200, description: 'Lote processado.' })
-  async checkInBatch(@Body() body: { ticketIds: string[] }, @Request() req: any) {
-    const scannerId = req.user.sub;
+  async checkInBatch(
+    @Body() body: { ticketIds: string[] },
+    @Request() req: any,
+  ) {
+    console.log('USER:', req.user);
+    const scannerId = req.user?.sub || req.user?.id;
+
+    if (!scannerId) {
+      throw new Error('Usuário não autenticado ou token inválido');
+    }
     return await this.scansService.bulkCheckIn(body.ticketIds, scannerId);
   }
 }

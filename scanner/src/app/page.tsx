@@ -40,17 +40,31 @@ export default function ScannerPage() {
             });
         }
 
-        // Tenta sincronizar scans offline a cada 30 segundos
-        const syncInterval = setInterval(() => {
-            const SyncService = require('@/services/SyncService').default;
-            SyncService.processQueue();
-            
-            // Atualiza contador de pendentes
+        // --- MELHORIAS DE SINCRONIZAÇÃO SOLICITADAS ---
+        
+        // 1. Sincronizar ao abrir o app
+        const performInitialSync = async () => {
+            const SyncService = (await import('@/services/SyncService')).default;
+            await SyncService.processQueue();
+            updatePendingCount();
+        };
+        performInitialSync();
+
+        // 2. Sincronizar ao voltar a internet (online)
+        window.addEventListener('online', performInitialSync);
+
+        // 3. Sincronizar periodicamente a cada 15s
+        const syncInterval = setInterval(performInitialSync, 15000);
+
+        function updatePendingCount() {
             const queue = JSON.parse(localStorage.getItem('OFFLINE_SCANS_QUEUE') || '[]');
             setPendingCount(queue.length);
-        }, 15000);
+        }
 
-        return () => clearInterval(syncInterval);
+        return () => {
+            clearInterval(syncInterval);
+            window.removeEventListener('online', performInitialSync);
+        };
     }, []);
 
     // Atualização imediata do contador ao detectar
@@ -150,14 +164,49 @@ export default function ScannerPage() {
                     </button>
                 )}
 
-                <button
-                    onClick={handleLogout}
-                    className="text-slate-400 text-xs font-semibold hover:text-red-400 transition-colors uppercase tracking-widest mt-2"
-                >
-                    Sair da Conta
-                </button>
+                {pendingCount > 0 && (
+                    <button
+                        onClick={async () => {
+                            const SyncService = (await import('@/services/SyncService')).default;
+                            await SyncService.processQueue();
+                            const queue = JSON.parse(localStorage.getItem('OFFLINE_SCANS_QUEUE') || '[]');
+                            setPendingCount(queue.length);
+                        }}
+                        className="w-full p-3 bg-red-100 text-red-700 font-bold rounded-xl border border-red-200 hover:bg-red-200 transition-all flex items-center justify-center gap-2"
+                    >
+                         🚀 Sincronizar Agora ({pendingCount})
+                    </button>
+                )}
+
+                    </button>
+                )}
+
+                {/* --- SEÇÃO DE TESTE SOLICITADA --- */}
+                <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col gap-3">
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center mb-1">Área do Desenvolvedor</p>
+                    
+                    <button
+                        onClick={async () => {
+                            const SyncService = (await import('@/services/SyncService')).default;
+                            const result = await SyncService.generateTestScans(10);
+                            alert(`Teste Concluído!\nLote processado: ${result.processed}\nJá verificados: ${result.alreadyScanned}\nErros: ${result.errors}`);
+                            const queue = JSON.parse(localStorage.getItem('OFFLINE_SCANS_QUEUE') || '[]');
+                            setPendingCount(queue.length);
+                        }}
+                        className="w-full p-3 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-xl border border-indigo-100 hover:bg-indigo-100 transition-all flex items-center justify-center gap-2"
+                    >
+                         🧪 Gerar 10 Scans e Sincronizar
+                    </button>
+
+                    <button
+                        onClick={handleLogout}
+                        className="text-slate-400 text-[10px] font-semibold hover:text-red-400 transition-colors uppercase tracking-widest mt-2"
+                    >
+                        Sair da Conta
+                    </button>
+                </div>
             </footer>
-            </main>
-        </div>
+        </main>
+</div>
     );
 }
