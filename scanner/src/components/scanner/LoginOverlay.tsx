@@ -57,7 +57,7 @@ export const LoginOverlay: React.FC<LoginOverlayProps> = ({ onLoginSuccess }) =>
                 <div className="flex justify-center mb-6">
                     <div className="relative w-[160px] h-[80px]">
                         <img 
-                            src="/img/logo.jpg" 
+                            src="/scanner/img/logo.jpg" 
                             alt="Alta Café" 
                             className="w-full h-full object-contain"
                         />
