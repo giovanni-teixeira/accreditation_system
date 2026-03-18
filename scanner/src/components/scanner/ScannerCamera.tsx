@@ -107,14 +107,6 @@ export const ScannerCamera: React.FC<ScannerCameraProps> = ({ onDetect, isPaused
                 )}
             </div>
 
-            {/* Badge de Status Inferior */}
-            <div className="absolute bottom-10 left-0 right-0 flex justify-center z-30">
-                <div className="bg-black/60 backdrop-blur-md px-6 py-2 rounded-full border border-white/20">
-                    <span className="text-white/90 text-[10px] font-bold uppercase tracking-[0.2em]">
-                        {isPaused ? 'Leitura Pausada' : 'Aguardando Código'}
-                    </span>
-                </div>
-            </div>
         </div>
     );
 };

@@ -9,7 +9,7 @@ export function useScanner(publicKey: string) {
         status: 'IDLE' | 'SUCCESS' | 'ERROR' | 'ALREADY_SCANNED';
         message: string;
         details?: string;
-    }>({ status: 'IDLE', message: 'Aguardando Leitura...' });
+    }>({ status: 'IDLE', message: '' });
 
     const [isPaused, setIsPaused] = useState(false);
     const [flashActive, setFlashActive] = useState(false);
