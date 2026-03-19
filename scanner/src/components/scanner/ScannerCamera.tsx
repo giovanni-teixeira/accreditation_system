@@ -19,45 +19,45 @@ export const ScannerCamera: React.FC<ScannerCameraProps> = ({ onDetect, isPaused
             html5QrCodeRef.current = new Html5Qrcode("qr-reader");
         }
 
-        // const startScanner = async () => {
-        //     if (isPaused) return;
-        //     setCameraError(null);
-        //
-        //     try {
-        //         // Verificar requisito de HTTPS
-        //         if (!window.isSecureContext) {
-        //             setCameraError("Acesso Negado: O scanner requer HTTPS (Conexão Segura) para acessar a câmera.");
-        //             return;
-        //         }
-        //         const qrCodeSuccessCallback = (decodedText: string) => {
-        //             if (Date.now() - lastScanRef.current < 2000) return;
-        //             lastScanRef.current = Date.now();
-        //             onDetect(decodedText);
-        //         };
-        //
-        //         const qrboxFunction = (viewfinderWidth: number, viewfinderHeight: number) => {
-        //             const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-        //             const qrboxSize = Math.floor(minEdge * 0.75);
-        //             return {
-        //                 width: qrboxSize,
-        //                 height: qrboxSize
-        //             };
-        //         };
-        //
-        //         await html5QrCodeRef.current?.start(
-        //             { facingMode: "environment" },
-        //             {
-        //                 fps: 20,
-        //                 qrbox: qrboxFunction,
-        //             },
-        //             qrCodeSuccessCallback,
-        //             () => {}
-        //         );
-        //     } catch (err: any) {
-        //         console.error("Erro ao iniciar scanner:", err);
-        //         setCameraError("Não foi possível acessar a câmera. Verifique se as permissões estão liberadas no seu navegador.");
-        //     }
-        // };
+        const startScanner = async () => {
+            if (isPaused) return;
+            setCameraError(null);
+
+            try {
+                // Verificar requisito de HTTPS
+                if (!window.isSecureContext) {
+                    setCameraError("Acesso Negado: O scanner requer HTTPS (Conexão Segura) para acessar a câmera.");
+                    return;
+                }
+                const qrCodeSuccessCallback = (decodedText: string) => {
+                    if (Date.now() - lastScanRef.current < 2000) return;
+                    lastScanRef.current = Date.now();
+                    onDetect(decodedText);
+                };
+
+                const qrboxFunction = (viewfinderWidth: number, viewfinderHeight: number) => {
+                    const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+                    const qrboxSize = Math.floor(minEdge * 0.75);
+                    return {
+                        width: qrboxSize,
+                        height: qrboxSize
+                    };
+                };
+
+                await html5QrCodeRef.current?.start(
+                    { facingMode: "environment" },
+                    {
+                        fps: 20,
+                        qrbox: qrboxFunction,
+                    },
+                    qrCodeSuccessCallback,
+                    () => {}
+                );
+            } catch (err: any) {
+                console.error("Erro ao iniciar scanner:", err);
+                setCameraError("Não foi possível acessar a câmera. Verifique se as permissões estão liberadas no seu navegador.");
+            }
+        };
 
         const stopScanner = async () => {
             if (html5QrCodeRef.current && html5QrCodeRef.current.isScanning) {
@@ -69,11 +69,11 @@ export const ScannerCamera: React.FC<ScannerCameraProps> = ({ onDetect, isPaused
             }
         };
 
-        // if (!isPaused) {
-        //     startScanner();
-        // } else {
-        //     stopScanner();
-        // }
+        if (!isPaused) {
+            startScanner();
+        } else {
+            stopScanner();
+        }
 
         return () => {
             stopScanner();
