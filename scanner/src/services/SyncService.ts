@@ -26,8 +26,13 @@ class SyncService {
     // Adiciona ao histórico local de visibilidade imediata
     this.addToHistory(ticketId);
 
-    // Tenta sincronizar imediatamente (o processQueue cuida da verificação de rede/token)
-    this.processQueue();
+    // Tente sincronizar apenas se houver 3 ou mais itens na fila (Novo Requisito)
+    if (queue.length >= 3) {
+        console.log(`📦 Lote com ${queue.length} itens. Iniciando sincronização...`);
+        this.processQueue();
+    } else {
+        console.log(`⏳ Aguardando mais scans para fechar lote (Atual: ${queue.length}/3)`);
+    }
   }
 
   static async processQueue() {

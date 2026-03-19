@@ -26,7 +26,8 @@ export function useScanner(publicKey: string) {
             if (result.isValid && result.data) {
                 const ticketId = result.data.ticketId;
 
-
+                // Comentado conforme solicitação: apenas verificar se a credencial é válida
+                /*
                 if (SyncService.isAlreadyScannedToday(ticketId)) {
                     setScanState({
                         status: 'ALREADY_SCANNED',
@@ -34,14 +35,14 @@ export function useScanner(publicKey: string) {
                         details: JSON.stringify(result.data)
                     });
                 } else {
-
+                */
                     SyncService.enqueueScan(ticketId);
                     setScanState({
                         status: 'SUCCESS',
                         message: 'Acesso Liberado!',
                         details: JSON.stringify(result.data)
                     });
-                }
+                // } 
                 setIsPaused(true);
             } else {
                 setScanState({
