@@ -95,7 +95,7 @@ export class AuthController implements OnModuleInit {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
-  @ApiOperation({ summary: 'Criar novo usuário na organização (Apenas ADMIN)' })
+  @ApiOperation({ summary: 'Criar novo usuário na organização com credencial completa (Apenas ADMIN)' })
   @ApiResponse({ status: 201, description: 'Usuário registrado com sucesso.' })
   @ApiResponse({ status: 403, description: 'Sem permissão de acesso.' })
   async register(@Body() registerDto: RegisterDto) {
@@ -103,11 +103,56 @@ export class AuthController implements OnModuleInit {
       const saltRounds = 10;
       const hashData = await bcrypt.hash(registerDto.senhaPura, saltRounds);
 
+      // 1. Criar login do usuário
       const novoUsuario = await this.usuarioRepository.create({
         login: registerDto.login,
         senhaHash: hashData,
         perfilAcesso: registerDto.perfilAcesso,
+        setor: registerDto.setor,
       });
+
+      // 2. Se CPF foi fornecido, criar Credenciado + Credencial (QR) + Descarbonizacao
+      if (registerDto.cpf) {
+        const evento = await this.eventoRepository.findFirst();
+        const credExists = await this.credenciadoRepository.findByCpf(registerDto.cpf);
+
+        if (!credExists && evento) {
+          const nomeCompleto = registerDto.nomeCompleto || registerDto.login.toUpperCase();
+          const tokenDados = QrCodeHelper.generateSignedToken(
+            evento.id,
+            evento.privateKey!,
+            nomeCompleto,
+          );
+
+          await this.credenciadoRepository.create(
+            {
+              nomeCompleto,
+              cpf: registerDto.cpf,
+              rg: registerDto.rg ?? null,
+              celular: registerDto.celular ?? '00000000000',
+              email: registerDto.email ?? `${registerDto.login}@sistema.com`,
+              tipoCategoria: 'ORGANIZACAO',
+              aceiteLgpd: true,
+              evento: { connect: { id: evento.id } },
+              descarbonizacao: {
+                create: {
+                  distanciaIdaVoltaKm: 0,
+                  tipoCombustivel: 'GASOLINA',
+                  pegadaCo2: 0,
+                },
+              },
+              credencial: {
+                create: {
+                  ticketId: tokenDados.ticketId,
+                  qrToken: tokenDados.qrToken,
+                  status: 'ACTIVE',
+                },
+              },
+            },
+            { credencial: true },
+          );
+        }
+      }
 
       return new UsuarioResponseDto(novoUsuario);
     } catch (error) {
