@@ -161,6 +161,26 @@ export class CredenciadosController {
     return result.map((c) => new CredenciadoResponseDto(c));
   }
 
+  @Get(ROUTES.CREDENCIADOS.BUSCAR_CPF)
+  @ApiOperation({ summary: 'Buscar por CPF (público)' })
+  @ApiResponse({ status: 200, type: CredenciadoResponseDto })
+  async buscarPorCpf(@Param('cpf') cpf: string) {
+    try {
+      const res = await this.credenciadoRepository.findByCpf(cpf);
+      if (!res)
+        throw new BusinessException(
+          'Documento não encontrado nos registros.',
+          404,
+        );
+      return new CredenciadoResponseDto(res);
+    } catch (error) {
+      if (error instanceof BusinessException) throw error;
+      throw new BusinessException(
+        `Erro ao buscar credenciado: ${error.message}`,
+      );
+    }
+  }
+
   @Get(':id')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
