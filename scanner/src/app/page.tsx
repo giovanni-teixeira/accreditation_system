@@ -108,6 +108,8 @@ export default function ScannerPage() {
 
             {isLoggedIn && (
                 <section className="relative w-full max-w-[420px] aspect-square rounded-lg overflow-hidden">
+                    <ScannerCamera onDetect={onDetect} isPaused={isPaused} />
+                    <StatusOverlay status={scanState.status} />
                     <FlashEffect active={flashActive} />
                     
                     {/* Badge de Sincronização Pendente (Comentado conforme solicitação)

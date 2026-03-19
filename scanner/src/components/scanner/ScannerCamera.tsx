@@ -25,10 +25,10 @@ export const ScannerCamera: React.FC<ScannerCameraProps> = ({ onDetect, isPaused
 
             try {
                 // Verificar requisito de HTTPS
-                if (!window.isSecureContext) {
-                    setCameraError("Acesso Negado: O scanner requer HTTPS (Conexão Segura) para acessar a câmera.");
-                    return;
-                }
+                // if (!window.isSecureContext) {
+                //     setCameraError("Acesso Negado: O scanner requer HTTPS (Conexão Segura) para acessar a câmera.");
+                //     return;
+                // }
                 const qrCodeSuccessCallback = (decodedText: string) => {
                     if (Date.now() - lastScanRef.current < 2000) return;
                     lastScanRef.current = Date.now();
