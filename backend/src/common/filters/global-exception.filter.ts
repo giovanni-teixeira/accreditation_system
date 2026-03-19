@@ -6,9 +6,12 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Response, Request } from 'express';
+import { AppLoggerService } from '../logger/logger.service';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
+  private readonly logger = new AppLoggerService();
+
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -22,7 +25,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       status = exception.getStatus();
       const res = exception.getResponse();
 
-      // Erros de validação do class-validator vêm como objeto com array de 'message'
       if (typeof res === 'object' && res !== null && 'message' in res) {
         const rawMessage = (res as any).message;
         message = Array.isArray(rawMessage)
@@ -32,7 +34,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         message = res;
       }
 
-      // Mapear códigos HTTP para errorCode legível
       const codeMap: Record<number, string> = {
         400: 'BAD_REQUEST',
         401: 'UNAUTHORIZED',
@@ -46,6 +47,20 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       errorCode = codeMap[status] ?? 'HTTP_ERROR';
     } else if (exception instanceof Error) {
       message = exception.message;
+    }
+
+    // Logar erros 5xx em arquivo
+    if (status >= 500) {
+      this.logger.error(
+        `[${status}] ${request.method} ${request.url} → ${message}`,
+        exception instanceof Error ? exception.stack : undefined,
+        'GlobalExceptionFilter',
+      );
+    } else if (status >= 400) {
+      this.logger.warn(
+        `[${status}] ${request.method} ${request.url} → ${message}`,
+        'GlobalExceptionFilter',
+      );
     }
 
     response.status(status).json({
