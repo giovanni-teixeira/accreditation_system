@@ -26,11 +26,13 @@ export const StatusOverlay: React.FC<StatusOverlayProps> = ({ status }) => {
                 </svg>
             )}
             
+            {/* 
             {status === 'ALREADY_SCANNED' && (
                 <div className="flex flex-col items-center gap-3">
                     <div className="text-yellow-400 text-7xl animate-pulse">⚠️</div>
                 </div>
             )}
+            */}
             
             {status === 'ERROR' && (
                 <div className="text-white text-6xl animate-bounce">❌</div>

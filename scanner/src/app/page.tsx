@@ -108,9 +108,15 @@ export default function ScannerPage() {
 
             {isLoggedIn && (
                 <section className="relative w-full max-w-[420px] aspect-square rounded-lg overflow-hidden">
-                    <ScannerCamera onDetect={onDetect} isPaused={isPaused} />
-                    <StatusOverlay status={scanState.status} />
                     <FlashEffect active={flashActive} />
+                    
+                    {/* Badge de Sincronização Pendente (Comentado conforme solicitação)
+                    {pendingCount > 0 && (
+                        <div className="absolute top-4 right-4 bg-red-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg border-2 border-white animate-bounce z-50">
+                            {pendingCount} SINC. PENDENTE
+                        </div>
+                    )}
+                    */}
                 </section>
             )}
 
@@ -125,6 +131,7 @@ export default function ScannerPage() {
                         scanState.status === 'ERROR' ? 'text-red-600' :
                         'text-slate-400'
                     }`}>
+                        {/* A lógica de status "Já Verificado Hoje" foi removida conforme pedido, exibindo sempre sucesso */}
                         {scanState.status === 'ALREADY_SCANNED' ? 'Acesso Liberado!' : scanState.message}
                     </h3>
                     {renderDetails()}

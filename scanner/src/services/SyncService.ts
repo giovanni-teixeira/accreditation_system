@@ -14,11 +14,13 @@ class SyncService {
     const queue = this.getQueue();
     const today = new Date().toDateString();
 
-    // 1. Evitar duplicatas no mesmo dia (na fila local)
+    // 1. Evitar duplicatas no mesmo dia (na fila local) - Comentado conforme pedido
+    /*
     if (queue.some(s => s.ticketId === ticketId && s.eventDay === today)) {
         console.log(`ℹ️ Ticket ${ticketId} já está na fila para hoje.`);
         return;
     }
+    */
 
     queue.push({ ticketId, eventDay: today, timestamp: Date.now() });
     this.saveQueue(queue);
