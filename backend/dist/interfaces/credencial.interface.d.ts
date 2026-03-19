@@ -1,3 +1,4 @@
+import { ICredenciado } from './credenciado.interface';
 export interface ICredencial {
     id: string;
     credenciadoId: string;
@@ -8,4 +9,5 @@ export interface ICredencial {
     printCount: number;
     createdAt: Date;
     updatedAt: Date;
+    credenciado?: ICredenciado;
 }

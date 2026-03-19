@@ -62,7 +62,7 @@ export function AdminMobileSidebar({ isOpen, onClose }: AdminMobileSidebarProps)
         <SheetHeader className="flex h-16 flex-row items-center justify-between border-b border-sidebar-border px-4">
           <div className="flex items-center gap-3">
             <SheetTitle className="text-sidebar-foreground">
-              <img src="/altacafe.png" alt="Logo Alta Café" className="mt-1 md-6 h-10 w-auto" />
+              <img src="/admin/altacafe.png" alt="Logo Alta Café" className="mt-1 md-6 h-10 w-auto" />
             </SheetTitle>
           </div>
           <Button

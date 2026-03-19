@@ -7,7 +7,6 @@ class CredenciadoResponseDto {
     cpf;
     email;
     tipoCategoria;
-    tipoCombustivel;
     endereco;
     credencial;
     descarbonizacao;
@@ -20,12 +19,11 @@ class CredenciadoResponseDto {
         this.cpf = partial.cpf;
         this.email = partial.email;
         this.tipoCategoria = partial.tipoCategoria;
-        this.tipoCombustivel = partial.tipoCombustivel;
         this.nomeEmpresa = partial.nomeEmpresa;
         this.nomePropriedade = partial.nomePropriedade;
         this.nomeVeiculo = partial.nomeVeiculo;
-        this.endereco = partial.endereco;
-        this.descarbonizacao = partial.descarbonizacao;
+        this.endereco = partial.endereco ?? null;
+        this.descarbonizacao = partial.descarbonizacao ?? null;
         this.credencial = partial.credencial
             ? {
                 ticketId: partial.credencial.ticketId,

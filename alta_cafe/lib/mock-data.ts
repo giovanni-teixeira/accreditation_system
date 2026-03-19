@@ -13,7 +13,7 @@ export const evento: Evento = {
   isGratuito: false,
   dataInicio: '2026-06-15',
   dataFim: '2026-06-18',
-  local: 'Centro de Convenções - Patrocínio/MG',
+  local: 'Clube de Campo da Franca',
   ativo: true,
 }
 

@@ -10,7 +10,7 @@ class EventoResponseDto {
         this.id = partial.id;
         this.nomeEvento = partial.nomeEvento;
         this.isGratuito = partial.isGratuito;
-        this.publicKey = partial.publicKey;
+        this.publicKey = partial.publicKey ?? null;
     }
 }
 exports.EventoResponseDto = EventoResponseDto;

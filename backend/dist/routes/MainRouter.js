@@ -10,12 +10,13 @@ exports.MainRouter = void 0;
 const common_1 = require("@nestjs/common");
 const AuthController_1 = require("../controllers/AuthController");
 const CredenciadosController_1 = require("../controllers/CredenciadosController");
+const ScansController_1 = require("../controllers/ScansController");
 let MainRouter = class MainRouter {
 };
 exports.MainRouter = MainRouter;
 exports.MainRouter = MainRouter = __decorate([
     (0, common_1.Module)({
-        controllers: [AuthController_1.AuthController, CredenciadosController_1.CredenciadosController],
+        controllers: [AuthController_1.AuthController, CredenciadosController_1.CredenciadosController, ScansController_1.ScansController],
     })
 ], MainRouter);
 //# sourceMappingURL=MainRouter.js.map

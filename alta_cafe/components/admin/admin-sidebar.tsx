@@ -64,7 +64,7 @@ export function AdminSidebar({ isCollapsed, onToggle }: AdminSidebarProps) {
           
           {!isCollapsed && (
             <div className="flex flex-col">
-              <img src="/altacafe.png" alt="Logo Alta Café" className="mt-1 md-6 h-10 w-auto" />
+              <img src="/admin/altacafe.png" alt="Logo Alta Café" className="mt-1 md-6 h-10 w-auto" />
             </div>
           )}
         </Link>

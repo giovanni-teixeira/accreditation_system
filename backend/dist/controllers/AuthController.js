@@ -57,6 +57,7 @@ const business_exception_1 = require("../common/exceptions/business.exception");
 const swagger_1 = require("@nestjs/swagger");
 const login_dto_1 = require("../dtos/request/login.dto");
 const register_dto_1 = require("../dtos/request/register.dto");
+const promover_credenciado_dto_1 = require("../dtos/request/promover-credenciado.dto");
 const usuario_repository_1 = require("../repositories/usuario.repository");
 const evento_repository_1 = require("../repositories/evento.repository");
 const credenciado_repository_1 = require("../repositories/credenciado.repository");
@@ -118,13 +119,80 @@ let AuthController = class AuthController {
                 login: registerDto.login,
                 senhaHash: hashData,
                 perfilAcesso: registerDto.perfilAcesso,
+                setor: registerDto.setor,
             });
+            if (registerDto.cpf) {
+                const evento = await this.eventoRepository.findFirst();
+                const credExists = await this.credenciadoRepository.findByCpf(registerDto.cpf);
+                if (!credExists && evento) {
+                    const nomeCompleto = registerDto.nomeCompleto || registerDto.login.toUpperCase();
+                    const tokenDados = qrcode_util_1.QrCodeHelper.generateSignedToken(evento.id, evento.privateKey, nomeCompleto);
+                    await this.credenciadoRepository.create({
+                        nomeCompleto,
+                        cpf: registerDto.cpf,
+                        rg: registerDto.rg ?? null,
+                        celular: registerDto.celular ?? '00000000000',
+                        email: registerDto.email ?? `${registerDto.login}@sistema.com`,
+                        tipoCategoria: 'ORGANIZACAO',
+                        aceiteLgpd: true,
+                        evento: { connect: { id: evento.id } },
+                        descarbonizacao: {
+                            create: {
+                                distanciaIdaVoltaKm: 0,
+                                tipoCombustivel: 'GASOLINA',
+                                pegadaCo2: 0,
+                            },
+                        },
+                        credencial: {
+                            create: {
+                                ticketId: tokenDados.ticketId,
+                                qrToken: tokenDados.qrToken,
+                                status: 'ACTIVE',
+                            },
+                        },
+                    }, { credencial: true });
+                }
+            }
             return new usuario_response_dto_1.UsuarioResponseDto(novoUsuario);
         }
         catch (error) {
             if (error instanceof business_exception_1.BusinessException)
                 throw error;
             throw new business_exception_1.BusinessException(`Erro ao registrar usuário: ${error.message}`);
+        }
+    }
+    async promover(dto) {
+        try {
+            const credenciado = await this.credenciadoRepository.findByCpf(dto.cpf);
+            if (!credenciado) {
+                throw new business_exception_1.BusinessException(`CPF ${dto.cpf} não encontrado nos credenciados. Cadastre a pessoa primeiro.`, 404);
+            }
+            const loginExiste = await this.usuarioRepository.findByLogin(dto.login);
+            if (loginExiste) {
+                throw new business_exception_1.BusinessException(`O login '${dto.login}' já está em uso. Escolha outro.`, 409);
+            }
+            const hash = await bcrypt.hash(dto.senhaPura, 10);
+            const novoUsuario = await this.usuarioRepository.create({
+                login: dto.login,
+                senhaHash: hash,
+                perfilAcesso: dto.perfilAcesso,
+                setor: dto.setor,
+            });
+            return {
+                ...new usuario_response_dto_1.UsuarioResponseDto(novoUsuario),
+                credenciado: {
+                    id: credenciado.id,
+                    nomeCompleto: credenciado.nomeCompleto,
+                    cpf: credenciado.cpf,
+                    tipoCategoria: credenciado.tipoCategoria,
+                },
+                mensagem: `Usuário '${dto.login}' criado com perfil ${dto.perfilAcesso} e vinculado ao credenciado '${credenciado.nomeCompleto}'.`,
+            };
+        }
+        catch (error) {
+            if (error instanceof business_exception_1.BusinessException)
+                throw error;
+            throw new business_exception_1.BusinessException(`Erro ao promover credenciado: ${error.message}`);
         }
     }
     async onModuleInit() {
@@ -270,7 +338,7 @@ __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('ADMIN'),
-    (0, swagger_1.ApiOperation)({ summary: 'Criar novo usuário na organização (Apenas ADMIN)' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Criar novo usuário na organização com credencial completa (Apenas ADMIN)' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Usuário registrado com sucesso.' }),
     (0, swagger_1.ApiResponse)({ status: 403, description: 'Sem permissão de acesso.' }),
     __param(0, (0, common_1.Body)()),
@@ -278,6 +346,25 @@ __decorate([
     __metadata("design:paramtypes", [register_dto_1.RegisterDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "register", null);
+__decorate([
+    (0, common_1.Post)(routes_constants_1.ROUTES.AUTH.PROMOVER),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Promover credenciado existente a ADMIN ou LEITOR_CATRACA (apenas ADMIN)',
+        description: 'Busca um credenciado pelo CPF e cria um login de acesso para ele. ' +
+            'Não duplica registros — se o credenciado já existe, apenas cria o usuário.',
+    }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: 'Usuário criado e vinculado ao credenciado com sucesso.' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'CPF não encontrado nos credenciados.' }),
+    (0, swagger_1.ApiResponse)({ status: 409, description: 'Login já existe no sistema.' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [promover_credenciado_dto_1.PromoverCredenciadoDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "promover", null);
 exports.AuthController = AuthController = __decorate([
     (0, swagger_1.ApiTags)('autenticacao'),
     (0, common_1.Controller)(routes_constants_1.ROUTES.AUTH.BASE),

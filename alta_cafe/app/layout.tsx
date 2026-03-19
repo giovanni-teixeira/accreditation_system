@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   description: 'Gestão de credenciamento, credenciais e operação de acesso - Alta Café',
 
   icons: {
-    icon: '/ico_alta-cafe.png', // Caminho considerando que o arquivo está na pasta public/
+    icon: '/admin/ico_alta-cafe.png', // Caminho considerando que o arquivo está na pasta public/
     apple: '/apple-touch-icon.png', // Opcional: ícone para dispositivos Apple
   },
 }

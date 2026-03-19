@@ -3,14 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
-  Search, 
-  Bell, 
+  // Search, 
+  // Bell, 
   Menu, 
   ChevronDown,
   LogOut,
   User,
   Settings,
-  Coffee,
+  // Coffee,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -70,7 +70,7 @@ export function AdminTopbar({ onMobileMenuClick }: AdminTopbarProps) {
         {/* Evento fixo - Alta Café 2026 */}
         <div className="flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2">
           <div className="flex h-8 w-auto items-center justify-center">
-            <img src="/ico_alta-cafe.png" alt="Logo Alta Café" className="mt-1 md-6 h-8 w-auto" />
+            <img src="/admin/ico_alta-cafe.png" alt="Logo Alta Café" className="mt-1 md-6 h-8 w-auto" />
           </div>
           <div className="hidden sm:block">
             <p className="text-sm font-medium">{evento.nomeEvento}</p>
@@ -83,7 +83,7 @@ export function AdminTopbar({ onMobileMenuClick }: AdminTopbarProps) {
       </div>
 
       {/* Search */}
-      <form onSubmit={handleSearch} className="hidden flex-1 justify-center px-8 md:flex">
+      {/* <form onSubmit={handleSearch} className="hidden flex-1 justify-center px-8 md:flex">
         <div className="relative w-full max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -94,15 +94,10 @@ export function AdminTopbar({ onMobileMenuClick }: AdminTopbarProps) {
             className="w-full border-border bg-background pl-9"
           />
         </div>
-      </form>
+      </form> */}
 
       {/* Actions */}
       <div className="flex items-center gap-2">
-        {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5 text-muted-foreground" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary" />
-        </Button>
 
         {/* User menu */}
         <DropdownMenu>
@@ -110,7 +105,7 @@ export function AdminTopbar({ onMobileMenuClick }: AdminTopbarProps) {
             <Button variant="ghost" className="gap-2 px-2">
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                  <img src="/tst.jpg" alt="Logo Alta Café" className="mt-1 md-6 h-8 w-auto" />
+                  <img src="/admin/profile.png" alt="Logo Alta Café" className="md-7 h-8 w-auto" />
                 </AvatarFallback>
               </Avatar>
               <div className="hidden flex-col items-start lg:flex">

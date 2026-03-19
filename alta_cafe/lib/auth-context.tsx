@@ -1,90 +1,74 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
-import type { UsuarioAdmin, PerfilAcesso } from './types'
-import { usuarioAdmin } from './mock-data'
+import { authService, IUsuario } from './api.service'
 
 interface AuthContextType {
-  user: UsuarioAdmin | null
+  user: IUsuario | null
+  token: string | null
   login: (username: string, password: string) => Promise<boolean>
   logout: () => void
   isAdmin: boolean
-  isComissao: boolean
-  isColaborador: boolean
+  isLeitorCatraca: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-// Usuários de teste para diferentes perfis
-const testUsers: Record<string, UsuarioAdmin> = {
-  'admin': {
-    ...usuarioAdmin,
-    perfilAcesso: 'ADMIN',
-  },
-  'comissao': {
-    id: 'usr-002',
-    nome: 'Maria Comissão',
-    login: 'comissao',
-    senha: 'comissao123',
-    email: 'comissao@altacafe.com.br',
-    perfilAcesso: 'COMISSAO_ORGANIZADORA',
-    ativo: true,
-  },
-  'colaborador': {
-    id: 'usr-003',
-    nome: 'José Colaborador',
-    login: 'colaborador',
-    senha: 'colaborador123',
-    email: 'colaborador@altacafe.com.br',
-    perfilAcesso: 'COLABORADOR_TERCEIRIZADO',
-    ativo: true,
-  },
-}
+const TOKEN_KEY = 'altacafe_token'
+const USER_KEY = 'altacafe_user'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<UsuarioAdmin | null>(null)
+  const [user, setUser] = useState<IUsuario | null>(null)
+  const [token, setToken] = useState<string | null>(null)
 
   useEffect(() => {
-    // Verificar se há usuário salvo no sessionStorage
-    const savedUser = sessionStorage.getItem('altacafe_user')
-    if (savedUser) {
+    // Restaurar sessão salva
+    const savedToken = localStorage.getItem(TOKEN_KEY)
+    const savedUser = localStorage.getItem(USER_KEY)
+
+    if (savedToken && savedUser) {
       try {
+        setToken(savedToken)
         setUser(JSON.parse(savedUser))
+        // Mantém o token acessível para o helper getAuthHeaders() do api.service
       } catch {
-        sessionStorage.removeItem('altacafe_user')
+        localStorage.removeItem(TOKEN_KEY)
+        localStorage.removeItem(USER_KEY)
       }
     }
   }, [])
 
   const login = async (username: string, password: string): Promise<boolean> => {
-    // Simular delay de rede
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    try {
+      const response = await authService.login(username, password)
 
-    // Verificar credenciais
-    const foundUser = Object.values(testUsers).find(
-      u => u.login === username && u.senha === password
-    )
+      setToken(response.access_token)
+      setUser(response.user)
 
-    if (foundUser) {
-      setUser(foundUser)
-      sessionStorage.setItem('altacafe_user', JSON.stringify(foundUser))
+      // Salvar no localStorage para persistir entre reloads
+      // O helper getAuthHeaders() em api.service.ts lê daqui automaticamente
+      localStorage.setItem(TOKEN_KEY, response.access_token)
+      localStorage.setItem(USER_KEY, JSON.stringify(response.user))
+
       return true
+    } catch (error) {
+      console.error('[AuthContext] Erro no login:', error)
+      return false
     }
-
-    return false
   }
 
   const logout = () => {
+    setToken(null)
     setUser(null)
-    sessionStorage.removeItem('altacafe_user')
+    localStorage.removeItem(TOKEN_KEY)
+    localStorage.removeItem(USER_KEY)
   }
 
   const isAdmin = user?.perfilAcesso === 'ADMIN'
-  const isComissao = user?.perfilAcesso === 'COMISSAO_ORGANIZADORA'
-  const isColaborador = user?.perfilAcesso === 'COLABORADOR_TERCEIRIZADO'
+  const isLeitorCatraca = user?.perfilAcesso === 'LEITOR_CATRACA'
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAdmin, isComissao, isColaborador }}>
+    <AuthContext.Provider value={{ user, token, login, logout, isAdmin, isLeitorCatraca }}>
       {children}
     </AuthContext.Provider>
   )
