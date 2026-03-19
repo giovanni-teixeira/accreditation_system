@@ -34,7 +34,7 @@ export class ScansController {
   @ApiResponse({ status: 404, description: 'Credencial não encontrada.' })
   async checkIn(@Body() body: { ticketId: string }, @Request() req: any) {
     console.log('USER:', req.user);
-    const scannerId = req.user?.sub || req.user?.id;
+    const scannerId = req.user?.userID || req.user?.id;
     if (!scannerId) {
       throw new Error('Usuario não autenticado ou token inválido');
     }
@@ -54,7 +54,7 @@ export class ScansController {
     @Request() req: any,
   ) {
     console.log('USER:', req.user);
-    const scannerId = req.user?.sub || req.user?.id;
+    const scannerId = req.user?.userID || req.user?.id;
 
     if (!scannerId) {
       throw new Error('Usuário não autenticado ou token inválido');
