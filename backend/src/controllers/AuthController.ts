@@ -23,11 +23,11 @@ import {
 } from '@nestjs/swagger';
 import { LoginDto } from '../dtos/request/login.dto';
 import { RegisterDto } from '../dtos/request/register.dto';
+import { PromoverCredenciadoDto } from '../dtos/request/promover-credenciado.dto';
 import { UsuarioRepository } from '../repositories/usuario.repository';
 import { EventoRepository } from '../repositories/evento.repository';
 import { CredenciadoRepository } from '../repositories/credenciado.repository';
 import { UsuarioResponseDto } from '../dtos/response/usuario-response.dto';
-// Nota: Os Guards e Decorators serão movidos em breve, por enquanto mantemos o import corrigido se necessário
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { Roles } from './decorators/roles.decorator';
@@ -162,7 +162,64 @@ export class AuthController implements OnModuleInit {
       );
     }
   }
+  @Post(ROUTES.AUTH.PROMOVER)
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Promover credenciado existente a ADMIN ou LEITOR_CATRACA (apenas ADMIN)',
+    description:
+      'Busca um credenciado pelo CPF e cria um login de acesso para ele. ' +
+      'Não duplica registros — se o credenciado já existe, apenas cria o usuário.',
+  })
+  @ApiResponse({ status: 201, description: 'Usuário criado e vinculado ao credenciado com sucesso.' })
+  @ApiResponse({ status: 404, description: 'CPF não encontrado nos credenciados.' })
+  @ApiResponse({ status: 409, description: 'Login já existe no sistema.' })
+  async promover(@Body() dto: PromoverCredenciadoDto) {
+    try {
+      // 1. Verificar se o credenciado existe pelo CPF
+      const credenciado = await this.credenciadoRepository.findByCpf(dto.cpf);
+      if (!credenciado) {
+        throw new BusinessException(
+          `CPF ${dto.cpf} não encontrado nos credenciados. Cadastre a pessoa primeiro.`,
+          404,
+        );
+      }
 
+      // 2. Verificar se o login já existe
+      const loginExiste = await this.usuarioRepository.findByLogin(dto.login);
+      if (loginExiste) {
+        throw new BusinessException(
+          `O login '${dto.login}' já está em uso. Escolha outro.`,
+          409,
+        );
+      }
+
+      // 3. Criar apenas o usuário (credenciado já existe, sem duplicar)
+      const hash = await bcrypt.hash(dto.senhaPura, 10);
+      const novoUsuario = await this.usuarioRepository.create({
+        login: dto.login,
+        senhaHash: hash,
+        perfilAcesso: dto.perfilAcesso,
+        setor: dto.setor,
+      });
+
+      return {
+        ...new UsuarioResponseDto(novoUsuario),
+        credenciado: {
+          id: credenciado.id,
+          nomeCompleto: credenciado.nomeCompleto,
+          cpf: credenciado.cpf,
+          tipoCategoria: credenciado.tipoCategoria,
+        },
+        mensagem: `Usuário '${dto.login}' criado com perfil ${dto.perfilAcesso} e vinculado ao credenciado '${credenciado.nomeCompleto}'.`,
+      };
+    } catch (error) {
+      if (error instanceof BusinessException) throw error;
+      throw new BusinessException(`Erro ao promover credenciado: ${error.message}`);
+    }
+  }
   async onModuleInit() {
     const eventoSeedPath = path.join(
       process.cwd(),

@@ -3,6 +3,7 @@ export const ROUTES = {
     BASE: 'auth',
     LOGIN: 'login', // POST /auth/login
     REGISTER: 'register', // POST /auth/register
+    PROMOVER: 'promover', // POST /auth/promover
   },
   USUARIOS: {
     BASE: 'usuarios',
