@@ -1,98 +1,133 @@
 'use client'
 
-import { useMemo } from 'react'
-import { 
-  Leaf, 
-  Car, 
-  Bus, 
-  Plane, 
-  Bike,
-  TreeDeciduous,
-  Download,
-  TrendingDown,
-  MapPin,
+import { useEffect, useMemo, useState } from 'react'
+import {
+  Leaf, Car, Fuel, Zap, TreeDeciduous,
+  Download, TrendingDown, MapPin, Loader2,
 } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, PieChart, Pie, Cell,
+} from 'recharts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { calcularEmissaoTotal, fatoresEmissao } from '@/lib/mock-data'
+import { toast } from 'sonner'
+import {
+  descarbonizacaoService,
+  IDescarbonizacao,
+  IDescarbonizacaoSummary,
+  TipoCombustivel,
+} from '@/lib/api.service'
 
-const transporteIcons: Record<string, React.ElementType> = {
-  CARRO: Car,
-  ONIBUS: Bus,
-  AVIAO: Plane,
-  MOTO: Bike,
+// ─── Config por combustível ───────────────────────────────────────────────────
+const combustivelConfig: Record<string, {
+  label: string
+  color: string
+  icon: React.ElementType
+  fatorKgPorKm: number
+}> = {
+  [TipoCombustivel.GASOLINA]: { label: 'Gasolina', color: '#EF4444', icon: Car,  fatorKgPorKm: 0.21 },
+  [TipoCombustivel.ETANOL]:   { label: 'Etanol',   color: '#F59E0B', icon: Fuel, fatorKgPorKm: 0.10 },
+  [TipoCombustivel.DIESEL]:   { label: 'Diesel',   color: '#6B7280', icon: Car,  fatorKgPorKm: 0.27 },
+  [TipoCombustivel.ELETRICO]: { label: 'Elétrico', color: '#22C55E', icon: Zap,  fatorKgPorKm: 0.05 },
 }
 
-const transporteLabels: Record<string, string> = {
-  CARRO: 'Carro',
-  ONIBUS: 'Ônibus',
-  AVIAO: 'Avião',
-  MOTO: 'Moto',
+// ─── Helper CSV ───────────────────────────────────────────────────────────────
+function exportCSV(filename: string, headers: string[], rows: (string | number)[][]) {
+  const content = [
+    headers.join(';'),
+    ...rows.map(r => r.map(c => `"${c}"`).join(';')),
+  ].join('\n')
+  const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = filename
+  link.click()
 }
 
-const transporteColors: Record<string, string> = {
-  CARRO: '#EF4444',
-  ONIBUS: '#22C55E',
-  AVIAO: '#3B82F6',
-  MOTO: '#F59E0B',
-}
-
+// ─── Componente ───────────────────────────────────────────────────────────────
 export default function CarbonoPage() {
-  const emissaoData = useMemo(() => calcularEmissaoTotal(), [])
-  
-  // Dados para o gráfico de pizza
-  const pieData = Object.entries(emissaoData.porTransporte).map(([key, value]) => ({
-    name: transporteLabels[key],
-    value: Math.round(value.emissaoKg),
-    quantidade: value.quantidade,
-    color: transporteColors[key],
-  })).filter(item => item.value > 0)
+  const [registros, setRegistros] = useState<IDescarbonizacao[]>([])
+  const [summary, setSummary] = useState<IDescarbonizacaoSummary | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Dados para o gráfico de barras
-  const barData = Object.entries(emissaoData.porTransporte).map(([key, value]) => ({
-    transporte: transporteLabels[key],
-    emissao: Math.round(value.emissaoKg),
-    quantidade: value.quantidade,
-  })).filter(item => item.emissao > 0)
-
-  // Cálculo de árvores necessárias para compensar (1 árvore absorve ~22kg CO2/ano)
-  const arvoresNecessarias = Math.ceil(emissaoData.totalKgCO2 / 22)
-
-  // Ordenar credenciados por emissão
-  const topEmissores = [...emissaoData.porCredenciado]
-    .sort((a, b) => b.emissaoKg - a.emissaoKg)
-    .slice(0, 10)
-
-  const handleExportCSV = () => {
-    const headers = ['Nome', 'Cidade', 'Distância (km)', 'Transporte', 'Emissão (kg CO2)']
-    const rows = emissaoData.porCredenciado.map(c => [
-      c.nome,
-      c.cidade,
-      c.distancia.toString(),
-      transporteLabels[c.transporte],
-      c.emissaoKg.toFixed(2)
+  useEffect(() => {
+    Promise.all([
+      descarbonizacaoService.listar(),
+      descarbonizacaoService.summary(),
     ])
-    
-    const csvContent = [
-      headers.join(','),
-      ...rows.map(row => row.join(','))
-    ].join('\n')
+      .then(([regs, sum]) => {
+        setRegistros(regs)
+        setSummary(sum)
+      })
+      .catch(() => toast.error('Erro ao carregar dados de descarbonização.'))
+      .finally(() => setIsLoading(false))
+  }, [])
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const link = document.createElement('a')
-    link.href = URL.createObjectURL(blob)
-    link.download = 'emissao_carbono_alta_cafe_2026.csv'
-    link.click()
+  // ── Métricas derivadas ────────────────────────────────────────────────────
+  const totalCo2   = summary?.totalCo2Kg       ?? registros.reduce((a, r) => a + (r.pegadaCo2 ?? 0), 0)
+  const totalKm    = summary?.totalDistanciaKm ?? registros.reduce((a, r) => a + r.distanciaIdaVoltaKm, 0)
+  const totalPessoas = summary?.totalCredenciados ?? registros.length
+  const mediaPorPessoa = totalPessoas > 0 ? totalCo2 / totalPessoas : 0
+  const arvoresNecessarias = Math.ceil(totalCo2 / 22)
+
+  // ── Agrupamento por combustível ───────────────────────────────────────────
+  const porCombustivel = useMemo(() => {
+    const map: Record<string, { emissaoKg: number; quantidade: number; distanciaKm: number }> = {}
+    registros.forEach((r) => {
+      const key = r.tipoCombustivel
+      if (!map[key]) map[key] = { emissaoKg: 0, quantidade: 0, distanciaKm: 0 }
+      map[key].emissaoKg   += r.pegadaCo2 ?? 0
+      map[key].quantidade  += 1
+      map[key].distanciaKm += r.distanciaIdaVoltaKm
+    })
+    return map
+  }, [registros])
+
+  const barData = useMemo(() =>
+    Object.entries(porCombustivel)
+      .map(([key, v]) => ({
+        combustivel: combustivelConfig[key]?.label ?? key,
+        emissao: Math.round(v.emissaoKg),
+        quantidade: v.quantidade,
+        color: combustivelConfig[key]?.color ?? '#999',
+      }))
+      .filter(d => d.emissao > 0)
+      .sort((a, b) => b.emissao - a.emissao),
+    [porCombustivel],
+  )
+
+  const pieData = barData.map(d => ({
+    name: d.combustivel,
+    value: d.emissao,
+    color: d.color,
+  }))
+
+  // ── Top emissores ─────────────────────────────────────────────────────────
+  const topEmissores = useMemo(() =>
+    [...registros]
+      .sort((a, b) => (b.pegadaCo2 ?? 0) - (a.pegadaCo2 ?? 0))
+      .slice(0, 10),
+    [registros],
+  )
+
+  // ── Export ────────────────────────────────────────────────────────────────
+  const handleExportCSV = () => {
+    exportCSV(
+      'emissao_carbono_alta_cafe_2026.csv',
+      ['ID Credenciado', 'Combustível', 'Distância Ida+Volta (km)', 'Pegada CO2 (kg)'],
+      registros.map(r => [
+        r.credenciadoId,
+        combustivelConfig[r.tipoCombustivel]?.label ?? r.tipoCombustivel,
+        r.distanciaIdaVoltaKm.toFixed(1),
+        (r.pegadaCo2 ?? 0).toFixed(2),
+      ]),
+    )
+    toast.success('CSV exportado com sucesso!')
   }
 
   return (
@@ -105,7 +140,7 @@ export default function CarbonoPage() {
             Análise de emissões de CO2 pelo deslocamento dos participantes
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={handleExportCSV}>
+        <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={isLoading}>
           <Download className="mr-2 h-4 w-4" />
           Exportar CSV
         </Button>
@@ -122,7 +157,7 @@ export default function CarbonoPage() {
               <div>
                 <p className="text-sm text-muted-foreground">Emissão Total</p>
                 <p className="text-2xl font-bold text-foreground">
-                  {emissaoData.totalKgCO2.toFixed(0)}
+                  {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : totalCo2.toFixed(0)}
                   <span className="text-sm font-normal text-muted-foreground ml-1">kg CO2</span>
                 </p>
               </div>
@@ -139,7 +174,7 @@ export default function CarbonoPage() {
               <div>
                 <p className="text-sm text-muted-foreground">Árvores para Compensar</p>
                 <p className="text-2xl font-bold text-foreground">
-                  {arvoresNecessarias}
+                  {isLoading ? '...' : arvoresNecessarias}
                   <span className="text-sm font-normal text-muted-foreground ml-1">árvores/ano</span>
                 </p>
               </div>
@@ -156,7 +191,7 @@ export default function CarbonoPage() {
               <div>
                 <p className="text-sm text-muted-foreground">Distância Total</p>
                 <p className="text-2xl font-bold text-foreground">
-                  {emissaoData.porCredenciado.reduce((acc, c) => acc + c.distancia, 0).toLocaleString('pt-BR')}
+                  {isLoading ? '...' : Math.round(totalKm).toLocaleString('pt-BR')}
                   <span className="text-sm font-normal text-muted-foreground ml-1">km</span>
                 </p>
               </div>
@@ -173,7 +208,7 @@ export default function CarbonoPage() {
               <div>
                 <p className="text-sm text-muted-foreground">Média por Pessoa</p>
                 <p className="text-2xl font-bold text-foreground">
-                  {(emissaoData.totalKgCO2 / emissaoData.porCredenciado.length).toFixed(1)}
+                  {isLoading ? '...' : mediaPorPessoa.toFixed(1)}
                   <span className="text-sm font-normal text-muted-foreground ml-1">kg CO2</span>
                 </p>
               </div>
@@ -182,27 +217,27 @@ export default function CarbonoPage() {
         </Card>
       </div>
 
-      {/* Fatores de Emissão */}
+      {/* Fatores de emissão */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Fatores de Emissão Utilizados</CardTitle>
-          <CardDescription>Valores de referência para cálculo de emissão por tipo de transporte</CardDescription>
+          <CardDescription>Valores de referência por tipo de combustível</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-            {Object.entries(fatoresEmissao).map(([key, value]) => {
-              const Icon = transporteIcons[key]
+            {Object.entries(combustivelConfig).map(([key, cfg]) => {
+              const Icon = cfg.icon
               return (
                 <div key={key} className="flex items-center gap-3 rounded-lg border border-border p-3">
-                  <div 
+                  <div
                     className="flex h-10 w-10 items-center justify-center rounded-lg"
-                    style={{ backgroundColor: `${transporteColors[key]}20` }}
+                    style={{ backgroundColor: `${cfg.color}20` }}
                   >
-                    <Icon className="h-5 w-5" style={{ color: transporteColors[key] }} />
+                    <Icon className="h-5 w-5" style={{ color: cfg.color }} />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">{transporteLabels[key]}</p>
-                    <p className="text-xs text-muted-foreground">{value} kg CO2/km</p>
+                    <p className="text-sm font-medium">{cfg.label}</p>
+                    <p className="text-xs text-muted-foreground">{cfg.fatorKgPorKm} kg CO2/km</p>
                   </div>
                 </div>
               )
@@ -215,118 +250,151 @@ export default function CarbonoPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Emissão por Meio de Transporte</CardTitle>
-            <CardDescription>Distribuição das emissões de CO2</CardDescription>
+            <CardTitle>Emissão por Combustível</CardTitle>
+            <CardDescription>Total de CO2 emitido por tipo de combustível</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={barData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E7DED2" />
-                <XAxis dataKey="transporte" stroke="#6B5D52" fontSize={12} />
-                <YAxis stroke="#6B5D52" fontSize={12} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#FFFFFF',
-                    border: '1px solid #E7DED2',
-                    borderRadius: '8px',
-                  }}
-                  formatter={(value: number) => [`${value} kg CO2`, 'Emissão']}
-                />
-                <Bar dataKey="emissao" fill="#119447" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {isLoading ? (
+              <div className="flex h-[300px] items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : barData.length === 0 ? (
+              <div className="flex h-[300px] items-center justify-center text-sm text-muted-foreground">
+                Nenhum dado disponível.
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={barData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E7DED2" />
+                  <XAxis dataKey="combustivel" stroke="#6B5D52" fontSize={12} />
+                  <YAxis stroke="#6B5D52" fontSize={12} />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #E7DED2', borderRadius: '8px' }}
+                    formatter={(v: number) => [`${v} kg CO2`, 'Emissão']}
+                  />
+                  <Bar dataKey="emissao" radius={[4, 4, 0, 0]}>
+                    {barData.map((entry, index) => (
+                      <Cell key={index} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Proporção por Transporte</CardTitle>
-            <CardDescription>Participação de cada meio de transporte</CardDescription>
+            <CardTitle>Proporção por Combustível</CardTitle>
+            <CardDescription>Participação de cada combustível nas emissões</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={4}
-                  dataKey="value"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  labelLine={false}
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#FFFFFF',
-                    border: '1px solid #E7DED2',
-                    borderRadius: '8px',
-                  }}
-                  formatter={(value: number, name: string) => [`${value} kg CO2`, name]}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+            {isLoading ? (
+              <div className="flex h-[300px] items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : pieData.length === 0 ? (
+              <div className="flex h-[300px] items-center justify-center text-sm text-muted-foreground">
+                Nenhum dado disponível.
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={4}
+                    dataKey="value"
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    labelLine={false}
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={index} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #E7DED2', borderRadius: '8px' }}
+                    formatter={(v: number, name: string) => [`${v} kg CO2`, name]}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Top Emissores */}
+      {/* Top emissores */}
       <Card>
         <CardHeader>
           <CardTitle>Maiores Emissores</CardTitle>
-          <CardDescription>Top 10 participantes com maior emissão de carbono</CardDescription>
+          <CardDescription>Top 10 registros com maior pegada de carbono</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-12">#</TableHead>
-                <TableHead>Participante</TableHead>
-                <TableHead>Origem</TableHead>
-                <TableHead>Distância</TableHead>
-                <TableHead>Transporte</TableHead>
-                <TableHead className="text-right">Emissão</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {topEmissores.map((item, index) => {
-                const Icon = transporteIcons[item.transporte]
-                return (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">{index + 1}</TableCell>
-                    <TableCell className="font-medium">{item.nome}</TableCell>
-                    <TableCell className="text-muted-foreground">{item.cidade}</TableCell>
-                    <TableCell>{item.distancia.toLocaleString('pt-BR')} km</TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant="secondary" 
-                        className="gap-1"
-                        style={{ 
-                          backgroundColor: `${transporteColors[item.transporte]}20`,
-                          color: transporteColors[item.transporte]
-                        }}
-                      >
-                        <Icon className="h-3 w-3" />
-                        {transporteLabels[item.transporte]}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right font-medium">
-                      {item.emissaoKg.toFixed(1)} kg CO2
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-12">#</TableHead>
+                  <TableHead>ID Credenciado</TableHead>
+                  <TableHead>Combustível</TableHead>
+                  <TableHead className="text-right">Distância (km)</TableHead>
+                  <TableHead className="text-right">Emissão</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8">
+                      <Loader2 className="h-5 w-5 animate-spin mx-auto text-muted-foreground" />
                     </TableCell>
                   </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
+                ) : topEmissores.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                      Nenhum dado disponível.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  topEmissores.map((item, index) => {
+                    const cfg = combustivelConfig[item.tipoCombustivel]
+                    const Icon = cfg?.icon ?? Car
+                    return (
+                      <TableRow key={item.id}>
+                        <TableCell className="font-medium">{index + 1}</TableCell>
+                        <TableCell className="font-mono text-sm">{item.credenciadoId}</TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="secondary"
+                            className="gap-1"
+                            style={{
+                              backgroundColor: `${cfg?.color ?? '#999'}20`,
+                              color: cfg?.color ?? '#999',
+                            }}
+                          >
+                            <Icon className="h-3 w-3" />
+                            {cfg?.label ?? item.tipoCombustivel}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {item.distanciaIdaVoltaKm.toLocaleString('pt-BR')} km
+                        </TableCell>
+                        <TableCell className="text-right font-medium">
+                          {(item.pegadaCo2 ?? 0).toFixed(1)} kg CO2
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Sugestões de Compensação */}
+      {/* Sugestões */}
       <Card className="bg-green-50 border-green-200">
         <CardHeader>
           <CardTitle className="text-green-800">Sugestões para Compensação</CardTitle>
@@ -334,25 +402,23 @@ export default function CarbonoPage() {
             Ações recomendadas para neutralizar a emissão de carbono do evento
           </CardDescription>
         </CardHeader>
-        <CardContent className="text-green-800">
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-start gap-2">
-              <TreeDeciduous className="h-4 w-4 mt-0.5 shrink-0" />
-              <span>Plantar <strong>{arvoresNecessarias} árvores</strong> para compensar as emissões em 1 ano</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <Bus className="h-4 w-4 mt-0.5 shrink-0" />
-              <span>Incentivar transporte coletivo para edições futuras</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <Leaf className="h-4 w-4 mt-0.5 shrink-0" />
-              <span>Parceria com programas de crédito de carbono certificados</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <Car className="h-4 w-4 mt-0.5 shrink-0" />
-              <span>Criar programa de carona solidária entre participantes da mesma região</span>
-            </li>
-          </ul>
+        <CardContent className="text-green-800 text-sm space-y-2">
+          <div className="flex items-start gap-2">
+            <TreeDeciduous className="h-4 w-4 mt-0.5 shrink-0" />
+            <span>Plantar <strong>{arvoresNecessarias} árvores</strong> para compensar as emissões em 1 ano</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <Car className="h-4 w-4 mt-0.5 shrink-0" />
+            <span>Incentivar o uso de veículos elétricos e etanol para reduzir emissões futuras</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <Leaf className="h-4 w-4 mt-0.5 shrink-0" />
+            <span>Parceria com programas de crédito de carbono certificados</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
+            <span>Criar programa de carona solidária entre participantes da mesma região</span>
+          </div>
         </CardContent>
       </Card>
     </div>
