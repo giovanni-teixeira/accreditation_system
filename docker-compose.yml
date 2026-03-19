@@ -46,6 +46,8 @@ services:
     build: ./alta_cafe
     container_name: frontend_admin
     restart: always
+    environment:
+      NEXT_PUBLIC_API_URL: "http://localhost/api"
     expose:
       - "3000"
 

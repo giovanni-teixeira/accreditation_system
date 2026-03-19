@@ -5,9 +5,10 @@ const app_module_1 = require("./app.module");
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const prisma_exception_filter_1 = require("./common/filters/prisma-exception.filter");
+const global_exception_filter_1 = require("./common/filters/global-exception.filter");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    app.useGlobalFilters(new prisma_exception_filter_1.PrismaExceptionFilter());
+    app.useGlobalFilters(new global_exception_filter_1.GlobalExceptionFilter(), new prisma_exception_filter_1.PrismaExceptionFilter());
     app.enableCors({
         origin: '*',
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -15,9 +16,10 @@ async function bootstrap() {
     });
     app.useGlobalPipes(new common_1.ValidationPipe({ whitelist: true, transform: true }));
     const config = new swagger_1.DocumentBuilder()
-        .setTitle('APIV Alta Café - Rotas Individuais')
-        .setDescription('Sistema elegante com endpoints específicos para cada perfil de credenciamento.')
-        .setVersion('1.1.0')
+        .setTitle('API Alta Café')
+        .setDescription('API REST completa do sistema Alta Café - Hackathon.')
+        .setVersion('1.2.0')
+        .addBearerAuth()
         .build();
     const documentFactory = () => swagger_1.SwaggerModule.createDocument(app, config);
     swagger_1.SwaggerModule.setup('docs', app, documentFactory);

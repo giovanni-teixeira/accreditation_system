@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
+import logo from '../../public/altacafe.png'
+
 
 type LoginState = 'idle' | 'loading' | 'error'
 
@@ -71,7 +73,7 @@ export default function AdminLoginPage() {
       {/* Left decorative panel (visible on larger screens) */}
       <div className="absolute bottom-0 left-0 top-0 hidden w-1/3 bg-sidebar lg:block">
         <div className="flex h-full flex-col items-center justify-center p-8 text-center">
-          <img src="/altacafe.png" alt="Logo Alta Café" className="h-32 w-auto" />
+          <img src="/admin/altacafe.png" alt="Logo Alta Café" className="h-32 w-auto" />
           <div className="mt-6 max-w-xs">
             <p className="text-sm leading-relaxed text-sidebar-foreground/60">
               Gestão completa de credenciamento para o maior evento de café do Brasil.
@@ -84,7 +86,7 @@ export default function AdminLoginPage() {
       <div className="relative z-10 w-full max-w-md lg:ml-auto lg:mr-[15%]">
         {/* Mobile logo */}
         <div className="mb-8 flex flex-col items-center lg:hidden">
-          <img src="/altacafe.png" alt="Logo Alta Café" className="h-24 w-auto" />
+          <img src="/admin/altacafe.png" alt="Logo Alta Café" className="h-32 w-auto" />
         </div>
 
         <Card className="border-border bg-card shadow-lg">
@@ -176,11 +178,6 @@ export default function AdminLoginPage() {
             </form>
           </CardContent>
         </Card>
-
-        <div className="mt-6 space-y-2 text-center text-xs text-muted-foreground">
-          <p className="font-medium">Credenciais de teste:</p>
-          <p><strong>Admin:</strong> admin / admin123</p>
-        </div>
       </div>
     </div>
   )
