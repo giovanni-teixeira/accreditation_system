@@ -57,9 +57,6 @@ export class ScansService {
     };
   }
 
-  /**
-   * Processamento em lote (Batch) para alta escalabilidade
-   */
   async bulkCheckIn(ticketIds: string[], scannerId: string) {
     const results = {
       processed: 0,

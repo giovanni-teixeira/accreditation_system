@@ -54,8 +54,7 @@ export class ScansController {
     @Request() req: any,
   ) {
     console.log('USER:', req.user);
-    console.log(req.user);
-    const scannerId = req.user?.userId || req.user?.userId;
+    const scannerId = req.user?.userID || req.user?.id;
 
     if (!scannerId) {
       throw new Error('Usuário não autenticado ou token inválido');
