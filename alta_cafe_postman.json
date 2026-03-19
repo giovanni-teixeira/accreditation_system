@@ -1,0 +1,282 @@
+{
+  "info": {
+    "name": "Alta Café API",
+    "_postman_id": "alta-cafe-api-collection",
+    "description": "Coleção completa da API REST do sistema Alta Café - Hackathon",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://SEU_IP_OU_DOMINIO/api", "type": "string", "description": "Use /api pois o nginx roteia /api/ para o backend. Ex: http://localhost/api ou https://altacafe.com.br/api" },
+    { "key": "token", "value": "", "type": "string", "description": "Token JWT retornado pelo login. Coloque aqui após logar." }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"admin\",\n  \"senhaHash\": \"admin123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Registrar Usuário (ADMIN)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/register",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"novo_scanner\",\n  \"senhaPura\": \"senha123\",\n  \"perfilAcesso\": \"LEITOR_CATRACA\",\n  \"setor\": \"PORTARIA\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Promover Credenciado por CPF (ADMIN)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/promover",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cpf\": \"12345678901\",\n  \"login\": \"novo_admin\",\n  \"senhaPura\": \"senha123\",\n  \"perfilAcesso\": \"ADMIN\",\n  \"setor\": \"GERENCIA\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuários",
+      "item": [
+        {
+          "name": "Listar Usuários",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/usuarios",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Buscar Usuário por ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/usuarios/:id",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Atualizar Usuário",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/usuarios/:id",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"perfilAcesso\": \"LEITOR_CATRACA\",\n  \"setor\": \"PORTARIA\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Deletar Usuário",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/usuarios/:id",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Credenciados",
+      "item": [
+        {
+          "name": "Cadastrar Credenciado",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/credenciados",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nomeCompleto\": \"João da Silva\",\n  \"cpf\": \"12345678901\",\n  \"celular\": \"16999999999\",\n  \"email\": \"joao@email.com\",\n  \"cidade\": \"Franca\",\n  \"estado\": \"SP\",\n  \"pais\": \"Brasil\",\n  \"aceiteLgpd\": true,\n  \"tipoCategoria\": \"VISITANTE\",\n  \"tipoCombustivel\": \"GASOLINA\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar Todos (ADMIN)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/credenciados",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Buscar por CPF",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/credenciados/cpf/:cpf"
+          }
+        },
+        {
+          "name": "Buscar por ID (ADMIN)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/credenciados/:id",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Atualizar Credenciado (ADMIN)",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/credenciados/:id",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"celular\": \"16988888888\",\n  \"email\": \"novo@email.com\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Deletar Credenciado (ADMIN)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/credenciados/:id",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Eventos",
+      "item": [
+        {
+          "name": "Ver Evento",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/eventos"
+          }
+        },
+        {
+          "name": "Atualizar Evento (ADMIN)",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/eventos/:id",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nomeEvento\": \"Alta Café 2026\",\n  \"localEvento\": \"Clube de Campo, Franca, SP\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Descarbonização",
+      "item": [
+        {
+          "name": "Listar Todos (ADMIN)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/descarbonizacao",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Resumo Geral - CO2 e Distância (ADMIN)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/descarbonizacao/summary",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Buscar por Credenciado (ADMIN)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/descarbonizacao/:credenciadoId",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scans (Scanner)",
+      "item": [
+        {
+          "name": "Check-in Individual",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/scans/check-in",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ticketId\": \"TKT-ABCDE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Check-in em Lote",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/scans/check-in-batch",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ticketIds\": [\"TKT-ABC\", \"TKT-DEF\", \"TKT-GHI\"]\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Endereços",
+      "item": [
+        {
+          "name": "Buscar por CEP",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/address/14400000?country=Brasil",
+              "query": [{ "key": "country", "value": "Brasil" }]
+            }
+          }
+        },
+        {
+          "name": "Listar Cache de Endereços (ADMIN)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/endereco-cache",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    }
+  ]
+}
