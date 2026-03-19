@@ -1,18 +1,53 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { UserPlus, Download, Users } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { CredenciadosTable } from '@/components/admin/credenciados/credenciados-table'
 import { CredenciadosFilters } from '@/components/admin/credenciados/credenciados-filters'
 import { CredenciadoDrawer } from '@/components/admin/credenciados/credenciado-drawer'
-import { credenciados as credenciadosIniciais, categoriasLabels } from '@/lib/mock-data'
+import { categoriasLabels } from '@/lib/mock-data'
+import { credenciadosService, ICredenciado } from '@/lib/api.service'
 import type { Credenciado, FiltrosCredenciados } from '@/lib/types'
 import { toast } from 'sonner'
 
+// Converte ICredenciado da API para o tipo Credenciado dos componentes
+function mapApiToCredenciado(c: ICredenciado): Credenciado {
+  return {
+    id: c.id,
+    eventoId: c.eventoId,
+    tipoCategoria: c.tipoCategoria as any,
+    nomeCompleto: c.nomeCompleto,
+    cpf: c.cpf,
+    rg: c.rg,
+    celular: c.celular,
+    email: c.email,
+    aceiteLgpd: c.aceiteLgpd,
+    createdAt: c.createdAt,
+    updatedAt: c.updatedAt,
+    cnpj: c.cnpj,
+    ccir: c.ccir,
+    // Endereço aninhado
+    rua: c.endereco?.rua,
+    municipio: c.endereco?.cidade ?? '',
+    uf: c.endereco?.estado ?? '',
+    // Empresa via nomeEmpresa
+    empresa: c.nomeEmpresa,
+    cargo: undefined,
+    // Descarbonização
+    cidadeOrigem: undefined,
+    estadoOrigem: undefined,
+    distanciaKm: c.descarbonizacao
+      ? c.descarbonizacao.distanciaIdaVoltaKm / 2
+      : undefined,
+    meioTransporte: undefined,
+  }
+}
+
 export default function CredenciadosPage() {
-  const [credenciados, setCredenciados] = useState<Credenciado[]>(credenciadosIniciais)
+  const [credenciados, setCredenciados] = useState<Credenciado[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [filtros, setFiltros] = useState<FiltrosCredenciados>({
     busca: '',
     categoria: '',
@@ -20,6 +55,13 @@ export default function CredenciadosPage() {
   })
   const [selectedCredenciado, setSelectedCredenciado] = useState<Credenciado | null>(null)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+
+  useEffect(() => {
+    credenciadosService.listar()
+      .then((data) => setCredenciados(data.map(mapApiToCredenciado)))
+      .catch(() => toast.error('Erro ao carregar credenciados.'))
+      .finally(() => setIsLoading(false))
+  }, [])
 
   const handleViewDetails = (credenciado: Credenciado) => {
     setSelectedCredenciado(credenciado)
@@ -31,22 +73,27 @@ export default function CredenciadosPage() {
     setTimeout(() => setSelectedCredenciado(null), 300)
   }
 
-  const handleDelete = (credenciado: Credenciado) => {
-    if (confirm(`Tem certeza que deseja excluir ${credenciado.nomeCompleto}?`)) {
+  const handleDelete = async (credenciado: Credenciado) => {
+    if (!confirm(`Tem certeza que deseja excluir ${credenciado.nomeCompleto}?`)) return
+    try {
+      await credenciadosService.deletar(credenciado.id)
       setCredenciados(prev => prev.filter(c => c.id !== credenciado.id))
       toast.success('Credenciado excluído com sucesso!')
+    } catch {
+      toast.error('Erro ao excluir credenciado.')
     }
   }
 
   const handleExportCSV = () => {
-    const headers = ['ID', 'Nome', 'CPF', 'Email', 'Celular', 'Categoria', 'Empresa', 'Cargo', 'Município', 'UF', 'Data Cadastro']
+    const headers = ['ID', 'Nome', 'CPF', 'Email', 'Celular', 'Categoria', 'Empresa', 'Município', 'UF', 'Data Cadastro']
+
     const filteredData = credenciados.filter((c) => {
       if (filtros.busca) {
         const busca = filtros.busca.toLowerCase()
-        const matchNome = c.nomeCompleto.toLowerCase().includes(busca)
-        const matchCpf = c.cpf.includes(busca)
-        const matchEmail = c.email.toLowerCase().includes(busca)
-        if (!matchNome && !matchCpf && !matchEmail) return false
+        const match = c.nomeCompleto.toLowerCase().includes(busca)
+          || c.cpf.includes(busca)
+          || c.email.toLowerCase().includes(busca)
+        if (!match) return false
       }
       if (filtros.categoria && c.tipoCategoria !== filtros.categoria) return false
       if (filtros.uf && c.uf !== filtros.uf) return false
@@ -59,17 +106,16 @@ export default function CredenciadosPage() {
       c.cpf,
       c.email,
       c.celular,
-      categoriasLabels[c.tipoCategoria],
-      c.empresa || '',
-      c.cargo || '',
+      categoriasLabels[c.tipoCategoria] ?? c.tipoCategoria,
+      c.empresa ?? '',
       c.municipio,
       c.uf,
-      new Date(c.createdAt).toLocaleDateString('pt-BR')
+      new Date(c.createdAt).toLocaleDateString('pt-BR'),
     ])
 
     const csvContent = [
       headers.join(';'),
-      ...rows.map(row => row.map(cell => `"${cell}"`).join(';'))
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(';')),
     ].join('\n')
 
     const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
@@ -77,18 +123,17 @@ export default function CredenciadosPage() {
     link.href = URL.createObjectURL(blob)
     link.download = `credenciados_alta_cafe_2026_${new Date().toISOString().split('T')[0]}.csv`
     link.click()
-    
+
     toast.success('Arquivo CSV exportado com sucesso!')
   }
 
-  // Contar credenciados filtrados
   const filteredCount = credenciados.filter((c) => {
     if (filtros.busca) {
       const busca = filtros.busca.toLowerCase()
-      const matchNome = c.nomeCompleto.toLowerCase().includes(busca)
-      const matchCpf = c.cpf.includes(busca)
-      const matchEmail = c.email.toLowerCase().includes(busca)
-      if (!matchNome && !matchCpf && !matchEmail) return false
+      const match = c.nomeCompleto.toLowerCase().includes(busca)
+        || c.cpf.includes(busca)
+        || c.email.toLowerCase().includes(busca)
+      if (!match) return false
     }
     if (filtros.categoria && c.tipoCategoria !== filtros.categoria) return false
     if (filtros.uf && c.uf !== filtros.uf) return false
@@ -101,9 +146,7 @@ export default function CredenciadosPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Credenciados</h1>
-          <p className="text-muted-foreground">
-            Gerencie os credenciamentos do evento
-          </p>
+          <p className="text-muted-foreground">Gerencie os credenciamentos do evento</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" onClick={handleExportCSV}>
@@ -136,6 +179,7 @@ export default function CredenciadosPage() {
       {/* Table */}
       <CredenciadosTable
         credenciados={credenciados}
+        isLoading={isLoading}
         filtros={filtros}
         onViewDetails={handleViewDetails}
         onDelete={handleDelete}
