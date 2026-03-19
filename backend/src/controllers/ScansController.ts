@@ -17,6 +17,17 @@ import { RolesGuard } from './guards/roles.guard';
 import { Roles } from './decorators/roles.decorator';
 import { ScansService } from '../services/scans.service';
 
+import { CheckInDto } from '../dtos/request/check-in.dto';
+import { CheckInBatchDto } from '../dtos/request/check-in-batch.dto';
+
+interface ScannerRequest extends Request {
+  user: {
+    userId: string;
+    login: string;
+    role: string;
+  };
+}
+
 @ApiTags('scans')
 @Controller('scans')
 export class ScansController {
@@ -32,11 +43,10 @@ export class ScansController {
   @ApiResponse({ status: 200, description: 'Check-in processado.' })
   @ApiResponse({ status: 403, description: 'Acesso negado.' })
   @ApiResponse({ status: 404, description: 'Credencial não encontrada.' })
-  async checkIn(@Body() body: { ticketId: string }, @Request() req: any) {
-    console.log('USER:', req.user);
-    const scannerId = req.user?.userID || req.user?.id;
+  async checkIn(@Body() body: CheckInDto, @Request() req: ScannerRequest) {
+    const scannerId = req.user?.userId;
     if (!scannerId) {
-      throw new Error('Usuario não autenticado ou token inválido');
+      throw new Error('Usuário não autenticado ou token inválido');
     }
     return await this.scansService.checkIn(body.ticketId, scannerId);
   }
@@ -50,11 +60,10 @@ export class ScansController {
   })
   @ApiResponse({ status: 200, description: 'Lote processado.' })
   async checkInBatch(
-    @Body() body: { ticketIds: string[] },
-    @Request() req: any,
+    @Body() body: CheckInBatchDto,
+    @Request() req: ScannerRequest,
   ) {
-    console.log('USER:', req.user);
-    const scannerId = req.user?.userID || req.user?.id;
+    const scannerId = req.user?.userId;
 
     if (!scannerId) {
       throw new Error('Usuário não autenticado ou token inválido');
