@@ -56,6 +56,9 @@ export class AppLoggerService implements NestLoggerService {
     this.accessLogger = winston.createLogger({
       level: 'info',
       transports: [
+        // Console
+        new winston.transports.Console({ format: consoleFormat }),
+        // Arquivo
         new (winston.transports as any).DailyRotateFile({
           dirname: logsDir,
           filename: 'access-%DATE%.log',
