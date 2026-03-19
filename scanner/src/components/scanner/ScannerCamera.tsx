@@ -69,11 +69,11 @@ export const ScannerCamera: React.FC<ScannerCameraProps> = ({ onDetect, isPaused
             }
         };
 
-        if (!isPaused) {
-            startScanner();
-        } else {
-            stopScanner();
-        }
+        // if (!isPaused) {
+        //     startScanner();
+        // } else {
+        //     stopScanner();
+        // }
 
         return () => {
             stopScanner();
