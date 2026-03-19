@@ -1,5 +1,9 @@
 // src/dtos/response/credenciado-response.dto.ts
 import { TipoCategoria, TipoCombustivel } from '@prisma/client';
+import { ICredenciado } from '../../interfaces/credenciado.interface';
+import { IEndereco } from '../../interfaces/endereco.interface';
+import { ICredencial } from '../../interfaces/credencial.interface';
+import { IDescarbonizacao } from '../../interfaces/descarbonizacao.interface';
 
 export class CredenciadoResponseDto {
   id: string;
@@ -7,26 +11,28 @@ export class CredenciadoResponseDto {
   cpf: string;
   email: string;
   tipoCategoria: TipoCategoria;
-  tipoCombustivel?: TipoCombustivel;
-  endereco?: any;
-  credencial?: any;
-  descarbonizacao?: any;
+  endereco?: IEndereco | null;
+  credencial?: Pick<ICredencial, 'ticketId' | 'status' | 'qrToken'> | null;
+  descarbonizacao?: IDescarbonizacao | null;
   nomeEmpresa?: string;
   nomePropriedade?: string;
   nomeVeiculo?: string;
 
-  constructor(partial: any) {
+  constructor(partial: ICredenciado & {
+    endereco?: IEndereco | null;
+    credencial?: ICredencial | null;
+    descarbonizacao?: IDescarbonizacao | null;
+  }) {
     this.id = partial.id;
     this.nomeCompleto = partial.nomeCompleto;
     this.cpf = partial.cpf;
     this.email = partial.email;
     this.tipoCategoria = partial.tipoCategoria;
-    this.tipoCombustivel = partial.tipoCombustivel;
     this.nomeEmpresa = partial.nomeEmpresa;
     this.nomePropriedade = partial.nomePropriedade;
     this.nomeVeiculo = partial.nomeVeiculo;
-    this.endereco = partial.endereco;
-    this.descarbonizacao = partial.descarbonizacao;
+    this.endereco = partial.endereco ?? null;
+    this.descarbonizacao = partial.descarbonizacao ?? null;
     this.credencial = partial.credencial
       ? {
           ticketId: partial.credencial.ticketId,
