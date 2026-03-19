@@ -5,9 +5,13 @@ import { PassportModule } from '@nestjs/passport';
 import { PrismaService } from './prisma.service';
 import { AuthController } from './controllers/AuthController';
 import { CredenciadosController } from './controllers/CredenciadosController';
+import { UsuariosController } from './controllers/UsuariosController';
+import { EventosController } from './controllers/EventosController';
+import { DescarbonizacaoController } from './controllers/DescarbonizacaoController';
 import { UsuarioRepository } from './repositories/usuario.repository';
 import { EventoRepository } from './repositories/evento.repository';
 import { CredenciadoRepository } from './repositories/credenciado.repository';
+import { DescarbonizacaoRepository } from './repositories/descarbonizacao.repository';
 import { CommonRepository } from './repositories/common.repository';
 import { AddressRepository } from './repositories/address.repository';
 import { AddressService } from './services/address.service';
@@ -29,12 +33,22 @@ import { CredencialRepository as CredRepo } from './repositories/credencial.repo
       signOptions: { expiresIn: '24h' },
     }),
   ],
-  controllers: [AuthController, CredenciadosController, AddressController, DataController, ScansController],
+  controllers: [
+    AuthController,
+    CredenciadosController,
+    UsuariosController,
+    EventosController,
+    DescarbonizacaoController,
+    AddressController,
+    DataController,
+    ScansController,
+  ],
   providers: [
     PrismaService,
     UsuarioRepository,
     EventoRepository,
     CredenciadoRepository,
+    DescarbonizacaoRepository,
     CommonRepository,
     AddressRepository,
     AddressService,

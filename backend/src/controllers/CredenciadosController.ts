@@ -4,11 +4,15 @@ import {
   Body,
   Get,
   Param,
+  Patch,
+  Delete,
+  UseGuards,
   BadRequestException,
 } from '@nestjs/common';
 import { TipoCategoria, TipoCombustivel } from '@prisma/client';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { CriarCredenciadoDto } from '../dtos/request/criar-credenciado.dto';
+import { AtualizarCredenciadoDto } from '../dtos/request/atualizar-credenciado.dto';
 import { CredenciadoResponseDto } from '../dtos/response/credenciado-response.dto';
 import { CredenciadoRepository } from '../repositories/credenciado.repository';
 import { EventoRepository } from '../repositories/evento.repository';
@@ -16,6 +20,9 @@ import { QrCodeHelper } from '../utils/qrcode.util';
 import { AddressService } from '../services/address.service';
 import { CalculationHelper } from '../utils/calculation.helper';
 import { BusinessException } from '../common/exceptions/business.exception';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { RolesGuard } from './guards/roles.guard';
+import { Roles } from './decorators/roles.decorator';
 
 import { ROUTES } from '../routes/routes.constants';
 
@@ -143,23 +150,60 @@ export class CredenciadosController {
     }
   }
 
-  @Get(ROUTES.CREDENCIADOS.BUSCAR_CPF)
-  @ApiOperation({ summary: 'Buscar por CPF' })
+  @Get()
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiOperation({ summary: 'Listar todos os credenciados (ADMIN)' })
+  @ApiResponse({ status: 200, type: [CredenciadoResponseDto] })
+  async findAll() {
+    const result = await this.credenciadoRepository.findAll({ credencial: true, endereco: true });
+    return result.map((c) => new CredenciadoResponseDto(c));
+  }
+
+  @Get(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiOperation({ summary: 'Buscar credenciado por ID (ADMIN)' })
   @ApiResponse({ status: 200, type: CredenciadoResponseDto })
-  async buscarPorCpf(@Param('cpf') cpf: string) {
+  @ApiResponse({ status: 404, description: 'Não encontrado.' })
+  async findById(@Param('id') id: string) {
+    const result = await this.credenciadoRepository.findById(id, { credencial: true, endereco: true });
+    if (!result) throw new BusinessException('Credenciado não encontrado.', 404);
+    return new CredenciadoResponseDto(result);
+  }
+
+  @Patch(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiOperation({ summary: 'Atualizar credenciado parcialmente (ADMIN)' })
+  @ApiResponse({ status: 200, type: CredenciadoResponseDto })
+  async update(@Param('id') id: string, @Body() dto: AtualizarCredenciadoDto) {
     try {
-      const res = await this.credenciadoRepository.findByCpf(cpf);
-      if (!res)
-        throw new BusinessException(
-          'Documento não encontrado nos registros.',
-          404,
-        );
-      return new CredenciadoResponseDto(res);
+      const { tipoCombustivel, cep, cidade, estado, pais, distanciaManualKm, ...rest } = dto;
+      const result = await this.credenciadoRepository.update(id, rest as any);
+      return new CredenciadoResponseDto(result);
     } catch (error) {
       if (error instanceof BusinessException) throw error;
-      throw new BusinessException(
-        `Erro ao buscar credenciado: ${error.message}`,
-      );
+      throw new BusinessException(`Erro ao atualizar: ${error.message}`);
+    }
+  }
+
+  @Delete(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiOperation({ summary: 'Deletar credenciado (ADMIN)' })
+  @ApiResponse({ status: 200, description: 'Deletado com sucesso.' })
+  async delete(@Param('id') id: string) {
+    try {
+      await this.credenciadoRepository.delete(id);
+      return { message: 'Credenciado removido com sucesso.' };
+    } catch (error) {
+      if (error instanceof BusinessException) throw error;
+      throw new BusinessException(`Erro ao deletar: ${error.message}`);
     }
   }
 }
