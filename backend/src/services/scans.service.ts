@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { QrScanRepository } from '../repositories/qr-scan.repository';
 import { CredencialRepository } from '../repositories/credencial.repository';
+import { UsuarioRepository } from '../repositories/usuario.repository';
 import { BusinessException } from '../common/exceptions/business.exception';
 
 @Injectable()
@@ -8,6 +9,7 @@ export class ScansService {
   constructor(
     private readonly qrScanRepository: QrScanRepository,
     private readonly credencialRepository: CredencialRepository,
+    private readonly usuarioRepository: UsuarioRepository,
   ) {}
 
   async checkIn(ticketId: string, scannerId: string) {
@@ -80,5 +82,26 @@ export class ScansService {
     }
 
     return results;
+  }
+
+  async getScannerActivities() {
+    // 1. Obter estatísticas brutas do repositório
+    const stats = await this.qrScanRepository.getStatsByScanner();
+
+    // 2. Buscar nomes dos usuários organizacionais
+    const enrichedStats = await Promise.all(
+      stats.map(async (s) => {
+        const user = await this.usuarioRepository.findById(s.scannerId);
+        return {
+          scannerId: s.scannerId,
+          scannerName: user ? user.login : `ID: ${s.scannerId}`,
+          setor: user?.setor || 'N/A',
+          totalScans: s._count.id,
+          lastScanAt: s._max.createdAt,
+        };
+      }),
+    );
+
+    return enrichedStats;
   }
 }

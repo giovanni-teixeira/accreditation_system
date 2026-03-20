@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Get,
   Body,
   UseGuards,
   Request,
@@ -69,5 +70,17 @@ export class ScansController {
       throw new Error('Usuário não autenticado ou token inválido');
     }
     return await this.scansService.bulkCheckIn(body.ticketIds, scannerId);
+  }
+
+  @Get('activities')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiOperation({
+    summary: 'Obter estatísticas de atividades por scanner (Admin only)',
+  })
+  @ApiResponse({ status: 200, description: 'Estatísticas recuperadas.' })
+  async getActivities() {
+    return await this.scansService.getScannerActivities();
   }
 }

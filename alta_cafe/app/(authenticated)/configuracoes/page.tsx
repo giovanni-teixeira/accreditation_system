@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
-import { authService, usuariosService, IUsuario, PerfilAcesso } from '@/lib/api.service'
+import { authService, usuariosService, scansService, IUsuario, IScannerActivity, PerfilAcesso } from '@/lib/api.service'
 
 // ─── Config de perfis disponíveis ────────────────────────────────────────────
 const perfisDisponiveis = [
@@ -44,7 +44,9 @@ const perfilConfig: Record<string, { label: string; icon: React.ElementType }> =
 // ─── Componente ───────────────────────────────────────────────────────────────
 export default function ConfiguracoesPage() {
   const [usuarios, setUsuarios] = useState<IUsuario[]>([])
+  const [atividades, setAtividades] = useState<IScannerActivity[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingAtividades, setIsLoadingAtividades] = useState(true)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<IUsuario | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -55,12 +57,17 @@ export default function ConfiguracoesPage() {
   const [formPerfil, setFormPerfil] = useState<PerfilAcesso>(PerfilAcesso.LEITOR_CATRACA)
   const [formSetor, setFormSetor] = useState('')
 
-  // ── Carregar usuários ──────────────────────────────────────────────────────
+  // ── Carregar dados iniciais ────────────────────────────────────────────────
   useEffect(() => {
-    usuariosService.listar()
-      .then(setUsuarios)
-      .catch(() => toast.error('Erro ao carregar usuários.'))
-      .finally(() => setIsLoading(false))
+    Promise.all([
+      usuariosService.listar().then(setUsuarios),
+      scansService.listarAtividades().then(setAtividades)
+    ])
+      .catch(() => toast.error('Erro ao carregar dados organizacional ou de scans.'))
+      .finally(() => {
+        setIsLoading(false)
+        setIsLoadingAtividades(false)
+      })
   }, [])
 
   // ── Reset form ────────────────────────────────────────────────────────────
@@ -339,6 +346,59 @@ export default function ConfiguracoesPage() {
                       </TableRow>
                     )
                   })
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Atividade dos Scanners */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ScanLine className="h-5 w-5" />
+            Atividade dos Scanners
+          </CardTitle>
+          <CardDescription>
+            Relatório de produtividade por leitor (Contagem de capturas acumuladas)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Leitor (Login)</TableHead>
+                  <TableHead>Setor</TableHead>
+                  <TableHead className="text-center">Total Capturas</TableHead>
+                  <TableHead className="text-right">Última Atividade</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoadingAtividades ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center py-8">
+                      <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+                    </TableCell>
+                  </TableRow>
+                ) : atividades.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                      Nenhuma atividade de scan registrada ainda.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  atividades.map((atv) => (
+                    <TableRow key={atv.scannerId}>
+                      <TableCell className="font-medium">{atv.scannerName}</TableCell>
+                      <TableCell className="text-muted-foreground">{atv.setor}</TableCell>
+                      <TableCell className="text-center font-bold text-primary">{atv.totalScans}</TableCell>
+                      <TableCell className="text-right text-sm text-muted-foreground">
+                        {atv.lastScanAt ? new Date(atv.lastScanAt).toLocaleString('pt-BR') : '—'}
+                      </TableCell>
+                    </TableRow>
+                  ))
                 )}
               </TableBody>
             </Table>

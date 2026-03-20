@@ -31,4 +31,21 @@ export class QrScanRepository extends BaseRepository<
       },
     }) as IQrScan | null;
   }
+
+  async getStatsByScanner() {
+    return await this.prisma.qrScan.groupBy({
+      by: ['scannerId'],
+      _count: {
+        id: true
+      },
+      _max: {
+        createdAt: true
+      },
+      orderBy: {
+        _count: {
+          id: 'desc'
+        }
+      }
+    });
+  }
 }

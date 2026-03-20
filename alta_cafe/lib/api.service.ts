@@ -202,6 +202,14 @@ export interface IQrScan {
   createdAt: string
 }
 
+export interface IScannerActivity {
+  scannerId: string
+  scannerName: string
+  setor: string
+  totalScans: number
+  lastScanAt: string
+}
+
 // --- Dashboard ---
 export interface IDashboardKPIs {
   totalCredenciados: number
@@ -481,6 +489,11 @@ export const scansService = {
       method: 'POST',
       body: JSON.stringify({ ticketIds }),
     })
+  },
+
+  /** GET /scans/activities — obter estatísticas por scanner (Admin only) */
+  listarAtividades(): Promise<IScannerActivity[]> {
+    return request<IScannerActivity[]>('/scans/activities', { revalidate: 0 })
   },
 }
 
