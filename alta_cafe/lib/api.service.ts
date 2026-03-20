@@ -509,11 +509,20 @@ export const scansService = {
   },
 
   /** GET /scans/logs — obter histórico detalhado de capturas (Admin only) */
-  listarLogs(filtros: { scannerId?: string; ticketId?: string; nome?: string; limit?: number }): Promise<IScanLog[]> {
+  listarLogs(filtros: { 
+    scannerId?: string; 
+    ticketId?: string; 
+    nome?: string; 
+    startDate?: string;
+    endDate?: string;
+    limit?: number 
+  }): Promise<IScanLog[]> {
     const params = new URLSearchParams()
     if (filtros.scannerId) params.append('scannerId', filtros.scannerId)
     if (filtros.ticketId) params.append('ticketId', filtros.ticketId)
     if (filtros.nome) params.append('nome', filtros.nome)
+    if (filtros.startDate) params.append('startDate', filtros.startDate)
+    if (filtros.endDate) params.append('endDate', filtros.endDate)
     if (filtros.limit) params.append('limit', filtros.limit.toString())
     
     return request<IScanLog[]>(`/scans/logs?${params.toString()}`, { revalidate: 0 })

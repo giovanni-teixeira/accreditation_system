@@ -81,14 +81,6 @@ export class ScansController {
     summary: 'Obter estatísticas de atividades por scanner (Admin only)',
   })
   @ApiResponse({ status: 200, description: 'Estatísticas recuperadas.' })
-  @Get('activities')
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
-  @ApiOperation({
-    summary: 'Obter estatísticas de atividades por scanner (Admin only)',
-  })
-  @ApiResponse({ status: 200, description: 'Estatísticas recuperadas.' })
   async getActivities() {
     return await this.scansService.getScannerActivities();
   }
@@ -104,13 +96,17 @@ export class ScansController {
     @Query('scannerId') scannerId?: string,
     @Query('ticketId') ticketId?: string,
     @Query('nome') nome?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
     @Query('limit') limit?: string,
   ) {
     return await this.scansService.getScanLogs({
       scannerId,
       ticketId,
       nome,
-      limit: limit ? parseInt(limit) : 50,
+      startDate,
+      endDate,
+      limit: limit ? parseInt(limit) : 20,
     });
   }
 }

@@ -13,6 +13,8 @@ import {
   Loader2,
   Search,
   History,
+  Calendar,
+  ChevronDown,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -51,8 +53,15 @@ export default function ConfiguracoesPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingAtividades, setIsLoadingAtividades] = useState(true)
   const [isSearchingLogs, setIsSearchingLogs] = useState(false)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  
+  // Filtros
   const [searchNome, setSearchNome] = useState('')
   const [selectedScanner, setSelectedScanner] = useState<string>('all')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [logsLimit, setLogsLimit] = useState(20)
+
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<IUsuario | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -68,7 +77,7 @@ export default function ConfiguracoesPage() {
     Promise.all([
       usuariosService.listar().then(setUsuarios),
       scansService.listarAtividades().then(setAtividades),
-      scansService.listarLogs({ limit: 10 }).then(setLogs)
+      scansService.listarLogs({ limit: 20 }).then(setLogs)
     ])
       .catch(() => toast.error('Erro ao carregar dados organizacional ou de scans.'))
       .finally(() => {
@@ -81,12 +90,13 @@ export default function ConfiguracoesPage() {
   useEffect(() => {
     const handler = setTimeout(() => {
       if (!isLoadingAtividades) {
-        handleSearchLogs();
+        setLogsLimit(20) // Reseta limite ao mudar filtros base
+        handleSearchLogs(20);
       }
-    }, 400); // 400ms delay para busca fluida
+    }, 400);
 
     return () => clearTimeout(handler);
-  }, [searchNome, selectedScanner]);
+  }, [searchNome, selectedScanner, startDate, endDate]);
 
   // ── Reset form ────────────────────────────────────────────────────────────
   const resetForm = () => {
@@ -153,19 +163,32 @@ export default function ConfiguracoesPage() {
     }
   }
 
-  const handleSearchLogs = async () => {
+  const handleSearchLogs = async (limit: number = logsLimit) => {
     setIsSearchingLogs(true)
     try {
       const results = await scansService.listarLogs({ 
         nome: searchNome,
         scannerId: selectedScanner === 'all' ? undefined : selectedScanner,
-        limit: 30 
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+        limit 
       })
       setLogs(results)
     } catch (error: any) {
-      // Falha silenciosa na busca automática para não interromper a digitação
+      // toast.error('Erro ao buscar logs.')
     } finally {
       setIsSearchingLogs(false)
+    }
+  }
+
+  const handleLoadMore = async () => {
+    const nextLimit = logsLimit + 20
+    setIsLoadingMore(true)
+    try {
+      await handleSearchLogs(nextLimit)
+      setLogsLimit(nextLimit)
+    } finally {
+      setIsLoadingMore(false)
     }
   }
 
@@ -177,7 +200,7 @@ export default function ConfiguracoesPage() {
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Configurações</h1>
           <p className="text-muted-foreground text-sm">Gerencie os usuários e audite as atividades de captura</p>
         </div>
-        {isSearchingLogs && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
+        {(isSearchingLogs || isLoadingMore) && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
       </div>
 
       {/* Usuários */}
@@ -369,12 +392,13 @@ export default function ConfiguracoesPage() {
             <History className="h-5 w-5" />
             Histórico e Busca Técnica
           </CardTitle>
-          <CardDescription>Filtre o histórico de capturas por nome ou leitor em tempo real</CardDescription>
+          <CardDescription>Auditoria completa de capturas com filtros avançados</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="space-y-6">
+          {/* Filtros */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
-              <Label>Filtrar por Leitor</Label>
+              <Label>Leitor</Label>
               <Select value={selectedScanner} onValueChange={setSelectedScanner}>
                 <SelectTrigger><SelectValue placeholder="Todos os scanners" /></SelectTrigger>
                 <SelectContent>
@@ -387,50 +411,99 @@ export default function ConfiguracoesPage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="searchNome">Buscar por Nome Credenciado</Label>
+              <Label htmlFor="searchNome">Nome do Credenciado</Label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="searchNome"
-                  placeholder="Digite para filtrar..."
+                  placeholder="Filtrar..."
                   value={searchNome}
                   onChange={(e) => setSearchNome(e.target.value)}
                   className="pl-9"
                 />
               </div>
             </div>
+            <div className="space-y-2">
+              <Label>Data Inicial</Label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Data Final</Label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="overflow-x-auto border rounded-md">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Scanner</TableHead>
-                  <TableHead>Credenciado</TableHead>
-                  <TableHead className="hidden md:table-cell">CPF/CNPJ</TableHead>
-                  <TableHead className="text-right">Data/Hora</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isSearchingLogs ? (
-                  <TableRow><TableCell colSpan={4} className="text-center py-8"><Loader2 className="h-5 w-5 animate-spin mx-auto" /></TableCell></TableRow>
-                ) : logs.length === 0 ? (
-                  <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhum resultado nos filtros.</TableCell></TableRow>
-                ) : (
-                  logs.map((log) => (
-                    <TableRow key={log.id}>
-                      <TableCell><Badge variant="outline" className="font-mono text-[10px]">{log.scannerName}</Badge></TableCell>
-                      <TableCell>
-                        <div className="font-medium text-sm">{log.credenciadoNome}</div>
-                        <div className="text-[10px] text-muted-foreground uppercase">{log.tipoCategoria || 'Visitante'}</div>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell text-muted-foreground text-xs">{log.credenciadoCpf}</TableCell>
-                      <TableCell className="text-right text-[10px]">{new Date(log.createdAt).toLocaleString('pt-BR')}</TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+          {/* Tabela */}
+          <div className="space-y-4">
+            <div className="overflow-x-auto border rounded-lg">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead className="w-[120px]">Scanner</TableHead>
+                    <TableHead>Credenciado</TableHead>
+                    <TableHead className="hidden md:table-cell">Documento</TableHead>
+                    <TableHead className="text-right">Horário</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {isSearchingLogs && logs.length === 0 ? (
+                    <TableRow><TableCell colSpan={4} className="text-center py-12"><Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" /></TableCell></TableRow>
+                  ) : logs.length === 0 ? (
+                    <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-12">Nenhum registro encontrado para estes filtros.</TableCell></TableRow>
+                  ) : (
+                    logs.map((log) => (
+                      <TableRow key={log.id} className="hover:bg-muted/30 transition-colors">
+                        <TableCell>
+                          <Badge variant="outline" className="font-mono text-[10px] bg-white">{log.scannerName}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="font-medium text-sm">{log.credenciadoNome}</div>
+                          <div className="text-[10px] text-muted-foreground uppercase">{log.tipoCategoria || 'Visitante'}</div>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell text-muted-foreground text-xs">{log.credenciadoCpf}</TableCell>
+                        <TableCell className="text-right text-[10px] font-medium">{new Date(log.createdAt).toLocaleString('pt-BR')}</TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Footer de Paginação */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2 px-1">
+              <p className="text-xs text-muted-foreground">
+                Mostrando <span className="font-bold text-foreground">{logs.length}</span> registros {logsLimit > logs.length ? '(fim da lista)' : ''}
+              </p>
+              
+              {logs.length >= logsLimit && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleLoadMore} 
+                  disabled={isLoadingMore}
+                  className="w-full sm:w-auto"
+                >
+                  {isLoadingMore ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ChevronDown className="mr-2 h-4 w-4" />}
+                  Ver Mais Registros
+                </Button>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>

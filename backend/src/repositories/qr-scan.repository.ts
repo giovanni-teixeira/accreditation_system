@@ -49,17 +49,42 @@ export class QrScanRepository extends BaseRepository<
     });
   }
 
-  async findLogs(filters: { scannerId?: string; ticketId?: string; nome?: string; limit?: number }) {
+  async findLogs(filters: { 
+    scannerId?: string; 
+    ticketId?: string; 
+    nome?: string; 
+    startDate?: string;
+    endDate?: string;
+    limit?: number 
+  }) {
+    const where: any = {
+      scannerId: filters.scannerId,
+    };
+
+    if (filters.ticketId) {
+      where.ticketId = { contains: filters.ticketId };
+    }
+
+    if (filters.nome) {
+      where.credencial = {
+        credenciado: {
+          nomeCompleto: { contains: filters.nome, mode: 'insensitive' }
+        }
+      };
+    }
+
+    if (filters.startDate || filters.endDate) {
+      where.createdAt = {};
+      if (filters.startDate) where.createdAt.gte = new Date(filters.startDate);
+      if (filters.endDate) {
+        const end = new Date(filters.endDate);
+        if (filters.endDate.length <= 10) end.setHours(23, 59, 59, 999);
+        where.createdAt.lte = end;
+      }
+    }
+
     return (this.prisma as any).qrScan.findMany({
-      where: {
-        scannerId: filters.scannerId,
-        ticketId: filters.ticketId ? { contains: filters.ticketId } : undefined,
-        credencial: filters.nome ? {
-          credenciado: {
-            nomeCompleto: { contains: filters.nome, mode: 'insensitive' }
-          }
-        } : undefined,
-      },
+      where,
       include: {
         credencial: {
           include: {

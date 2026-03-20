@@ -105,7 +105,14 @@ export class ScansService {
     return enrichedStats;
   }
 
-  async getScanLogs(filters: { scannerId?: string; ticketId?: string; nome?: string; limit?: number }) {
+  async getScanLogs(filters: { 
+    scannerId?: string; 
+    ticketId?: string; 
+    nome?: string; 
+    startDate?: string;
+    endDate?: string;
+    limit?: number 
+  }) {
     const logs = await this.qrScanRepository.findLogs(filters);
 
     return Promise.all(
