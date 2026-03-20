@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 import { authService, IUsuario } from './api.service'
+import { STORAGE_KEYS } from './api-config'
 
 interface AuthContextType {
   user: IUsuario | null
@@ -14,41 +15,37 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-const TOKEN_KEY = 'altacafe_token'
-const USER_KEY = 'altacafe_user'
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<IUsuario | null>(null)
   const [token, setToken] = useState<string | null>(null)
 
   useEffect(() => {
     // Restaurar sessão salva
-    const savedToken = localStorage.getItem(TOKEN_KEY)
-    const savedUser = localStorage.getItem(USER_KEY)
+    const savedToken = localStorage.getItem(STORAGE_KEYS.TOKEN)
+    const savedUser = localStorage.getItem(STORAGE_KEYS.USER)
 
     if (savedToken && savedUser) {
       try {
         setToken(savedToken)
         setUser(JSON.parse(savedUser))
-        // Mantém o token acessível para o helper getAuthHeaders() do api.service
       } catch {
-        localStorage.removeItem(TOKEN_KEY)
-        localStorage.removeItem(USER_KEY)
+        localStorage.removeItem(STORAGE_KEYS.TOKEN)
+        localStorage.removeItem(STORAGE_KEYS.USER)
       }
     }
   }, [])
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
+      // O backend espera { login, senhaHash }. O api.service já cuida disso.
       const response = await authService.login(username, password)
 
       setToken(response.access_token)
       setUser(response.user)
 
       // Salvar no localStorage para persistir entre reloads
-      // O helper getAuthHeaders() em api.service.ts lê daqui automaticamente
-      localStorage.setItem(TOKEN_KEY, response.access_token)
-      localStorage.setItem(USER_KEY, JSON.stringify(response.user))
+      localStorage.setItem(STORAGE_KEYS.TOKEN, response.access_token)
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.user))
 
       return true
     } catch (error) {
@@ -60,8 +57,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setToken(null)
     setUser(null)
-    localStorage.removeItem(TOKEN_KEY)
-    localStorage.removeItem(USER_KEY)
+    localStorage.removeItem(STORAGE_KEYS.TOKEN)
+    localStorage.removeItem(STORAGE_KEYS.USER)
   }
 
   const isAdmin = user?.perfilAcesso === 'ADMIN'

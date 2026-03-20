@@ -1,3 +1,4 @@
+import { ENV_CONFIG, STORAGE_KEYS, API_ROUTES } from './api-config'
 
 export enum TipoCategoria {
   EXPOSITOR = 'EXPOSITOR',
@@ -20,7 +21,7 @@ export enum PerfilAcesso {
   LEITOR_CATRACA = 'LEITOR_CATRACA',
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost/api'
+const API_URL = (ENV_CONFIG.API_BASE_URL || '') + '/api'
 
 // =============================================================================
 // HELPERS
@@ -28,7 +29,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost/api'
 
 function getAuthHeaders(): HeadersInit {
   const headers: HeadersInit = { 'Content-Type': 'application/json' }
-  const jwt = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+  const jwt = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEYS.TOKEN) : null
   if (jwt) headers['Authorization'] = `Bearer ${jwt}`
   return headers
 }
@@ -277,14 +278,13 @@ export interface IPromoverCredenciadoDTO {
 }
 
 // =============================================================================
-// AUTH
-// POST /auth/login | /auth/register | /auth/promover
+// SERVICES
 // =============================================================================
 
 export const authService = {
   /** POST /auth/login — público */
   login(login: string, senhaHash: string): Promise<ILoginResponse> {
-    return request<ILoginResponse>('/auth/login', {
+    return request<ILoginResponse>(API_ROUTES.AUTH.LOGIN, {
       method: 'POST',
       body: JSON.stringify({ login, senhaHash }),
     })
@@ -296,7 +296,7 @@ export const authService = {
    * também cria credenciado + credencial (QR) automaticamente.
    */
   register(data: IRegistrarUsuarioDTO): Promise<IUsuario> {
-    return request<IUsuario>('/auth/register', {
+    return request<IUsuario>(API_ROUTES.AUTH.REGISTER, {
       method: 'POST',
       body: JSON.stringify(data),
     })
@@ -308,7 +308,7 @@ export const authService = {
    * Retorna usuário criado + credenciado vinculado + mensagem.
    */
   promover(data: IPromoverCredenciadoDTO): Promise<IPromoverResponse> {
-    return request<IPromoverResponse>('/auth/promover', {
+    return request<IPromoverResponse>(API_ROUTES.AUTH.PROMOVER, {
       method: 'POST',
       body: JSON.stringify(data),
     })
@@ -368,7 +368,7 @@ export const credenciadosService = {
    * Cria credenciado + endereço + descarbonização + credencial (QR) em uma única chamada
    */
   cadastrar(data: ICadastrarCredenciadoDTO): Promise<ICredenciado> {
-    return request<ICredenciado>('/credenciados', {
+    return request<ICredenciado>(API_ROUTES.CREDENCIADOS.LISTAR, {
       method: 'POST',
       body: JSON.stringify(data),
     })
@@ -376,22 +376,22 @@ export const credenciadosService = {
 
   /** GET /credenciados — requer ADMIN, retorna lista com credencial e endereço */
   listar(): Promise<ICredenciado[]> {
-    return request<ICredenciado[]>('/credenciados', { revalidate: 0 })
+    return request<ICredenciado[]>(API_ROUTES.CREDENCIADOS.LISTAR, { revalidate: 0 })
   },
 
   /** GET /credenciados/cpf/:cpf — público */
   buscarPorCpf(cpf: string): Promise<ICredenciado> {
-    return request<ICredenciado>(`/credenciados/cpf/${cpf}`)
+    return request<ICredenciado>(API_ROUTES.CREDENCIADOS.BUSCAR_CPF(cpf))
   },
 
   /** GET /credenciados/:id — requer ADMIN, retorna com credencial e endereço */
   buscarPorId(id: string): Promise<ICredenciado> {
-    return request<ICredenciado>(`/credenciados/${id}`)
+    return request<ICredenciado>(API_ROUTES.CREDENCIADOS.BUSCAR(id))
   },
 
   /** PATCH /credenciados/:id — requer ADMIN */
   atualizar(id: string, data: Partial<ICadastrarCredenciadoDTO>): Promise<ICredenciado> {
-    return request<ICredenciado>(`/credenciados/${id}`, {
+    return request<ICredenciado>(API_ROUTES.CREDENCIADOS.BUSCAR(id), {
       method: 'PATCH',
       body: JSON.stringify(data),
     })
@@ -399,7 +399,7 @@ export const credenciadosService = {
 
   /** DELETE /credenciados/:id — requer ADMIN */
   deletar(id: string): Promise<{ message: string }> {
-    return request<{ message: string }>(`/credenciados/${id}`, { method: 'DELETE' })
+    return request<{ message: string }>(API_ROUTES.CREDENCIADOS.BUSCAR(id), { method: 'DELETE' })
   },
 }
 
@@ -487,70 +487,13 @@ export const scansService = {
 
 export const enderecoService = {
   /** GET /address/:cep?country=Brasil */
-  buscarPorCep(cep: string, country = 'Brasil'): Promise<IEndereco> {
-    return request<IEndereco>(
-      `/address/${cep}?country=${encodeURIComponent(country)}`,
-    )
+  buscarPorCep(cep: string): Promise<IEndereco> {
+    return request<IEndereco>(API_ROUTES.ENDERECO.BUSCAR_CEP(cep))
   },
 
   /** GET /endereco-cache — requer ADMIN */
   listarCache(): Promise<IEndereco[]> {
-    return request<IEndereco[]>('/endereco-cache', { revalidate: 300 })
-  },
-}
-
-// =============================================================================
-// DATA EXPORT (DataController)
-// Rotas de exportação/relatórios — GET públicos sem autenticação
-// GET /data/eventos
-// GET /data/usuarios-organizacao
-// GET /data/credenciados
-// GET /data/enderecos
-// GET /data/endereco-cache
-// GET /data/descarbonizacao
-// GET /data/credencial
-// GET /data/qr-scans
-// =============================================================================
-
-export const dataService = {
-  /** GET /data/eventos */
-  eventos(): Promise<IEvento[]> {
-    return request<IEvento[]>('/data/eventos', { revalidate: 0 })
-  },
-
-  /** GET /data/usuarios-organizacao */
-  usuariosOrganizacao(): Promise<IUsuario[]> {
-    return request<IUsuario[]>('/data/usuarios-organizacao', { revalidate: 0 })
-  },
-
-  /** GET /data/credenciados — com todas as relações */
-  credenciados(): Promise<ICredenciado[]> {
-    return request<ICredenciado[]>('/data/credenciados', { revalidate: 0 })
-  },
-
-  /** GET /data/enderecos */
-  enderecos(): Promise<IEndereco[]> {
-    return request<IEndereco[]>('/data/enderecos', { revalidate: 0 })
-  },
-
-  /** GET /data/endereco-cache */
-  enderecoCache(): Promise<IEndereco[]> {
-    return request<IEndereco[]>('/data/endereco-cache', { revalidate: 0 })
-  },
-
-  /** GET /data/descarbonizacao */
-  descarbonizacao(): Promise<IDescarbonizacao[]> {
-    return request<IDescarbonizacao[]>('/data/descarbonizacao', { revalidate: 0 })
-  },
-
-  /** GET /data/credencial */
-  credenciais(): Promise<ICredencial[]> {
-    return request<ICredencial[]>('/data/credencial', { revalidate: 0 })
-  },
-
-  /** GET /data/qr-scans */
-  qrScans(): Promise<IQrScan[]> {
-    return request<IQrScan[]>('/data/qr-scans', { revalidate: 0 })
+    return request<IEndereco[]>(API_ROUTES.ENDERECO.CACHE, { revalidate: 300 })
   },
 }
 
@@ -563,7 +506,7 @@ export const dataService = {
 export const dashboardService = {
   getKPIs(eventoId?: string): Promise<IDashboardResponse> {
     const query = eventoId ? `?eventoId=${eventoId}` : ''
-    return request<IDashboardResponse>(`/dashboard/kpis${query}`, {
+    return request<IDashboardResponse>(`${API_ROUTES.DASHBOARD.KPI}${query}`, {
       revalidate: 60,
     })
   },
