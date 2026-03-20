@@ -1,19 +1,14 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
-  // Search, 
-  // Bell, 
   Menu, 
   ChevronDown,
   LogOut,
   User,
   Settings,
-  // Coffee,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,7 +19,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { usuarioAdmin, evento } from '@/lib/mock-data'
+import { useAuth } from '@/lib/auth-context'
+import { evento } from '@/lib/mock-data'
 
 interface AdminTopbarProps {
   onMobileMenuClick: () => void
@@ -32,27 +28,13 @@ interface AdminTopbarProps {
 
 export function AdminTopbar({ onMobileMenuClick }: AdminTopbarProps) {
   const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState('')
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      router.push(`/admin/credenciados?busca=${encodeURIComponent(searchQuery)}`)
-    }
-  }
+  const { user, logout } = useAuth()
 
   const handleLogout = () => {
-    router.push('/login')
+    logout()
   }
 
-  const getInitials = (nome: string) => {
-    return nome
-      .split(' ')
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join('')
-      .toUpperCase()
-  }
+  const displayName = user?.login ? user.login.charAt(0).toUpperCase() + user.login.slice(1) : 'Usuário'
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-card px-4 lg:px-6">
@@ -82,20 +64,6 @@ export function AdminTopbar({ onMobileMenuClick }: AdminTopbarProps) {
         </div>
       </div>
 
-      {/* Search */}
-      {/* <form onSubmit={handleSearch} className="hidden flex-1 justify-center px-8 md:flex">
-        <div className="relative w-full max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Buscar por nome, CPF ou e-mail..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full border-border bg-background pl-9"
-          />
-        </div>
-      </form> */}
-
       {/* Actions */}
       <div className="flex items-center gap-2">
 
@@ -104,13 +72,15 @@ export function AdminTopbar({ onMobileMenuClick }: AdminTopbarProps) {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="gap-2 px-2">
               <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                  <img src="/admin/profile.png" alt="Logo Alta Café" className="md-7 h-8 w-auto" />
+                <AvatarFallback className="bg-primary text-primary-foreground text-xs uppercase">
+                  {user?.login?.substring(0, 2) || 'AD'}
                 </AvatarFallback>
               </Avatar>
-              <div className="hidden flex-col items-start lg:flex">
-                <span className="text-sm font-medium">{usuarioAdmin.nome}</span>
-                <span className="text-xs text-muted-foreground">{usuarioAdmin.perfilAcesso}</span>
+              <div className="hidden flex-col items-start lg:flex text-left">
+                <span className="text-sm font-medium">{displayName}</span>
+                <span className="text-xs text-muted-foreground uppercase opacity-70">
+                  {user?.perfilAcesso || 'Perfil'}
+                </span>
               </div>
               <ChevronDown className="hidden h-4 w-4 text-muted-foreground lg:block" />
             </Button>
@@ -127,9 +97,9 @@ export function AdminTopbar({ onMobileMenuClick }: AdminTopbarProps) {
               Configurações
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+            <DropdownMenuItem onClick={handleLogout} className="text-destructive font-medium">
               <LogOut className="mr-2 h-4 w-4" />
-              Sair
+              Sair da conta
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
