@@ -119,9 +119,9 @@ export default function CarbonoPage() {
   const handleExportCSV = () => {
     exportCSV(
       'emissao_carbono_alta_cafe_2026.csv',
-      ['ID Credenciado', 'Combustível', 'Distância Ida+Volta (km)', 'Pegada CO2 (kg)'],
+      ['Participante', 'Combustível', 'Distância Ida+Volta (km)', 'Pegada CO2 (kg)'],
       registros.map(r => [
-        r.credenciadoId,
+        r.credenciado?.nomeCompleto || r.credenciadoId,
         combustivelConfig[r.tipoCombustivel]?.label ?? r.tipoCombustivel,
         r.distanciaIdaVoltaKm.toFixed(1),
         (r.pegadaCo2 ?? 0).toFixed(2),
@@ -338,7 +338,7 @@ export default function CarbonoPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">#</TableHead>
-                  <TableHead>ID Credenciado</TableHead>
+                  <TableHead>Participante</TableHead>
                   <TableHead>Combustível</TableHead>
                   <TableHead className="text-right">Distância (km)</TableHead>
                   <TableHead className="text-right">Emissão</TableHead>
@@ -364,7 +364,9 @@ export default function CarbonoPage() {
                     return (
                       <TableRow key={item.id}>
                         <TableCell className="font-medium">{index + 1}</TableCell>
-                        <TableCell className="font-mono text-sm">{item.credenciadoId}</TableCell>
+                        <TableCell className="font-medium text-sm">
+                          {item.credenciado?.nomeCompleto || item.credenciadoId}
+                        </TableCell>
                         <TableCell>
                           <Badge
                             variant="secondary"

@@ -127,6 +127,11 @@ export interface IDescarbonizacao {
   pegadaCo2?: number
   createdAt: string
   updatedAt: string
+  credenciado?: {
+    nomeCompleto: string
+    cpf?: string
+    tipoCategoria?: string
+  }
 }
 
 export interface IDescarbonizacaoSummary {
