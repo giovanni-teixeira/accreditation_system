@@ -80,13 +80,16 @@ export function StatusModal({ isOpen, onClose, type, messages, userData }: Statu
     };
 
     const getFaixaColor = (role: string) => {
-        switch (role?.toLowerCase()) {
+        const r = role?.toLowerCase();
+        switch (r) {
             case 'visitante': return '#8B008B';
             case 'expositor': return '#0000FF';
             case 'imprensa': return '#778899';
             case 'produtor':
-            case 'cafeicultor': return '#00FF00';
-            default: return '#00FF00';
+            case 'cafeicultor': return '#00CC00';
+            case 'organizacao': return '#1a5c2a';
+            case 'terceirizado': return '#7b3f00';
+            default: return '#00CC00';
         }
     };
 
