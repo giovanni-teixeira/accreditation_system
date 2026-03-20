@@ -43,6 +43,7 @@ export class AuthController implements OnModuleInit {
     private readonly credenciadoRepository: CredenciadoRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly logger: AppLoggerService,
   ) {}
 
   @Post(ROUTES.AUTH.LOGIN)
@@ -59,11 +60,14 @@ export class AuthController implements OnModuleInit {
         !user ||
         !(await bcrypt.compare(loginDto.senhaHash, user.senhaHash))
       ) {
+        this.logger.warn(`Tentativa de login inválida para o usuário: ${loginDto.login}`, 'Auth');
         throw new BusinessException(
           'Usuário ou senha inválidos. Por favor, verifique suas credenciais.',
           401,
         );
       }
+
+      this.logger.log(`Login realizado com sucesso: ${user.login} (Perfil: ${user.perfilAcesso})`, 'Auth');
 
       const payload = {
         sub: user.id,
@@ -110,6 +114,8 @@ export class AuthController implements OnModuleInit {
         perfilAcesso: registerDto.perfilAcesso,
         setor: registerDto.setor,
       });
+
+      this.logger.log(`Novo usuário registrado: ${novoUsuario.login} (Perfil: ${novoUsuario.perfilAcesso})`, 'Auth');
 
       // 2. Se CPF foi fornecido, criar Credenciado + Credencial (QR) + Descarbonizacao
       if (registerDto.cpf) {
@@ -204,6 +210,8 @@ export class AuthController implements OnModuleInit {
         perfilAcesso: dto.perfilAcesso,
         setor: dto.setor,
       });
+
+      this.logger.log(`Credenciado promovido a usuário: ${novoUsuario.login} (Perfil: ${novoUsuario.perfilAcesso})`, 'Auth');
 
       return {
         ...new UsuarioResponseDto(novoUsuario),
