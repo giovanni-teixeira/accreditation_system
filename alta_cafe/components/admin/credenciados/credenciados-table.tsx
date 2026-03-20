@@ -123,7 +123,11 @@ export function CredenciadosTable({
             </TableHeader>
             <TableBody>
               {paginatedCredenciados.map((credenciado) => {
-                const catColor = categoriaColors[credenciado.tipoCategoria]
+                const catColor = categoriaColors[credenciado.tipoCategoria] || { 
+                  bg: 'bg-gray-100', 
+                  text: 'text-gray-800', 
+                  hex: '#888888' 
+                }
                 return (
                   <TableRow 
                     key={credenciado.id} 
@@ -138,7 +142,7 @@ export function CredenciadosTable({
                     </TableCell>
                     <TableCell>
                       <Badge variant="secondary" className={cn('font-medium', catColor.bg, catColor.text)}>
-                        {categoriasLabels[credenciado.tipoCategoria]}
+                        {categoriasLabels[credenciado.tipoCategoria] || credenciado.tipoCategoria}
                       </Badge>
                     </TableCell>
                     <TableCell className="hidden font-mono text-sm md:table-cell">

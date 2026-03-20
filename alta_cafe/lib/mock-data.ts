@@ -274,6 +274,8 @@ export const categoriasLabels: Record<string, string> = {
   PRODUTOR: 'Produtor',
   VISITANTE: 'Visitante',
   IMPRENSA: 'Imprensa',
+  ORGANIZACAO: 'Organização',
+  TERCEIRIZADO: 'Terceirizado',
 }
 
 // Cores das categorias
@@ -282,6 +284,8 @@ export const categoriaColors: Record<string, { bg: string; text: string; hex: st
   PRODUTOR: { bg: 'bg-green-100', text: 'text-green-800', hex: '#00FF00' },
   VISITANTE: { bg: 'bg-purple-100', text: 'text-purple-800', hex: '#8B008B' },
   IMPRENSA: { bg: 'bg-slate-100', text: 'text-slate-800', hex: '#778899' },
+  ORGANIZACAO: { bg: 'bg-orange-100', text: 'text-orange-800', hex: '#FF8C00' },
+  TERCEIRIZADO: { bg: 'bg-red-100', text: 'text-red-800', hex: '#DC143C' },
 }
 
 // Dados de cidades para relatórios

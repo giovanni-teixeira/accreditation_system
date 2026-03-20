@@ -17,6 +17,13 @@ export class CredenciadoResponseDto {
   nomeEmpresa?: string;
   nomePropriedade?: string;
   nomeVeiculo?: string;
+  siteEmpresa?: string;
+  rg?: string | null;
+  celular: string;
+  aceiteLgpd: boolean;
+  eventoId: string;
+  cnpj?: string | null;
+  ccir?: string | null;
   createdAt: Date;
   updatedAt: Date;
 
@@ -26,13 +33,20 @@ export class CredenciadoResponseDto {
     descarbonizacao?: IDescarbonizacao | null;
   }) {
     this.id = partial.id;
+    this.eventoId = partial.eventoId;
     this.nomeCompleto = partial.nomeCompleto;
     this.cpf = partial.cpf;
+    this.rg = partial.rg ?? null;
+    this.celular = partial.celular;
     this.email = partial.email;
     this.tipoCategoria = partial.tipoCategoria;
     this.nomeEmpresa = partial.nomeEmpresa;
     this.nomePropriedade = partial.nomePropriedade;
     this.nomeVeiculo = partial.nomeVeiculo;
+    this.siteEmpresa = partial.siteEmpresa;
+    this.aceiteLgpd = partial.aceiteLgpd;
+    this.cnpj = partial.cnpj;
+    this.ccir = partial.ccir;
     this.createdAt = partial.createdAt;
     this.updatedAt = partial.updatedAt;
     this.endereco = partial.endereco ?? null;

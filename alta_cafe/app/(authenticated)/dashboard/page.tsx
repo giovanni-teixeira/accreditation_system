@@ -38,17 +38,24 @@ export default function DashboardPage() {
       .catch((err) => console.error('[DashboardPage] Erro ao buscar credenciados:', err))
   }, [])
 
-  const recentRegistrations = [...credenciados]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 10)
-    .map(c => ({
-      id: c.id,
-      nomeCompleto: c.nomeCompleto,
-      tipoCategoria: c.tipoCategoria,
-      email: c.email,
-      createdAt: c.createdAt,
-      credencial: c.credencial ? { status: c.credencial.status } : null,
-    }))
+  const recentRegistrations = Array.isArray(credenciados) 
+    ? [...credenciados]
+        .filter(c => c && c.createdAt)
+        .sort((a, b) => {
+          const dateA = new Date(a.createdAt).getTime()
+          const dateB = new Date(b.createdAt).getTime()
+          return (isNaN(dateB) ? 0 : dateB) - (isNaN(dateA) ? 0 : dateA)
+        })
+        .slice(0, 10)
+        .map(c => ({
+          id: c.id,
+          nomeCompleto: c.nomeCompleto,
+          tipoCategoria: c.tipoCategoria,
+          email: c.email,
+          createdAt: c.createdAt,
+          credencial: c.credencial ? { status: c.credencial.status } : null,
+        }))
+    : []
 
   const categoryChart = Object.values(TipoCategoria)
     .map(categoria => ({
