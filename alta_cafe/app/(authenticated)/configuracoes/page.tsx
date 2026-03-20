@@ -51,7 +51,6 @@ export default function ConfiguracoesPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingAtividades, setIsLoadingAtividades] = useState(true)
   const [isSearchingLogs, setIsSearchingLogs] = useState(false)
-  const [searchTicketId, setSearchTicketId] = useState('')
   const [searchNome, setSearchNome] = useState('')
   const [selectedScanner, setSelectedScanner] = useState<string>('all')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -69,7 +68,7 @@ export default function ConfiguracoesPage() {
     Promise.all([
       usuariosService.listar().then(setUsuarios),
       scansService.listarAtividades().then(setAtividades),
-      scansService.listarLogs({ limit: 5 }).then(setLogs)
+      scansService.listarLogs({ limit: 10 }).then(setLogs)
     ])
       .catch(() => toast.error('Erro ao carregar dados organizacional ou de scans.'))
       .finally(() => {
@@ -77,6 +76,17 @@ export default function ConfiguracoesPage() {
         setIsLoadingAtividades(false)
       })
   }, [])
+
+  // ── Busca em Tempo Real (Debounce) ─────────────────────────────────────────
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (!isLoadingAtividades) {
+        handleSearchLogs();
+      }
+    }, 400); // 400ms delay para busca fluida
+
+    return () => clearTimeout(handler);
+  }, [searchNome, selectedScanner]);
 
   // ── Reset form ────────────────────────────────────────────────────────────
   const resetForm = () => {
@@ -104,7 +114,6 @@ export default function ConfiguracoesPage() {
     setIsSaving(true)
     try {
       if (editingUser) {
-        // Editar — PATCH /usuarios/:id
         const atualizado = await usuariosService.atualizar(editingUser.id, {
           perfilAcesso: formPerfil,
           setor: formSetor || undefined,
@@ -113,7 +122,6 @@ export default function ConfiguracoesPage() {
         setUsuarios(prev => prev.map(u => u.id === editingUser.id ? atualizado : u))
         toast.success('Usuário atualizado com sucesso!')
       } else {
-        // Criar — POST /auth/register
         const novo = await authService.register({
           login: formLogin,
           senhaPura: formSenha,
@@ -149,15 +157,13 @@ export default function ConfiguracoesPage() {
     setIsSearchingLogs(true)
     try {
       const results = await scansService.listarLogs({ 
-        ticketId: searchTicketId, 
         nome: searchNome,
         scannerId: selectedScanner === 'all' ? undefined : selectedScanner,
         limit: 30 
       })
       setLogs(results)
-      if (results.length === 0) toast.info('Nenhuma captura encontrada com estes filtros.')
     } catch (error: any) {
-      toast.error('Erro ao buscar logs.')
+      // Falha silenciosa na busca automática para não interromper a digitação
     } finally {
       setIsSearchingLogs(false)
     }
@@ -166,9 +172,12 @@ export default function ConfiguracoesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">Configurações</h1>
-        <p className="text-muted-foreground">Gerencie os usuários e monitore as atividades de captura</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Configurações</h1>
+          <p className="text-muted-foreground text-sm">Gerencie os usuários e audite as atividades de captura</p>
+        </div>
+        {isSearchingLogs && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
       </div>
 
       {/* Usuários */}
@@ -179,9 +188,7 @@ export default function ConfiguracoesPage() {
               <Users className="h-5 w-5" />
               Usuários da Organização
             </CardTitle>
-            <CardDescription>
-              Administradores e operadores de scanner com acesso ao sistema
-            </CardDescription>
+            <CardDescription>Operadores de scanner e administradores</CardDescription>
           </div>
 
           <Dialog open={isDialogOpen} onOpenChange={(open) => {
@@ -198,9 +205,7 @@ export default function ConfiguracoesPage() {
               <DialogHeader>
                 <DialogTitle>{editingUser ? 'Editar Usuário' : 'Novo Usuário'}</DialogTitle>
                 <DialogDescription>
-                  {editingUser
-                    ? 'Atualize o perfil ou a senha do usuário.'
-                    : 'Crie um novo acesso ao sistema.'}
+                  {editingUser ? 'Atualize o perfil do usuário.' : 'Crie um novo acesso.'}
                 </DialogDescription>
               </DialogHeader>
 
@@ -213,34 +218,30 @@ export default function ConfiguracoesPage() {
                       value={formLogin}
                       onChange={(e) => setFormLogin(e.target.value)}
                       placeholder="nome_usuario"
-                      autoComplete="off"
                     />
                   </div>
                 )}
 
                 {editingUser && (
-                  <div className="rounded-lg border border-border bg-muted/30 px-4 py-3">
+                  <div className="rounded-lg border bg-muted/30 px-4 py-3">
                     <p className="text-xs text-muted-foreground">Login</p>
-                    <p className="font-medium text-foreground">{editingUser.login}</p>
+                    <p className="font-medium">{editingUser.login}</p>
                   </div>
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="senha">
-                    {editingUser ? 'Nova Senha (deixe em branco para manter)' : 'Senha *'}
-                  </Label>
+                  <Label htmlFor="senha">{editingUser ? 'Nova Senha (opcional)' : 'Senha *'}</Label>
                   <Input
                     id="senha"
                     type="password"
                     value={formSenha}
                     onChange={(e) => setFormSenha(e.target.value)}
                     placeholder="••••••••"
-                    autoComplete="new-password"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="perfil">Perfil de Acesso *</Label>
+                  <Label htmlFor="perfil">Perfil *</Label>
                   <Select value={formPerfil} onValueChange={(v) => setFormPerfil(v as PerfilAcesso)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione o perfil" />
@@ -254,25 +255,20 @@ export default function ConfiguracoesPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="setor">Setor (opcional)</Label>
+                  <Label htmlFor="setor">Setor</Label>
                   <Input
                     id="setor"
                     value={formSetor}
                     onChange={(e) => setFormSetor(e.target.value)}
-                    placeholder="Ex: Portaria, TI, Administração..."
+                    placeholder="Ex: Portaria..."
                   />
                 </div>
               </div>
 
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Cancelar
-                </Button>
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
                 <Button onClick={handleSave} disabled={isSaving}>
-                  {isSaving
-                    ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Salvando...</>
-                    : editingUser ? 'Salvar' : 'Criar Usuário'
-                  }
+                  {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : editingUser ? 'Salvar' : 'Criar'}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -287,53 +283,31 @@ export default function ConfiguracoesPage() {
                   <TableHead>Login</TableHead>
                   <TableHead className="hidden sm:table-cell">Setor</TableHead>
                   <TableHead>Perfil</TableHead>
-                  <TableHead className="hidden sm:table-cell">Criado em</TableHead>
-                  <TableHead className="w-[100px]">Ações</TableHead>
+                  <TableHead className="hidden sm:table-cell text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                      <Loader2 className="h-5 w-5 animate-spin mx-auto" />
-                    </TableCell>
-                  </TableRow>
+                  <TableRow><TableCell colSpan={4} className="text-center py-8"><Loader2 className="h-5 w-5 animate-spin mx-auto" /></TableCell></TableRow>
                 ) : usuarios.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                      Nenhum usuário cadastrado.
-                    </TableCell>
-                  </TableRow>
+                  <TableRow><TableCell colSpan={4} className="text-center py-8">Nenhum usuário.</TableCell></TableRow>
                 ) : (
                   usuarios.map((usuario) => {
                     const config = perfilConfig[usuario.perfilAcesso]
                     const Icon = config?.icon ?? Shield
                     return (
                       <TableRow key={usuario.id}>
-                        <TableCell className="font-medium">
-                          {usuario.login}
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell text-muted-foreground">
-                          {usuario.setor ?? '—'}
-                        </TableCell>
+                        <TableCell className="font-medium">{usuario.login}</TableCell>
+                        <TableCell className="hidden sm:table-cell text-muted-foreground">{usuario.setor || '—'}</TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className="whitespace-nowrap gap-1">
+                          <Badge variant="secondary" className="gap-1">
                             <Icon className="h-3 w-3" />
-                            <span>{config?.label ?? usuario.perfilAcesso}</span>
+                            {config?.label || usuario.perfilAcesso}
                           </Badge>
                         </TableCell>
-                        <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
-                          {new Date(usuario.createdAt).toLocaleDateString('pt-BR')}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="icon" onClick={() => handleOpenEdit(usuario)}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDelete(usuario)}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" onClick={() => handleOpenEdit(usuario)}><Edit className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(usuario)}><Trash2 className="h-4 w-4" /></Button>
                         </TableCell>
                       </TableRow>
                     )
@@ -352,9 +326,7 @@ export default function ConfiguracoesPage() {
             <ScanLine className="h-5 w-5" />
             Atividade dos Scanners
           </CardTitle>
-          <CardDescription>
-            Relatório de produtividade por leitor (Contagem de capturas acumuladas)
-          </CardDescription>
+          <CardDescription>Resumo de produtividade acumulada</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -363,30 +335,22 @@ export default function ConfiguracoesPage() {
                 <TableRow>
                   <TableHead>Leitor (Login)</TableHead>
                   <TableHead>Setor</TableHead>
-                  <TableHead className="text-center">Total Capturas</TableHead>
-                  <TableHead className="text-right">Última Atividade</TableHead>
+                  <TableHead className="text-center">Total</TableHead>
+                  <TableHead className="text-right">Última</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoadingAtividades ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8">
-                      <Loader2 className="h-5 w-5 animate-spin mx-auto" />
-                    </TableCell>
-                  </TableRow>
+                  <TableRow><TableCell colSpan={4} className="text-center py-8"><Loader2 className="h-5 w-5 animate-spin mx-auto" /></TableCell></TableRow>
                 ) : atividades.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                      Nenhuma atividade de scan registrada ainda.
-                    </TableCell>
-                  </TableRow>
+                  <TableRow><TableCell colSpan={4} className="text-center py-8">Sem atividades.</TableCell></TableRow>
                 ) : (
                   atividades.map((atv) => (
                     <TableRow key={atv.scannerId}>
                       <TableCell className="font-medium">{atv.scannerName}</TableCell>
                       <TableCell className="text-muted-foreground">{atv.setor}</TableCell>
                       <TableCell className="text-center font-bold text-primary">{atv.totalScans}</TableCell>
-                      <TableCell className="text-right text-sm text-muted-foreground">
+                      <TableCell className="text-right text-xs text-muted-foreground">
                         {atv.lastScanAt ? new Date(atv.lastScanAt).toLocaleString('pt-BR') : '—'}
                       </TableCell>
                     </TableRow>
@@ -398,105 +362,70 @@ export default function ConfiguracoesPage() {
         </CardContent>
       </Card>
 
-      {/* Histórico e Busca de Capturas */}
+      {/* Histórico e Busca Técnica */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <History className="h-5 w-5" />
-                Histórico e Busca de Capturas
-              </CardTitle>
-              <CardDescription>
-                Busque detalhes de quem foi lido em cada scanner
-              </CardDescription>
-            </div>
-          </div>
+          <CardTitle className="flex items-center gap-2">
+            <History className="h-5 w-5" />
+            Histórico e Busca Técnica
+          </CardTitle>
+          <CardDescription>Filtre o histórico de capturas por nome ou leitor em tempo real</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 items-end gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Leitor (Scanner)</Label>
+              <Label>Filtrar por Leitor</Label>
               <Select value={selectedScanner} onValueChange={setSelectedScanner}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Todos os scanners" />
-                </SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Todos os scanners" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos os scanners</SelectItem>
                   {usuarios
                     .filter(u => u.perfilAcesso === PerfilAcesso.LEITOR_CATRACA)
-                    .map(u => (
-                      <SelectItem key={u.id} value={u.id}>{u.login}</SelectItem>
-                    ))
+                    .map(u => <SelectItem key={u.id} value={u.id}>{u.login}</SelectItem>)
                   }
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="searchNome">Nome do Credenciado</Label>
-              <Input
-                id="searchNome"
-                placeholder="Ex: João Silva"
-                value={searchNome}
-                onChange={(e) => setSearchNome(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearchLogs()}
-              />
+              <Label htmlFor="searchNome">Buscar por Nome Credenciado</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="searchNome"
+                  placeholder="Digite para filtrar..."
+                  value={searchNome}
+                  onChange={(e) => setSearchNome(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="searchTicket">ID da Credencial (Ticket ID)</Label>
-              <Input
-                id="searchTicket"
-                placeholder="Ex: TK-12345"
-                value={searchTicketId}
-                onChange={(e) => setSearchTicketId(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearchLogs()}
-              />
-            </div>
-            <Button onClick={handleSearchLogs} disabled={isSearchingLogs} className="w-full md:w-auto">
-              {isSearchingLogs ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-              {isSearchingLogs ? 'Buscando...' : 'Filtrar'}
-            </Button>
           </div>
 
           <div className="overflow-x-auto border rounded-md">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Scanner (Login)</TableHead>
+                  <TableHead>Scanner</TableHead>
                   <TableHead>Credenciado</TableHead>
                   <TableHead className="hidden md:table-cell">CPF/CNPJ</TableHead>
-                  <TableHead className="text-right">Horário</TableHead>
+                  <TableHead className="text-right">Data/Hora</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isSearchingLogs ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8">
-                      <Loader2 className="h-5 w-5 animate-spin mx-auto" />
-                    </TableCell>
-                  </TableRow>
+                  <TableRow><TableCell colSpan={4} className="text-center py-8"><Loader2 className="h-5 w-5 animate-spin mx-auto" /></TableCell></TableRow>
                 ) : logs.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                      Nenhuma captura encontrada com estes filtros.
-                    </TableCell>
-                  </TableRow>
+                  <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhum resultado nos filtros.</TableCell></TableRow>
                 ) : (
                   logs.map((log) => (
                     <TableRow key={log.id}>
+                      <TableCell><Badge variant="outline" className="font-mono text-[10px]">{log.scannerName}</Badge></TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="font-mono text-xs">{log.scannerName}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="font-medium">{log.credenciadoNome}</div>
+                        <div className="font-medium text-sm">{log.credenciadoNome}</div>
                         <div className="text-[10px] text-muted-foreground uppercase">{log.tipoCategoria || 'Visitante'}</div>
                       </TableCell>
-                      <TableCell className="hidden md:table-cell text-muted-foreground text-sm">
-                        {log.credenciadoCpf}
-                      </TableCell>
-                      <TableCell className="text-right text-xs whitespace-nowrap">
-                        {new Date(log.createdAt).toLocaleString('pt-BR')}
-                      </TableCell>
+                      <TableCell className="hidden md:table-cell text-muted-foreground text-xs">{log.credenciadoCpf}</TableCell>
+                      <TableCell className="text-right text-[10px]">{new Date(log.createdAt).toLocaleString('pt-BR')}</TableCell>
                     </TableRow>
                   ))
                 )}
