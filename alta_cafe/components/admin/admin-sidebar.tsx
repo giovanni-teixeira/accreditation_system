@@ -12,7 +12,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Leaf,
-  ShieldCheck,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -46,11 +45,6 @@ const menuItems = [
     label: 'Configurações',
     href: '/configuracoes',
     icon: Settings,
-  },
-  {
-    label: 'Promover Usuário',
-    href: '/usuarios/promover',
-    icon: ShieldCheck,
   },
 ]
 

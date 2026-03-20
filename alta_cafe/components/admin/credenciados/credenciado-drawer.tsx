@@ -203,7 +203,10 @@ export function CredenciadoDrawer({ credenciado, isOpen, onClose, onEdit }: Cred
 
           <Separator />
 
-          {/* Operations */}
+          <Separator />
+          
+          {/* Operações (Ocultas temporariamente conforme pedido do usuário) */}
+          {/* 
           <div className="space-y-3">
             <h4 className="font-semibold text-foreground">Ações</h4>
             <Button 
@@ -215,6 +218,7 @@ export function CredenciadoDrawer({ credenciado, isOpen, onClose, onEdit }: Cred
               Editar Cadastro
             </Button>
           </div>
+          */}
 
           <Separator />
 
