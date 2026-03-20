@@ -169,10 +169,12 @@ export function CredenciadosTable({
                             <Eye className="mr-2 h-4 w-4" />
                             Ver detalhes
                           </DropdownMenuItem>
+                          {/* 
                           <DropdownMenuItem onClick={() => onEdit?.(credenciado)}>
                             <Edit className="mr-2 h-4 w-4" />
                             Editar
-                          </DropdownMenuItem>
+                          </DropdownMenuItem> 
+                          */}
                           <DropdownMenuSeparator />
                           <DropdownMenuItem 
                             className="text-destructive"
