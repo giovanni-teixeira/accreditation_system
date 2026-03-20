@@ -23,8 +23,8 @@ import CredentialPDF from '@/components/CredentialPDF'
 
 // Apenas as categorias internas da organização
 const categoriasDisponiveis = [
-  { value: TipoCategoria.ORGANIZACAO,  label: 'Comissão Organizadora' },
-  { value: TipoCategoria.TERCEIRIZADO, label: 'Colaborador Terceirizado' },
+  { value: TipoCategoria.ORGANIZACAO,  label: 'Organizadora' },
+  { value: TipoCategoria.TERCEIRIZADO, label: 'Terceirizado' },
 ]
 
 const corPorCategoria: Record<string, string> = {
