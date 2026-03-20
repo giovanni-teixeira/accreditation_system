@@ -9,7 +9,22 @@ interface CredentialPDFProps {
 }
 
 const CredentialPDF = forwardRef<HTMLDivElement, CredentialPDFProps>(({ userData, corTipo }, ref) => {
-    // Prioriza o QR Code em Base64 (pré-carregado) para o PDF
+    // Mapeamento de Labels e Cores conforme imagem
+    const CATEGORIA_CONFIG: Record<string, { label: string }> = {
+        expositor:    { label: 'Expositores' },
+        produtor:     { label: 'Produtores' },
+        cafeicultor:  { label: 'Produtores' },
+        visitante:    { label: 'Visitantes' },
+        imprensa:     { label: 'Imprensa' },
+        organizacao:  { label: 'Organizadora' },
+        terceirizado: { label: 'Terceirizado' },
+    };
+
+    const getLabel = (role: string) => {
+        const r = role?.toLowerCase();
+        return CATEGORIA_CONFIG[r]?.label || role?.toUpperCase();
+    };
+
     const qrSource = (userData as any).qrBase64 || `https://api.qrserver.com/v1/create-qr-code/?size=180x180&ecc=L&data=${encodeURIComponent(userData.qrToken)}&format=png&qzone=1`;
 
 
@@ -54,7 +69,7 @@ const CredentialPDF = forwardRef<HTMLDivElement, CredentialPDFProps>(({ userData
                 </div>
 
                 <div className={styles.faixaTipo}>
-                    {userData.role?.toUpperCase() === 'CAFEICULTOR' ? 'PRODUTOR' : userData.role}
+                    {getLabel(userData.role)}
                 </div>
             </div>
 
@@ -83,7 +98,7 @@ const CredentialPDF = forwardRef<HTMLDivElement, CredentialPDFProps>(({ userData
                 </div>
 
                 <div className={styles.faixaTipo}>
-                    {userData.role?.toUpperCase() === 'CAFEICULTOR' ? 'PRODUTOR'  : userData.role}
+                    {getLabel(userData.role)}
                 </div>
             </div>
 

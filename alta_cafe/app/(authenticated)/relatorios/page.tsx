@@ -32,8 +32,8 @@ const categoriaConfig: Record<string, { label: string; color: string }> = {
   [TipoCategoria.PRODUTOR]:    { label: 'Produtores',              color: '#00CC00' },
   [TipoCategoria.VISITANTE]:   { label: 'Visitantes',              color: '#8B008B' },
   [TipoCategoria.IMPRENSA]:    { label: 'Imprensa',                color: '#778899' },
-  [TipoCategoria.ORGANIZACAO]: { label: 'Comissão Organizadora',   color: '#1a5c2a' },
-  [TipoCategoria.TERCEIRIZADO]:{ label: 'Colaborador Terceirizado',color: '#7b3f00' },
+  [TipoCategoria.ORGANIZACAO]: { label: 'Organizadora',            color: '#1a5c2a' },
+  [TipoCategoria.TERCEIRIZADO]:{ label: 'Terceirizado',            color: '#7b3f00' },
 }
 
 // ─── Helper: agrupar credenciados por dia ─────────────────────────────────────
