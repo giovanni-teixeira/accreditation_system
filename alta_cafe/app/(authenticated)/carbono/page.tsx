@@ -338,7 +338,7 @@ export default function CarbonoPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">#</TableHead>
-                  <TableHead>Participante</TableHead>
+                  <TableHead>Credenciado</TableHead>
                   <TableHead>Combustível</TableHead>
                   <TableHead className="text-right">Distância (km)</TableHead>
                   <TableHead className="text-right">Emissão</TableHead>

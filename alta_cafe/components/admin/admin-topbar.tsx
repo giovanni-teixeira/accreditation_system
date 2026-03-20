@@ -32,6 +32,7 @@ export function AdminTopbar({ onMobileMenuClick }: AdminTopbarProps) {
 
   const handleLogout = () => {
     logout()
+    router.push('/login')
   }
 
   const displayName = user?.login ? user.login.charAt(0).toUpperCase() + user.login.slice(1) : 'Usuário'
