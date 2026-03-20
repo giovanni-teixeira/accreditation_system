@@ -3,6 +3,7 @@ import {
   Post,
   Get,
   Body,
+  Query,
   UseGuards,
   Request,
   HttpException,
@@ -80,7 +81,34 @@ export class ScansController {
     summary: 'Obter estatísticas de atividades por scanner (Admin only)',
   })
   @ApiResponse({ status: 200, description: 'Estatísticas recuperadas.' })
+  @Get('activities')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiOperation({
+    summary: 'Obter estatísticas de atividades por scanner (Admin only)',
+  })
+  @ApiResponse({ status: 200, description: 'Estatísticas recuperadas.' })
   async getActivities() {
     return await this.scansService.getScannerActivities();
+  }
+
+  @Get('logs')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiOperation({
+    summary: 'Obter logs detalhados de capturas com filtros (Admin only)',
+  })
+  async getLogs(
+    @Query('scannerId') scannerId?: string,
+    @Query('ticketId') ticketId?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return await this.scansService.getScanLogs({
+      scannerId,
+      ticketId,
+      limit: limit ? parseInt(limit) : 50,
+    });
   }
 }

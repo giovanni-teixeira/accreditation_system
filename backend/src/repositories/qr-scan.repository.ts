@@ -48,4 +48,22 @@ export class QrScanRepository extends BaseRepository<
       }
     });
   }
+
+  async findLogs(filters: { scannerId?: string; ticketId?: string; limit?: number }) {
+    return (this.prisma as any).qrScan.findMany({
+      where: {
+        scannerId: filters.scannerId,
+        ticketId: filters.ticketId ? { contains: filters.ticketId } : undefined,
+      },
+      include: {
+        credencial: {
+          include: {
+            credenciado: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: filters.limit || 50,
+    });
+  }
 }

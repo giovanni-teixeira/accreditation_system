@@ -11,6 +11,8 @@ import {
   Check,
   X,
   Loader2,
+  Search,
+  History,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -28,7 +30,7 @@ import {
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
-import { authService, usuariosService, scansService, IUsuario, IScannerActivity, PerfilAcesso } from '@/lib/api.service'
+import { authService, usuariosService, scansService, IUsuario, IScannerActivity, IScanLog, PerfilAcesso } from '@/lib/api.service'
 
 // ─── Config de perfis disponíveis ────────────────────────────────────────────
 const perfisDisponiveis = [
@@ -45,8 +47,11 @@ const perfilConfig: Record<string, { label: string; icon: React.ElementType }> =
 export default function ConfiguracoesPage() {
   const [usuarios, setUsuarios] = useState<IUsuario[]>([])
   const [atividades, setAtividades] = useState<IScannerActivity[]>([])
+  const [logs, setLogs] = useState<IScanLog[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingAtividades, setIsLoadingAtividades] = useState(true)
+  const [isSearchingLogs, setIsSearchingLogs] = useState(false)
+  const [searchTicketId, setSearchTicketId] = useState('')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<IUsuario | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -61,7 +66,8 @@ export default function ConfiguracoesPage() {
   useEffect(() => {
     Promise.all([
       usuariosService.listar().then(setUsuarios),
-      scansService.listarAtividades().then(setAtividades)
+      scansService.listarAtividades().then(setAtividades),
+      scansService.listarLogs({ limit: 5 }).then(setLogs)
     ])
       .catch(() => toast.error('Erro ao carregar dados organizacional ou de scans.'))
       .finally(() => {
@@ -148,6 +154,20 @@ export default function ConfiguracoesPage() {
       toast.success('Perfil atualizado!')
     } catch (error: any) {
       toast.error(error.message ?? 'Erro ao atualizar perfil.')
+    }
+  }
+
+  const handleSearchLogs = async () => {
+    if (!searchTicketId.trim()) return toast.info('Digite um ID de credencial para buscar.')
+    setIsSearchingLogs(true)
+    try {
+      const results = await scansService.listarLogs({ ticketId: searchTicketId, limit: 20 })
+      setLogs(results)
+      if (results.length === 0) toast.info('Nenhuma captura encontrada para este ID.')
+    } catch (error: any) {
+      toast.error('Erro ao buscar logs.')
+    } finally {
+      setIsSearchingLogs(false)
     }
   }
 
@@ -396,6 +416,86 @@ export default function ConfiguracoesPage() {
                       <TableCell className="text-center font-bold text-primary">{atv.totalScans}</TableCell>
                       <TableCell className="text-right text-sm text-muted-foreground">
                         {atv.lastScanAt ? new Date(atv.lastScanAt).toLocaleString('pt-BR') : '—'}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Histórico e Busca de Capturas */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <History className="h-5 w-5" />
+                Histórico e Busca de Capturas
+              </CardTitle>
+              <CardDescription>
+                Busque detalhes de quem foi lido em cada scanner
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-end gap-3 max-w-md">
+            <div className="flex-1 space-y-2">
+              <Label htmlFor="searchTicket">ID da Credencial (Ticket ID)</Label>
+              <Input
+                id="searchTicket"
+                placeholder="Ex: TK-12345"
+                value={searchTicketId}
+                onChange={(e) => setSearchTicketId(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearchLogs()}
+              />
+            </div>
+            <Button onClick={handleSearchLogs} disabled={isSearchingLogs}>
+              {isSearchingLogs ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+            </Button>
+          </div>
+
+          <div className="overflow-x-auto border rounded-md">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Credenciado</TableHead>
+                  <TableHead className="hidden md:table-cell">CPF/CNPJ</TableHead>
+                  <TableHead>Scanner (Login)</TableHead>
+                  <TableHead className="text-right">Horário</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isSearchingLogs ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center py-8">
+                      <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+                    </TableCell>
+                  </TableRow>
+                ) : logs.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                      Digite um ID acima para buscar o histórico de capturas.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  logs.map((log) => (
+                    <TableRow key={log.id}>
+                      <TableCell>
+                        <div className="font-medium">{log.credenciadoNome}</div>
+                        <div className="text-xs text-muted-foreground">{log.tipoCategoria}</div>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell text-muted-foreground">
+                        {log.credenciadoCpf}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{log.scannerName}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right text-xs">
+                        {new Date(log.createdAt).toLocaleString('pt-BR')}
                       </TableCell>
                     </TableRow>
                   ))

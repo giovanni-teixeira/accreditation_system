@@ -104,4 +104,27 @@ export class ScansService {
 
     return enrichedStats;
   }
+
+  async getScanLogs(filters: { scannerId?: string; ticketId?: string; limit?: number }) {
+    const logs = await this.qrScanRepository.findLogs(filters);
+
+    return Promise.all(
+      logs.map(async (log: any) => {
+        const scanner = await this.usuarioRepository.findById(log.scannerId);
+        const credencial = log.credencial;
+        const credenciado = credencial?.credenciado;
+
+        return {
+          id: log.id,
+          ticketId: log.ticketId,
+          scanType: log.scanType,
+          createdAt: log.createdAt,
+          scannerName: scanner ? scanner.login : `ID: ${log.scannerId}`,
+          credenciadoNome: credenciado ? credenciado.nomeCompleto : 'Desconhecido',
+          credenciadoCpf: credenciado ? credenciado.cpf : 'N/A',
+          tipoCategoria: credenciado ? credenciado.tipoCategoria : 'N/A',
+        };
+      }),
+    );
+  }
 }

@@ -210,6 +210,17 @@ export interface IScannerActivity {
   lastScanAt: string
 }
 
+export interface IScanLog {
+  id: string
+  ticketId: string
+  scanType: string
+  createdAt: string
+  scannerName: string
+  credenciadoNome: string
+  credenciadoCpf: string
+  tipoCategoria: string
+}
+
 // --- Dashboard ---
 export interface IDashboardKPIs {
   totalCredenciados: number
@@ -492,8 +503,19 @@ export const scansService = {
   },
 
   /** GET /scans/activities — obter estatísticas por scanner (Admin only) */
+  /** GET /scans/activities — obter estatísticas por scanner (Admin only) */
   listarAtividades(): Promise<IScannerActivity[]> {
     return request<IScannerActivity[]>('/scans/activities', { revalidate: 0 })
+  },
+
+  /** GET /scans/logs — obter histórico detalhado de capturas (Admin only) */
+  listarLogs(filtros: { scannerId?: string; ticketId?: string; limit?: number }): Promise<IScanLog[]> {
+    const params = new URLSearchParams()
+    if (filtros.scannerId) params.append('scannerId', filtros.scannerId)
+    if (filtros.ticketId) params.append('ticketId', filtros.ticketId)
+    if (filtros.limit) params.append('limit', filtros.limit.toString())
+    
+    return request<IScanLog[]>(`/scans/logs?${params.toString()}`, { revalidate: 0 })
   },
 }
 
