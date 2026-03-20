@@ -17,6 +17,8 @@ export class CredenciadoResponseDto {
   nomeEmpresa?: string;
   nomePropriedade?: string;
   nomeVeiculo?: string;
+  createdAt: Date;
+  updatedAt: Date;
 
   constructor(partial: ICredenciado & {
     endereco?: IEndereco | null;
@@ -31,6 +33,8 @@ export class CredenciadoResponseDto {
     this.nomeEmpresa = partial.nomeEmpresa;
     this.nomePropriedade = partial.nomePropriedade;
     this.nomeVeiculo = partial.nomeVeiculo;
+    this.createdAt = partial.createdAt;
+    this.updatedAt = partial.updatedAt;
     this.endereco = partial.endereco ?? null;
     this.descarbonizacao = partial.descarbonizacao ?? null;
     this.credencial = partial.credencial
