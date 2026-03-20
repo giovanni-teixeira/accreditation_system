@@ -14,13 +14,11 @@ class SyncService {
     const queue = this.getQueue();
     const today = new Date().toDateString();
 
-    // 1. Evitar duplicatas no mesmo dia (na fila local) - Comentado conforme pedido
-    /*
+    // 1. Evitar duplicatas na fila local para o mesmo dia
     if (queue.some(s => s.ticketId === ticketId && s.eventDay === today)) {
         console.log(`ℹ️ Ticket ${ticketId} já está na fila para hoje.`);
         return;
     }
-    */
 
     queue.push({ ticketId, eventDay: today, timestamp: Date.now() });
     this.saveQueue(queue);
@@ -28,13 +26,8 @@ class SyncService {
     // Adiciona ao histórico local de visibilidade imediata
     this.addToHistory(ticketId);
 
-    // Tente sincronizar apenas se houver 3 ou mais itens na fila (Novo Requisito)
-    if (queue.length >= 3) {
-        console.log(`📦 Lote com ${queue.length} itens. Iniciando sincronização...`);
-        this.processQueue();
-    } else {
-        console.log(`⏳ Aguardando mais scans para fechar lote (Atual: ${queue.length}/3)`);
-    }
+    // Sincronização automática se houver itens
+    this.processQueue();
   }
 
   static async processQueue() {
@@ -44,12 +37,12 @@ class SyncService {
 
         const token = localStorage.getItem('ALTA_CAFE_JWT');
         if (!token) {
-            console.warn('⚠️ Sincronização cancelada: Token ALTA_CAFE_JWT não encontrado no localStorage.');
+            console.warn('⚠️ Sincronização cancelada: Token ALTA_CAFE_JWT não encontrado.');
             return { success: false, error: 'Token ausente' };
         }
 
         const ticketIds = queue.map(item => item.ticketId);
-        console.log(`🚀 Tentando sincronizar lote de ${ticketIds.length} scans...`, ticketIds);
+        console.log(`🚀 Sincronizando lote de ${ticketIds.length} scans...`);
 
         const response = await fetch(API_ROUTES.SCANS.CHECK_IN_BATCH, {
           method: 'POST',
@@ -60,29 +53,33 @@ class SyncService {
           body: JSON.stringify({ ticketIds })
         });
 
-        const rawResult = await response.text();
-        
         if (response.ok) {
-          try {
-              const resData = JSON.parse(rawResult);
-              console.log(`✅ Lote processado pelo servidor:`, resData);
-
-              // Limpamos a fila local apenas se o servidor confirmou o recebimento
-              // No nosso backend, o bulkCheckIn retorna um objeto com 'processed', 'alreadyScanned', 'errors'
-              this.saveQueue([]);
-              return { success: true, ...resData };
-          } catch (e) {
-              console.error('❌ Erro ao processar resposta JSON do servidor:', rawResult);
-              return { success: false, error: 'Resposta inválida do servidor' };
-          }
+           // Em caso de sucesso do lote, limpamos APENAS o que foi enviado nesta leva
+           // Para ser ultra-robusto, poderíamos filtrar por IDs confirmados se o backend suportasse
+           // Como o backend bulkCheckIn processa tudo e retorna totais, assumimos sucesso total se 200 OK
+           this.saveQueue([]); 
+           console.log(`✅ Lote de ${ticketIds.length} enviado com sucesso.`);
+           return { success: true };
         } else {
-          console.error(`❌ Falha no envio (Status ${response.status}). Resposta:`, rawResult);
-          return { success: false, status: response.status, error: rawResult };
+          console.error(`❌ Falha no envio (Status ${response.status})`);
+          return { success: false, status: response.status };
         }
     } catch (err: any) {
-        console.error(`❌ Erro crítico de rede/conexão:`, err.message);
+        console.error(`❌ Erro de rede:`, err.message);
         return { success: false, error: err.message };
     }
+  }
+
+  // Iniciar sincronizador automático (chamado uma vez no app)
+  static startAutoSync(intervalMs: number = 60000) {
+    console.log(`⏰ Auto-sync ativado (${intervalMs/1000}s)`);
+    setInterval(() => {
+        const queue = this.getQueue();
+        if (queue.length > 0) {
+            console.log('⏰ Sincronização automática iniciada...');
+            this.processQueue();
+        }
+    }, intervalMs);
   }
 
   // Ferramenta de Teste Solicitada

@@ -41,14 +41,21 @@ export default function ScannerPage() {
         }
 
         // Tenta sincronizar scans offline a cada 30 segundos
-        const syncInterval = setInterval(() => {
-            const SyncService = require('@/services/SyncService').default;
+        const syncInterval = setInterval(async () => {
+            const { default: SyncService } = await import('@/services/SyncService');
             SyncService.processQueue();
             
             // Atualiza contador de pendentes
-            const queue = JSON.parse(localStorage.getItem('OFFLINE_SCANS_QUEUE') || '[]');
-            setPendingCount(queue.length);
-        }, 15000);
+            const queueStr = localStorage.getItem('OFFLINE_SCANS_QUEUE');
+            if (queueStr) {
+                try {
+                    const queue = JSON.parse(queueStr);
+                    setPendingCount(queue.length);
+                } catch (e) { setPendingCount(0); }
+            } else {
+                setPendingCount(0);
+            }
+        }, 30000);
 
         return () => clearInterval(syncInterval);
     }, []);
