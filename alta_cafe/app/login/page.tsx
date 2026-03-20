@@ -11,17 +11,14 @@ import { toast } from 'sonner'
 import logo from '../../public/altacafe.png'
 
 
-type LoginState = 'idle' | 'loading' | 'error'
+import { useAuth } from '@/lib/auth-context'
 
-// Credenciais válidas 
-const validCredentials = [
-  { login: 'admin', senha: 'admin123', perfil: 'Administrador' },
-  { login: 'comissao', senha: 'comissao123', perfil: 'Comissão Organizadora' },
-  { login: 'colaborador', senha: 'colaborador123', perfil: 'Colaborador Terceirizado' },
-]
+
+type LoginState = 'idle' | 'loading' | 'error'
 
 export default function AdminLoginPage() {
   const router = useRouter()
+  const { login: performLogin } = useAuth()
   const [login, setLogin] = useState('')
   const [senha, setSenha] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -40,25 +37,19 @@ export default function AdminLoginPage() {
     setState('loading')
     setErrorMessage('')
 
-    // Simular autenticação
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const success = await performLogin(login, senha)
 
-    // Verificar credenciais
-    const foundUser = validCredentials.find(
-      u => u.login === login && u.senha === senha
-    )
-
-    if (foundUser) {
-      // Salvar usuário na sessionStorage
-      sessionStorage.setItem('altacafe_user', JSON.stringify({
-        login: foundUser.login,
-        perfil: foundUser.perfil,
-      }))
-      toast.success(`Bem-vindo(a), ${foundUser.perfil}!`)
-      router.push('/dashboard')
-    } else {
+      if (success) {
+        toast.success(`Bem-vindo(a)!`)
+        router.push('/dashboard')
+      } else {
+        setState('error')
+        setErrorMessage('Credenciais inválidas. Verifique seu login e senha.')
+      }
+    } catch (error: any) {
       setState('error')
-      setErrorMessage('Credenciais inválidas. Verifique seu login e senha.')
+      setErrorMessage(error.message || 'Erro ao realizar login. Tente novamente.')
     }
   }
 

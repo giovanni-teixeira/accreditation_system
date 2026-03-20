@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { DM_Sans, Libre_Baskerville } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from '@/components/ui/sonner'
+import { AuthProvider } from '@/lib/auth-context'
 import './globals.css'
 
 const dmSans = DM_Sans({ 
@@ -22,8 +23,8 @@ export const metadata: Metadata = {
   description: 'Gestão de credenciamento, credenciais e operação de acesso - Alta Café',
 
   icons: {
-    icon: '/admin/ico_alta-cafe.png', // Caminho considerando que o arquivo está na pasta public/
-    apple: '/apple-touch-icon.png', // Opcional: ícone para dispositivos Apple
+    icon: '/admin/ico_alta-cafe.png',
+    apple: '/apple-touch-icon.png',
   },
 }
 
@@ -41,9 +42,11 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${dmSans.variable} ${libreBaskerville.variable} font-sans antialiased`}>
-        {children}
-        <Toaster position="top-right" />
-        <Analytics />
+        <AuthProvider>
+          {children}
+          <Toaster position="top-right" />
+          <Analytics />
+        </AuthProvider>
       </body>
     </html>
   )
