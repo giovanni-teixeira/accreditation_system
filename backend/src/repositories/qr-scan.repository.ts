@@ -49,11 +49,16 @@ export class QrScanRepository extends BaseRepository<
     });
   }
 
-  async findLogs(filters: { scannerId?: string; ticketId?: string; limit?: number }) {
+  async findLogs(filters: { scannerId?: string; ticketId?: string; nome?: string; limit?: number }) {
     return (this.prisma as any).qrScan.findMany({
       where: {
         scannerId: filters.scannerId,
         ticketId: filters.ticketId ? { contains: filters.ticketId } : undefined,
+        credencial: filters.nome ? {
+          credenciado: {
+            nomeCompleto: { contains: filters.nome, mode: 'insensitive' }
+          }
+        } : undefined,
       },
       include: {
         credencial: {

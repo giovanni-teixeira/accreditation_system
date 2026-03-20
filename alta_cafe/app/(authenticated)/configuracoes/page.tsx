@@ -52,6 +52,8 @@ export default function ConfiguracoesPage() {
   const [isLoadingAtividades, setIsLoadingAtividades] = useState(true)
   const [isSearchingLogs, setIsSearchingLogs] = useState(false)
   const [searchTicketId, setSearchTicketId] = useState('')
+  const [searchNome, setSearchNome] = useState('')
+  const [selectedScanner, setSelectedScanner] = useState<string>('all')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<IUsuario | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -143,27 +145,17 @@ export default function ConfiguracoesPage() {
     }
   }
 
-  // ── Alterar perfil diretamente na tabela ──────────────────────────────────
-  const handleTogglePerfil = async (user: IUsuario) => {
-    const novoPerfil = user.perfilAcesso === PerfilAcesso.ADMIN
-      ? PerfilAcesso.LEITOR_CATRACA
-      : PerfilAcesso.ADMIN
-    try {
-      const atualizado = await usuariosService.atualizar(user.id, { perfilAcesso: novoPerfil })
-      setUsuarios(prev => prev.map(u => u.id === user.id ? atualizado : u))
-      toast.success('Perfil atualizado!')
-    } catch (error: any) {
-      toast.error(error.message ?? 'Erro ao atualizar perfil.')
-    }
-  }
-
   const handleSearchLogs = async () => {
-    if (!searchTicketId.trim()) return toast.info('Digite um ID de credencial para buscar.')
     setIsSearchingLogs(true)
     try {
-      const results = await scansService.listarLogs({ ticketId: searchTicketId, limit: 20 })
+      const results = await scansService.listarLogs({ 
+        ticketId: searchTicketId, 
+        nome: searchNome,
+        scannerId: selectedScanner === 'all' ? undefined : selectedScanner,
+        limit: 30 
+      })
       setLogs(results)
-      if (results.length === 0) toast.info('Nenhuma captura encontrada para este ID.')
+      if (results.length === 0) toast.info('Nenhuma captura encontrada com estes filtros.')
     } catch (error: any) {
       toast.error('Erro ao buscar logs.')
     } finally {
@@ -176,7 +168,7 @@ export default function ConfiguracoesPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">Configurações</h1>
-        <p className="text-muted-foreground">Gerencie os usuários com acesso ao sistema</p>
+        <p className="text-muted-foreground">Gerencie os usuários e monitore as atividades de captura</p>
       </div>
 
       {/* Usuários */}
@@ -213,7 +205,6 @@ export default function ConfiguracoesPage() {
               </DialogHeader>
 
               <div className="space-y-4 py-4">
-                {/* Login — só exibe na criação */}
                 {!editingUser && (
                   <div className="space-y-2">
                     <Label htmlFor="login">Login *</Label>
@@ -320,12 +311,7 @@ export default function ConfiguracoesPage() {
                     return (
                       <TableRow key={usuario.id}>
                         <TableCell className="font-medium">
-                          <div>
-                            {usuario.login}
-                            <p className="text-xs text-muted-foreground sm:hidden">
-                              {usuario.setor ?? '—'}
-                            </p>
-                          </div>
+                          {usuario.login}
                         </TableCell>
                         <TableCell className="hidden sm:table-cell text-muted-foreground">
                           {usuario.setor ?? '—'}
@@ -333,10 +319,7 @@ export default function ConfiguracoesPage() {
                         <TableCell>
                           <Badge variant="secondary" className="whitespace-nowrap gap-1">
                             <Icon className="h-3 w-3" />
-                            <span className="hidden sm:inline">{config?.label ?? usuario.perfilAcesso}</span>
-                            <span className="sm:hidden">
-                              {usuario.perfilAcesso === PerfilAcesso.ADMIN ? 'Admin' : 'Scanner'}
-                            </span>
+                            <span>{config?.label ?? usuario.perfilAcesso}</span>
                           </Badge>
                         </TableCell>
                         <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
@@ -344,21 +327,10 @@ export default function ConfiguracoesPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleOpenEdit(usuario)}
-                              title="Editar"
-                            >
+                            <Button variant="ghost" size="icon" onClick={() => handleOpenEdit(usuario)}>
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-destructive hover:text-destructive"
-                              onClick={() => handleDelete(usuario)}
-                              title="Remover"
-                            >
+                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDelete(usuario)}>
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
@@ -442,8 +414,35 @@ export default function ConfiguracoesPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-end gap-3 max-w-md">
-            <div className="flex-1 space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-4 items-end gap-3">
+            <div className="space-y-2">
+              <Label>Leitor (Scanner)</Label>
+              <Select value={selectedScanner} onValueChange={setSelectedScanner}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos os scanners" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os scanners</SelectItem>
+                  {usuarios
+                    .filter(u => u.perfilAcesso === PerfilAcesso.LEITOR_CATRACA)
+                    .map(u => (
+                      <SelectItem key={u.id} value={u.id}>{u.login}</SelectItem>
+                    ))
+                  }
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="searchNome">Nome do Credenciado</Label>
+              <Input
+                id="searchNome"
+                placeholder="Ex: João Silva"
+                value={searchNome}
+                onChange={(e) => setSearchNome(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearchLogs()}
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="searchTicket">ID da Credencial (Ticket ID)</Label>
               <Input
                 id="searchTicket"
@@ -453,8 +452,9 @@ export default function ConfiguracoesPage() {
                 onKeyDown={(e) => e.key === 'Enter' && handleSearchLogs()}
               />
             </div>
-            <Button onClick={handleSearchLogs} disabled={isSearchingLogs}>
-              {isSearchingLogs ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+            <Button onClick={handleSearchLogs} disabled={isSearchingLogs} className="w-full md:w-auto">
+              {isSearchingLogs ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
+              {isSearchingLogs ? 'Buscando...' : 'Filtrar'}
             </Button>
           </div>
 
@@ -462,9 +462,9 @@ export default function ConfiguracoesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>Scanner (Login)</TableHead>
                   <TableHead>Credenciado</TableHead>
                   <TableHead className="hidden md:table-cell">CPF/CNPJ</TableHead>
-                  <TableHead>Scanner (Login)</TableHead>
                   <TableHead className="text-right">Horário</TableHead>
                 </TableRow>
               </TableHeader>
@@ -478,23 +478,23 @@ export default function ConfiguracoesPage() {
                 ) : logs.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                      Digite um ID acima para buscar o histórico de capturas.
+                      Nenhuma captura encontrada com estes filtros.
                     </TableCell>
                   </TableRow>
                 ) : (
                   logs.map((log) => (
                     <TableRow key={log.id}>
                       <TableCell>
-                        <div className="font-medium">{log.credenciadoNome}</div>
-                        <div className="text-xs text-muted-foreground">{log.tipoCategoria}</div>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell text-muted-foreground">
-                        {log.credenciadoCpf}
+                        <Badge variant="outline" className="font-mono text-xs">{log.scannerName}</Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{log.scannerName}</Badge>
+                        <div className="font-medium">{log.credenciadoNome}</div>
+                        <div className="text-[10px] text-muted-foreground uppercase">{log.tipoCategoria || 'Visitante'}</div>
                       </TableCell>
-                      <TableCell className="text-right text-xs">
+                      <TableCell className="hidden md:table-cell text-muted-foreground text-sm">
+                        {log.credenciadoCpf}
+                      </TableCell>
+                      <TableCell className="text-right text-xs whitespace-nowrap">
                         {new Date(log.createdAt).toLocaleString('pt-BR')}
                       </TableCell>
                     </TableRow>

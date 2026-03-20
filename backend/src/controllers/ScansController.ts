@@ -103,11 +103,13 @@ export class ScansController {
   async getLogs(
     @Query('scannerId') scannerId?: string,
     @Query('ticketId') ticketId?: string,
+    @Query('nome') nome?: string,
     @Query('limit') limit?: string,
   ) {
     return await this.scansService.getScanLogs({
       scannerId,
       ticketId,
+      nome,
       limit: limit ? parseInt(limit) : 50,
     });
   }
