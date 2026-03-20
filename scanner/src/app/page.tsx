@@ -101,10 +101,10 @@ export default function ScannerPage() {
         <div className="min-h-screen bg-white flex flex-col font-sans selection:bg-primary-green/20">
             {!isLoggedIn && <LoginOverlay onLoginSuccess={handleLoginSuccess} />}
 
-            <main className="flex-1 flex flex-col items-center p-6 pt-12 relative max-w-lg mx-auto w-full">
+            <main className="flex-1 flex flex-col items-center p-4 pt-4 relative max-w-lg mx-auto w-full">
 
-            <header className="flex flex-col items-center mb-10">
-                <div className="relative w-[180px] h-[90px]">
+            <header className="flex flex-col items-center mb-4">
+                <div className="relative w-[140px] h-[70px]">
                     <img
                         src="/scanner/img/logo.jpg"
                         alt="Alta Café Logo"
@@ -129,7 +129,7 @@ export default function ScannerPage() {
                 </section>
             )}
 
-            <footer className="w-full max-w-[400px] mt-6 flex flex-col gap-4">
+            <footer className="w-full max-w-[400px] mt-2 flex flex-col gap-3">
                 <div className={`p-4 rounded-2xl border transition-all duration-300 ${
                     scanState.status === 'SUCCESS' || scanState.status === 'ALREADY_SCANNED' ? 'bg-green-50 border-green-200' :
                     scanState.status === 'ERROR' ? 'bg-red-50 border-red-200' :

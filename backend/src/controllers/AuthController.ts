@@ -33,6 +33,7 @@ import { RolesGuard } from './guards/roles.guard';
 import { Roles } from './decorators/roles.decorator';
 
 import { ROUTES } from '../routes/routes.constants';
+import { AppLoggerService } from '../common/logger/logger.service';
 
 @ApiTags('autenticacao')
 @Controller(ROUTES.AUTH.BASE)
