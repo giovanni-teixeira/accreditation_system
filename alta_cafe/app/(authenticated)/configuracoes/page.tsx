@@ -50,6 +50,7 @@ export default function ConfiguracoesPage() {
   const [usuarios, setUsuarios] = useState<IUsuario[]>([])
   const [atividades, setAtividades] = useState<IScannerActivity[]>([])
   const [logs, setLogs] = useState<IScanLog[]>([])
+  const [availableDates, setAvailableDates] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingAtividades, setIsLoadingAtividades] = useState(true)
   const [isSearchingLogs, setIsSearchingLogs] = useState(false)
@@ -58,8 +59,7 @@ export default function ConfiguracoesPage() {
   // Filtros
   const [searchNome, setSearchNome] = useState('')
   const [selectedScanner, setSelectedScanner] = useState<string>('all')
-  const [startDate, setStartDate] = useState('')
-  const [endDate, setEndDate] = useState('')
+  const [selectedDate, setSelectedDate] = useState<string>('all')
   const [logsLimit, setLogsLimit] = useState(20)
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -77,7 +77,8 @@ export default function ConfiguracoesPage() {
     Promise.all([
       usuariosService.listar().then(setUsuarios),
       scansService.listarAtividades().then(setAtividades),
-      scansService.listarLogs({ limit: 20 }).then(setLogs)
+      scansService.listarLogs({ limit: 20 }).then(setLogs),
+      scansService.listarDatasDisponiveis().then(setAvailableDates)
     ])
       .catch(() => toast.error('Erro ao carregar dados organizacional ou de scans.'))
       .finally(() => {
@@ -96,7 +97,7 @@ export default function ConfiguracoesPage() {
     }, 400);
 
     return () => clearTimeout(handler);
-  }, [searchNome, selectedScanner, startDate, endDate]);
+  }, [searchNome, selectedScanner, selectedDate]);
 
   // ── Reset form ────────────────────────────────────────────────────────────
   const resetForm = () => {
@@ -169,8 +170,8 @@ export default function ConfiguracoesPage() {
       const results = await scansService.listarLogs({ 
         nome: searchNome,
         scannerId: selectedScanner === 'all' ? undefined : selectedScanner,
-        startDate: startDate || undefined,
-        endDate: endDate || undefined,
+        startDate: selectedDate === 'all' ? undefined : selectedDate,
+        endDate: selectedDate === 'all' ? undefined : selectedDate,
         limit 
       })
       setLogs(results)
@@ -190,6 +191,11 @@ export default function ConfiguracoesPage() {
     } finally {
       setIsLoadingMore(false)
     }
+  }
+
+  const formatDisplayDate = (dateStr: string) => {
+    const [year, month, day] = dateStr.split('-');
+    return `${day}/${month}/${year}`;
   }
 
   return (
@@ -392,13 +398,16 @@ export default function ConfiguracoesPage() {
             <History className="h-5 w-5" />
             Histórico e Busca Técnica
           </CardTitle>
-          <CardDescription>Auditoria completa de capturas com filtros avançados</CardDescription>
+          <CardDescription>Auditoria completa de capturas com seletores inteligentes</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Filtros */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="space-y-2">
-              <Label>Leitor</Label>
+              <Label className="flex items-center gap-2">
+                <ScanLine className="h-3.5 w-3.5 text-primary" />
+                Filtrar por Leitor
+              </Label>
               <Select value={selectedScanner} onValueChange={setSelectedScanner}>
                 <SelectTrigger><SelectValue placeholder="Todos os scanners" /></SelectTrigger>
                 <SelectContent>
@@ -410,39 +419,39 @@ export default function ConfiguracoesPage() {
                 </SelectContent>
               </Select>
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="searchNome">Nome do Credenciado</Label>
+              <Label className="flex items-center gap-2 text-foreground">
+                <Calendar className="h-3.5 w-3.5 text-primary" />
+                Data do Evento
+              </Label>
+              <Select value={selectedDate} onValueChange={setSelectedDate}>
+                <SelectTrigger>
+                   <SelectValue placeholder="Todas as datas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas as datas disponíveis</SelectItem>
+                  {availableDates.map(date => (
+                    <SelectItem key={date} value={date}>
+                      {formatDisplayDate(date)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="searchNome" className="flex items-center gap-2">
+                <Search className="h-3.5 w-3.5 text-primary" />
+                Buscar por Nome
+              </Label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="searchNome"
-                  placeholder="Filtrar..."
+                  placeholder="Ex: João Silva..."
                   value={searchNome}
                   onChange={(e) => setSearchNome(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Data Inicial</Label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Data Final</Label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
                   className="pl-9"
                 />
               </div>
@@ -451,7 +460,7 @@ export default function ConfiguracoesPage() {
 
           {/* Tabela */}
           <div className="space-y-4">
-            <div className="overflow-x-auto border rounded-lg">
+            <div className="overflow-x-auto border rounded-lg overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/50">
@@ -468,16 +477,26 @@ export default function ConfiguracoesPage() {
                     <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-12">Nenhum registro encontrado para estes filtros.</TableCell></TableRow>
                   ) : (
                     logs.map((log) => (
-                      <TableRow key={log.id} className="hover:bg-muted/30 transition-colors">
+                      <TableRow key={log.id} className="hover:bg-muted/30 transition-colors border-b">
                         <TableCell>
-                          <Badge variant="outline" className="font-mono text-[10px] bg-white">{log.scannerName}</Badge>
+                          <Badge variant="outline" className="font-mono text-[10px] bg-white border-primary/20">{log.scannerName}</Badge>
                         </TableCell>
                         <TableCell>
-                          <div className="font-medium text-sm">{log.credenciadoNome}</div>
-                          <div className="text-[10px] text-muted-foreground uppercase">{log.tipoCategoria || 'Visitante'}</div>
+                          <div className="font-bold text-sm tracking-tight">{log.credenciadoNome}</div>
+                          <div className="text-[10px] text-muted-foreground uppercase flex items-center gap-1">
+                            {log.tipoCategoria || 'Visitante'}
+                          </div>
                         </TableCell>
-                        <TableCell className="hidden md:table-cell text-muted-foreground text-xs">{log.credenciadoCpf}</TableCell>
-                        <TableCell className="text-right text-[10px] font-medium">{new Date(log.createdAt).toLocaleString('pt-BR')}</TableCell>
+                        <TableCell className="hidden md:table-cell text-slate-500 text-xs font-mono">{log.credenciadoCpf}</TableCell>
+                        <TableCell className="text-right text-[10px] font-medium text-slate-600">
+                          {new Date(log.createdAt).toLocaleString('pt-BR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </TableCell>
                       </TableRow>
                     ))
                   )}
@@ -487,9 +506,14 @@ export default function ConfiguracoesPage() {
 
             {/* Footer de Paginação */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2 px-1">
-              <p className="text-xs text-muted-foreground">
-                Mostrando <span className="font-bold text-foreground">{logs.length}</span> registros {logsLimit > logs.length ? '(fim da lista)' : ''}
-              </p>
+              <div className="flex items-center gap-2">
+                 <Badge variant="secondary" className="px-2 py-0 h-5 text-[10px] font-bold">
+                   {logs.length}
+                 </Badge>
+                 <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
+                   Registros Identificados {logsLimit > logs.length ? '(Tudo processado)' : ''}
+                 </span>
+              </div>
               
               {logs.length >= logsLimit && (
                 <Button 
@@ -497,10 +521,10 @@ export default function ConfiguracoesPage() {
                   size="sm" 
                   onClick={handleLoadMore} 
                   disabled={isLoadingMore}
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto font-bold text-xs uppercase h-8"
                 >
                   {isLoadingMore ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ChevronDown className="mr-2 h-4 w-4" />}
-                  Ver Mais Registros
+                  Ver Próximos Registros
                 </Button>
               )}
             </div>

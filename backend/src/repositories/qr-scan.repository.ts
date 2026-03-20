@@ -96,4 +96,16 @@ export class QrScanRepository extends BaseRepository<
       take: filters.limit || 50,
     });
   }
+
+  async getAvailableDates(): Promise<string[]> {
+    const dates = await this.prisma.$queryRaw<any[]>`
+      SELECT DISTINCT CAST("created_at" AS DATE) as date 
+      FROM "qrscans" 
+      ORDER BY date DESC
+    `;
+    return dates.map(d => {
+      const dt = new Date(d.date);
+      return dt.toISOString().split('T')[0];
+    });
+  }
 }

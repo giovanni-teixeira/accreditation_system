@@ -134,4 +134,8 @@ export class ScansService {
       }),
     );
   }
+
+  async getAvailableDates() {
+    return this.qrScanRepository.getAvailableDates();
+  }
 }

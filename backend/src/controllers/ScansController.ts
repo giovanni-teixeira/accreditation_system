@@ -109,4 +109,15 @@ export class ScansController {
       limit: limit ? parseInt(limit) : 20,
     });
   }
+
+  @Get('dates')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiOperation({
+    summary: 'Obter lista de datas únicas que possuem scans (Admin only)',
+  })
+  async getDates() {
+    return await this.scansService.getAvailableDates();
+  }
 }

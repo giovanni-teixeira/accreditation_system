@@ -527,6 +527,11 @@ export const scansService = {
     
     return request<IScanLog[]>(`/scans/logs?${params.toString()}`, { revalidate: 0 })
   },
+
+  /** GET /scans/dates — obter lista de datas únicas com scans (Admin only) */
+  listarDatasDisponiveis(): Promise<string[]> {
+    return request<string[]>('/scans/dates', { revalidate: 0 })
+  },
 }
 
 // =============================================================================
