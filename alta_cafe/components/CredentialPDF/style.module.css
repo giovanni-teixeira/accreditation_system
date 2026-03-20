@@ -49,21 +49,22 @@
     line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    line-height: 1.1;
+    line-height: 1.3; /* Aumentado de 1.1 para 1.3 para evitar cortes */
+    padding-bottom: 2mm; /* Garante que o pé das letras não corte */
 }
 
 .cidadeUF {
     font-size: 13pt;
     text-align: center;
     line-height: 1.2;
-    margin-top: 3mm;
+    margin-top: 2mm;
 }
 
 .infoAdicional {
     font-size: 16pt;
     text-align: center;
     line-height: 1.2;
-    margin-top: 2mm;
+    margin-top: 1mm;
     min-height: 1.2em;
 }
 
@@ -71,20 +72,20 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 3mm; /* Desce o QR Code ainda mais 3*/
-    margin-bottom: 3mm;
+    margin-top: 2mm;
+    margin-bottom: 2mm;
 }
 
 .qrCode {
-    width: 48mm; /* Aumentado conforme solicitado --48*/
+    width: 48mm;
     height: 48mm;
     border: 0.2mm solid #000;
-    padding: 1.5mm; /* Exatamente como solicitado pelo usuário (aproximado em mm) */
+    padding: 1.5mm;
     background: white;
     box-sizing: border-box;
     display: block;
     max-width: 100%;
-    object-fit: contain; /* Garante que a imagem centralize e não estique */
+    object-fit: contain;
 }
 
 .faixaTipo {
@@ -96,8 +97,11 @@
     width: calc(100% + 16mm);
     margin-left: -8mm;
     margin-bottom: -5mm;
-    padding: 12px 0;
+    padding: 10px 0; /* Reduzido levemente de 12px para 10px para compensar o line-height */
     text-transform: uppercase;
+    display: flex; /* Adicionado para centralização total */
+    justify-content: center;
+    align-items: center;
 }
 
 .tituloSecao {
